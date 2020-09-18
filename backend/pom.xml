@@ -57,14 +57,6 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<directory>frontend</directory>
-				<excludes>
-					<exclude>node_modules/**</exclude>
-				</excludes>
-			</resource>
-		</resources>
 	</build>
 
 </project>
