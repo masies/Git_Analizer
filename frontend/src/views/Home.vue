@@ -22,6 +22,10 @@
 
 <script>
 	export default {
-
+		mounted(){
+			fetch("/api/people")
+			.then(response => response.json())
+			.then(data => console.log(data));
+		}
 	};
 </script>
