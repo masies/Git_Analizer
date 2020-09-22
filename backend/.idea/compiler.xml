@@ -10,6 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="backend" target="1.8" />
       <module name="group4-software-analytics" target="1.8" />
     </bytecodeTargetLevel>
   </component>
