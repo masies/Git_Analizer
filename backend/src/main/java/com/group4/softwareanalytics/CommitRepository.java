@@ -10,6 +10,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(collectionResourceRel = "commit", path = "commit")
 public interface CommitRepository extends MongoRepository<Commit, String> {
 
-	List<Commit> findByHash(@Param("hash") String hash);
+	List<Commit> findByDeveloper(@Param("developer") String developer);
 
 }
