@@ -7,17 +7,18 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.Date;
 
 public class Repo {
-//    @CreatedDate
-//    private Date created_at;
-//    @LastModifiedDate
-//    private Date updated_at;
+
 
     @Field("id") private Long id;
 	private String name;
 	private String full_name;
 	private String html_url;
     private String description;
+//    private Date created_at;
+//    private Date updated_at;
+    @CreatedDate
     private Date created_at;
+    @LastModifiedDate
     private Date updated_at;
     private String homepage;
     private Long size;
