@@ -14,12 +14,10 @@ public class Repo {
 	private String full_name;
 	private String html_url;
     private String description;
-//    private Date created_at;
-//    private Date updated_at;
-    @CreatedDate
-    private Date created_at;
-    @LastModifiedDate
-    private Date updated_at;
+    @CreatedDate private Date my_created_at;
+    @LastModifiedDate private Date my_updated_at;
+    @CreatedDate private Date created_at;
+    @LastModifiedDate private Date updated_at;
     private String homepage;
     private Long size;
     private Long watchers_count;
@@ -29,7 +27,7 @@ public class Repo {
     private Long forks;
     private Long subscribers_count;
 
-    public Repo(Long id, String name, String full_name, String html_url, String description, Date created_at, Date updated_at, String homepage, Long size, Long watchers_count, String language, Long forks_count, Long open_issues_count, Long forks, Long subscribers_count) {
+    public Repo(Long id, String name, String full_name, String html_url, String description, Date created_at, Date updated_at, String homepage, Long size, Long watchers_count, String language, Long forks_count, Long open_issues_count, Long forks, Long subscribers_count, Date my_created_at, Date my_updated_at) {
         this.id = id;
         this.name = name;
         this.full_name = full_name;
@@ -45,6 +43,11 @@ public class Repo {
         this.open_issues_count = open_issues_count;
         this.forks = forks;
         this.subscribers_count = subscribers_count;
+        this.my_created_at = my_created_at;
+        this.my_updated_at = my_updated_at;
+
+
+
     }
 
     public Long getId() {
@@ -165,5 +168,21 @@ public class Repo {
 
     public void setSubscribers_count(Long subscribers_count) {
         this.subscribers_count = subscribers_count;
+    }
+
+    public Date getMy_created_at() {
+        return my_created_at;
+    }
+
+    public void setMy_created_at(Date my_created_at) {
+        this.my_created_at = my_created_at;
+    }
+
+    public Date getMy_updated_at() {
+        return my_updated_at;
+    }
+
+    public void setMy_updated_at(Date my_updated_at) {
+        this.my_updated_at = my_updated_at;
     }
 }
