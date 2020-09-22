@@ -2,6 +2,9 @@ package com.group4.softwareanalytics;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.catalina.users.MemoryUserDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class CommitController {
 
   private final AtomicLong counter = new AtomicLong();
+   @Autowired
+    private CommitRepository repository;
 
   @GetMapping("/commit")
   @ResponseBody
@@ -20,8 +25,8 @@ public class CommitController {
   @PostMapping("/commit")
   @ResponseBody
   public Object setCommit(@RequestBody Map<String,Object> objectJson) {
-    System.out.println(objectJson.get("developer").toString());
-    return objectJson.get("developer").toString();
+      this.repository.save(new Commit(counter.incrementAndGet(),"hello world", "adas"));
+      return "a";
 //    return objectJson;
 //    return new Commit(counter.incrementAndGet(),"hello world", developer);
   }
