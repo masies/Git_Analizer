@@ -3,10 +3,16 @@ package com.group4.softwareanalytics;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -27,38 +33,26 @@ public class RepoController {
 
     @GetMapping("/repo")
     @ResponseBody
-    public List<Repo> getRepos() {
+    public List<Repo> getRepos() throws IOException {
         return repository.findAll();
     }
 
     @PostMapping("/repo")
     @ResponseBody
-    public Repo fetchRepo(@RequestBody Map<String,Object> body) {
+    public Repo fetchRepo(@RequestBody Map<String, Object> body) {
         try {
-            String repoURL = body.get("url").toString();
-            URL url = new URL(repoURL);
-            URLConnection request = url.openConnection();
-            request.connect();
-            Gson gson = new Gson();
-            // Convert to a JSON object to print data
+            String owner = body.getOrDefault("owner", "google").toString();
+            String name = body.getOrDefault("name", "guava").toString();
 
-            JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-
-            // get current dateTime in ISO format
-            TimeZone tz = TimeZone.getTimeZone("UTC");
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
-            df.setTimeZone(tz);
-            String nowAsISO = df.format(new Date());
-            // add those to the repo object
-            root.getAsJsonObject().addProperty("my_created_at", nowAsISO);
-            root.getAsJsonObject().addProperty("my_updated_at", nowAsISO);
-
-            Repo repo = gson.fromJson(root,Repo.class);
+            RepositoryService service = new RepositoryService();
+            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
+            Repository r = service.getRepository(owner, name);
+            Repo repo = new Repo(r);
             repository.save(repo);
 
             return repo;
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
