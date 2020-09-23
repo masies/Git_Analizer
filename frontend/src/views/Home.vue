@@ -53,15 +53,17 @@
 					this.isInvalid = true;
 					return;
 				}
-
-				fetch("/api/repository",
+				var parts = url.pathname.split('/');
+				console.log(parts)
+				fetch("/api/repo",
 				{
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({
-						url: this.repositoryName
+						owner: parts[1],
+						name: parts[2]
 					}),
 				})
 				.then(response => {
