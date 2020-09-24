@@ -26,9 +26,16 @@ public class IssueController {
     }
 
     @RequestMapping("/{owner}/{repo}/issues")
-    public @ResponseBody Page<Issue> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @RequestParam(value = "page",defaultValue = "10") String page, @RequestParam(value = "size",defaultValue = "10") String size) {
+    public @ResponseBody Page<Issue> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "10") String size) {
         return repository.findByOwnerAndRepo(owner,repo, PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
     }
+
+    @RequestMapping("/{owner}/{repo}/issues/{id}")
+    public @ResponseBody Page<Issue> getAttr( @PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @PathVariable(value="id") String number, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "10") String size) {
+        return repository.findByOwnerAndRepoAndId(owner, repo, Integer.parseInt(number), PageRequest.of(Integer.parseInt(page), Integer.parseInt(size)));
+    }
+
+
 
 }
 
