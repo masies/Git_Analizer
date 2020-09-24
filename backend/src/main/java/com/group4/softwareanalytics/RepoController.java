@@ -20,16 +20,36 @@ import java.net.URLConnection;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "/api/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RepoController {
     @Autowired
     private RepoRepository repository;
+
+    @Autowired
+    private IssueRepository issueRepository;
+
+    public void fetchIssues(String owner, String name) throws IOException {
+        try {
+            IssueService service = new IssueService();
+            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
+            List<Issue> issues = service.getIssues(owner, name,
+                    Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
+
+            List<com.group4.softwareanalytics.Issue> issueList = new ArrayList<com.group4.softwareanalytics.Issue>();
+
+            for (Issue issue : issues) {
+                issueList.add(new com.group4.softwareanalytics.Issue(issue, owner, name));
+            }
+
+            issueRepository.saveAll(issueList);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e);
+        }
+    }
 
     @GetMapping("/repo")
     @ResponseBody
@@ -49,6 +69,8 @@ public class RepoController {
             Repository r = service.getRepository(owner, name);
             Repo repo = new Repo(r);
             repository.save(repo);
+
+            fetchIssues(owner, name);
 
             return repo;
 
