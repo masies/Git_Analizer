@@ -7,14 +7,24 @@
 		</div>
 		<div class="row">
 			<div class="col">
-				<div class="input-group">
-					<input type="text" placeholder="Analyze a repository" aria-label="Repository search" class="form-control"> 
-					<div class="input-group-append">
-						<button type="submit" class="btn btn-secondary">
-							<i class="material-icons text-white align-middle">search</i>
-						</button>
+				<form @submit.prevent="postRepository" novalidate>
+					<div class="input-group">
+						<input type="url" placeholder="Analyze a repository" v-model="repositoryName" aria-label="Repository search" class="form-control" :class="{'is-invalid': isInvalid}"> 
+						<div class="input-group-append">
+							<button type="submit" class="btn btn-secondary rounded-right">
+								<i class="material-icons text-white align-middle">search</i>
+							</button>
+						</div>
+						<div class="invalid-feedback">
+							Not a valid GitHub url
+						</div>
 					</div>
-				</div>
+				</form>
+			</div>
+		</div>
+		<div class="row mt-2">
+			<div class="col">
+				<repositories-container/>
 			</div>
 		</div>
 	</div>
@@ -22,10 +32,47 @@
 
 <script>
 	export default {
+		data: () => {
+			return {
+				repositoryName: "",
+				isInvalid: false,
+			}
+		},
 		mounted(){
-			fetch("/api/people")
-			.then(response => response.json())
-			.then(data => console.log(data));
+
+		},
+		methods: {
+			postRepository: function() {
+				try{
+					var url = new URL(this.repositoryName);
+					if(url.host != "github.com"){
+						this.isInvalid = true;
+						return;
+					}
+				}catch{
+					this.isInvalid = true;
+					return;
+				}
+				var parts = url.pathname.split('/');
+				console.log(parts)
+				fetch("/api/repo",
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						owner: parts[1],
+						name: parts[2]
+					}),
+				})
+				.then(response => {
+					this.repositoryName = "";
+					this.isInvalid = false;
+					return response.json()
+				})
+				.then(data => console.log(data));
+			}
 		}
 	};
 </script>
