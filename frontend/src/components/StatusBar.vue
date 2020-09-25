@@ -14,22 +14,22 @@
 			<div class="collapse" id="details">
 				<div class="card card-body p-2">
 					<p class="mb-0">
-						<samp>
-							> Fetching repository information <span v-if="tmp.hasRepository">- complete!</span>
+						<samp :class="{loading: !data.fetchedInfo}">
+							> Fetching repository information<span v-if="data.fetchedInfo"> - complete!</span>
 						</samp>
 					</p>
 					<p class="mb-0">
-						<samp v-if="tmp.hasRepository">
-							> Fetching issues <span v-if="tmp.hasIssues">- complete!</span>
+						<samp v-if="data.fetchedInfo" :class="{loading: !data.fetchedIssues}">
+							> Fetching issues<span v-if="data.fetchedIssues"> - complete!</span>
 						</samp>
 					</p>
 					<p class="mb-0">
-						<samp v-if="tmp.hasIssues">
-							> Fetching commits <span v-if="tmp.hasCommits">- complete!</span>
+						<samp v-if="data.fetchedIssues" :class="{loading: !data.fetchedCommits}">
+							> Fetching commits<span v-if="data.fetchedCommits"> - complete!</span>
 						</samp>
 					</p>
 					<p class="mb-0">
-						<samp v-if="tmp.hasCommits">
+						<samp v-if="isComplete">
 							> Fetching complete, repository information are ready at 
 							<router-link :to="{name: 'repository', params: {owner: owner, name: name}}">
 								{{ owner }}/{{ name }}
@@ -56,20 +56,22 @@
 		},
 		data: () => {
 			return {
-				data: null,
-				tmp: {
-					hasRepository: true,
-					hasIssues: false,
-					hasCommits: false
+				data: {
+					fetchedInfo: false,
+					fetchedIssues: false,
+					fetchedCommits: false
 				}
 			}
 		},
 		mounted(){
 			this.loadData();
-			setInterval(this.loadData, 5000)
+			this.interval = setInterval(this.loadData, 5000)
 		},
 		methods: {
 			loadData: function() {
+				if(this.isComplete){
+					clearInterval(this.interval);
+				}
 				fetch(`/api/repo/${this.owner}/${this.name}/status`)
 				.then(response => {
 					return response.json()
@@ -79,23 +81,23 @@
 		},
 		computed: {
 			percentage: function(){
-				var size = _.size(this.tmp)
-				var done = _.values(this.tmp).filter((x) => x).length;
+				var size = _.size(this.data)
+				var done = _.values(this.data).filter((x) => x).length;
 				return done/size*100
 			},
 			currentStatus: function(){
-				if(!this.tmp.hasRepository){
+				if(!this.data.fetchedInfo){
 					return "Fetching repository information"
-				}else if(!this.tmp.hasIssues){
+				}else if(!this.data.fetchedIssues){
 					return "Fetching issues"
-				}else if(!this.tmp.hasCommits){
+				}else if(!this.data.fetchedCommits){
 					return "Fetching commits"
 				}else{
 					return "Fetching complete"
 				}
 			},
 			isComplete: function(){
-				return _.values(this.tmp).filter((x) => !x).length == 0;
+				return _.values(this.data).filter((x) => !x).length == 0;
 			}
 		}
 	};
@@ -103,9 +105,6 @@
 <style scoped>
 .progress{
 	height: 20px;
-}
-.loading {
-	margin: 20px;
 }
 
 .loading:after {

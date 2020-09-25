@@ -22,7 +22,7 @@
 				</form>
 			</div>
 			<div class="col-12 mt-2">
-				<status-bar owner="google" name="guava" />
+				<status-bar :owner="owner" :name="name" v-if="showStatusBar" />
 			</div>
 		</div>
 		<hr>
@@ -40,6 +40,9 @@
 			return {
 				repositoryName: "",
 				isInvalid: false,
+				name: null,
+				owner: null,
+				showStatusBar: false
 			}
 		},
 		mounted(){
@@ -47,6 +50,9 @@
 		},
 		methods: {
 			postRepository: function() {
+				this.owner = null;
+				this.name = null;
+				this.showStatusBar = false;
 				try{
 					var url = new URL(this.repositoryName);
 					if(url.host != "github.com"){
@@ -58,6 +64,7 @@
 					return;
 				}
 				var parts = url.pathname.split('/');
+				
 				fetch("/api/repo",
 				{
 					method: 'POST',
@@ -72,6 +79,9 @@
 				.then(response => {
 					this.repositoryName = "";
 					this.isInvalid = false;
+					this.owner = parts[1];
+					this.name = parts[2];
+					this.showStatusBar = true;
 					return response.json()
 				})
 				.then(data => console.log(data));
