@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col">
+			<div class="col-12">
 				<form @submit.prevent="postRepository" novalidate>
 					<div class="input-group">
 						<input type="url" placeholder="Analyze a repository" v-model="repositoryName" aria-label="Repository search" class="form-control" :class="{'is-invalid': isInvalid}"> 
@@ -20,6 +20,9 @@
 						</div>
 					</div>
 				</form>
+			</div>
+			<div class="col-12 mt-2">
+				<status-bar owner="google" name="guava" />
 			</div>
 		</div>
 		<hr>
