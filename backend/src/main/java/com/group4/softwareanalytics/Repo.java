@@ -1,14 +1,15 @@
 package com.group4.softwareanalytics;
 
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Repository;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.eclipse.egit.github.core.service.IssueService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Date;
+import java.io.IOException;
+import java.util.*;
 
 public class Repo {
-
 
     public Repository getRepository() {
         return repository;
@@ -23,7 +24,7 @@ public class Repo {
 
 
     public Repo(Repository repository) {
-    this.repository = repository;
+        this.repository = repository;
     }
 
 
