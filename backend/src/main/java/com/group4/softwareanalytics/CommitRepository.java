@@ -6,5 +6,4 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(collectionResourceRel = "commit", path = "commit")
 public interface CommitRepository extends MongoRepository<Commit,String> {
 
-
 }

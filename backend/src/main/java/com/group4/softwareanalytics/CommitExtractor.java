@@ -64,7 +64,7 @@ public class CommitExtractor {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // commits with no modification
         }
 
         return entriesList;
