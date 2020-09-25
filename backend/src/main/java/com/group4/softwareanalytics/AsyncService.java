@@ -1,23 +1,22 @@
 package com.group4.softwareanalytics;
 
 import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-@RestController
-@RequestMapping(path = "/api/", produces = MediaType.APPLICATION_JSON_VALUE)
-public class RepoController {
+@Service
+public class AsyncService {
+
     @Autowired
     private RepoRepository repository;
 
@@ -27,8 +26,22 @@ public class RepoController {
     @Autowired
     private IssueCommentRepository issueCommentRepository;
 
-    @Autowired
-    private AsyncService asyncService;
+    @Async
+    public void fetchData(String owner, String name) throws InterruptedException {
+        try {
+            RepositoryService service = new RepositoryService();
+            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
+            Repository r = service.getRepository(owner, name);
+
+            Repo repo = new Repo(r);
+//            TODO: delete old file, if any.
+//            repository.deleteById(r.getId());
+            repository.save(repo);
+            fetchIssues(owner, name);
+        } catch (Exception ignored) {
+        }
+    }
+
 
     public void fetchIssues(String owner, String name) throws IOException {
         try {
@@ -40,6 +53,7 @@ public class RepoController {
                     // TODO: take all the issues and not just the open ones
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
             List<com.group4.softwareanalytics.Issue> issueList = new ArrayList<com.group4.softwareanalytics.Issue>();
+
 
             System.out.println("storing comments and issues..");
             for (Issue issue : issues) {
@@ -65,27 +79,4 @@ public class RepoController {
         }
     }
 
-    @GetMapping("/repo")
-    @ResponseBody
-    public Page<Repo> getRepos(@RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "3") int size) throws IOException {
-        Pageable paging = PageRequest.of(page, size);
-        return repository.findAll(paging);
-    }
-
-    @PostMapping("/repo")
-    @ResponseBody
-    public Repo fetchRepo(@RequestBody Map<String, Object> body) throws InterruptedException {
-        String owner = body.getOrDefault("owner", "google").toString();
-        String name = body.getOrDefault("name", "guava").toString();
-        asyncService.fetchData(owner, name);
-        return null;
-    }
 }
-
-
-
-
-
-
-
