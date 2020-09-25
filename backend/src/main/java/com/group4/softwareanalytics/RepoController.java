@@ -1,11 +1,7 @@
 package com.group4.softwareanalytics;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -31,20 +20,38 @@ public class RepoController {
     @Autowired
     private IssueRepository issueRepository;
 
+    @Autowired
+    private IssueCommentRepository issueCommentRepository;
+
     public void fetchIssues(String owner, String name) throws IOException {
         try {
             IssueService service = new IssueService();
             service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
-            List<Issue> issues = service.getIssues(owner, name,
-                    Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
 
+            // gather all the issues
+            List<Issue> issues = service.getIssues(owner, name,
+                    // TODO: take all the issues and not just the open ones
+                    Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
             List<com.group4.softwareanalytics.Issue> issueList = new ArrayList<com.group4.softwareanalytics.Issue>();
 
+            System.out.println("storing comments and issues..");
             for (Issue issue : issues) {
-                issueList.add(new com.group4.softwareanalytics.Issue(issue, owner, name));
-            }
+                com.group4.softwareanalytics.Issue i = new com.group4.softwareanalytics.Issue(issue, owner, name);
+                issueList.add(i);
 
+                // gather all the issue comments
+                List<Comment> comments = service.getComments(owner,name, issue.getNumber());
+                List<IssueComment> commentList = new ArrayList<IssueComment>();
+                for (Comment comment: comments) {
+                    IssueComment c = new IssueComment(comment, owner, name, issue.getNumber());
+                    commentList.add(c);
+                }
+                issueCommentRepository.saveAll(commentList);
+
+            }
+            System.out.println("done with storing comments");
             issueRepository.saveAll(issueList);
+            System.out.println("done with storing issues");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);
