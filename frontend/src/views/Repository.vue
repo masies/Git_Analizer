@@ -1,12 +1,7 @@
 <template>
-	<div class="row">
-		<div class="col">
-			<h1>Repo containers</h1>
-			<div class="row">
-				<div class="col-3" v-for="item in data">
-					<repository-item :data="item"/>
-				</div>
-			</div>
+	<div class="container mt-3">
+		<div class="row">
+			{{ data }}
 		</div>
 	</div>
 </template>
@@ -23,8 +18,10 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch("/api/repository")
-				.then(response => response.json())
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}`)
+				.then(response => {
+					return response.json()
+				})
 				.then(data => this.data = data);
 			}
 		}
