@@ -13,7 +13,6 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ import java.util.stream.Stream;
 public class AsyncService {
 
     @Autowired
-    private RepoRepository repository;
+    private RepoRepository repoRepository;
 
     @Autowired
     private IssueRepository issueRepository;
@@ -51,7 +50,7 @@ public class AsyncService {
 //            TODO: delete old file, if any.
 //            repository.deleteById(r.getId());
             repo.hasInfoDone();
-            repository.save(repo);
+            repoRepository.save(repo);
             fetchIssues(owner, name, repo);
             fetchCommits(repo);
         } catch (Exception ignored) {
@@ -98,7 +97,7 @@ public class AsyncService {
 
         System.out.println("done fetching commits");
         r.hasCommitsDone();
-        repository.save(r);
+        repoRepository.save(r);
     }
 
 
@@ -144,12 +143,12 @@ public class AsyncService {
             System.out.println("done with storing issues");
 
             repo.hasIssuesDone();
-            repository.save(repo);
+            repoRepository.save(repo);
 
 
         } catch (IOException e) {
+            System.out.println("Error during issue fetching");
             e.printStackTrace();
-            System.out.println(e);
         }
     }
 

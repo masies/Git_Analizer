@@ -19,15 +19,13 @@ import java.util.List;
 public class CommitExtractor {
     public static void DownloadRepo(String url, String destUrl)
     {
-        String repoUrl = url;
-        String cloneDirectoryPath = destUrl;
         try {
-            System.out.println("Cloning "+repoUrl+" into "+repoUrl);
+            System.out.println("Cloning "+ url +" into "+ url);
             Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(Paths.get(cloneDirectoryPath).toFile())
+                    .setURI(url)
+                    .setDirectory(Paths.get(destUrl).toFile())
                     .call();
-            System.out.println("Completed Cloning");
+            System.out.println("Repo cloned");
         } catch (GitAPIException e) {
             System.out.println("Exception occurred while cloning repo");
             e.printStackTrace();
@@ -44,7 +42,6 @@ public class CommitExtractor {
     }
 
     public static List<DiffEntry> getModifications(Git git, String commitID) throws IOException, GitAPIException {
-
         List<DiffEntry> entriesList = new ArrayList<>();
         try {
             ObjectReader reader = git.getRepository().newObjectReader();
@@ -58,9 +55,7 @@ public class CommitExtractor {
             DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
             diffFormatter.setRepository(git.getRepository());
             List<DiffEntry> entries = diffFormatter.scan(oldTreeIter, newTreeIter);
-            for (DiffEntry entry : entries) {
-                entriesList.add(entry);
-            }
+            entriesList.addAll(entries);
         }
         catch (Exception e)
         {
