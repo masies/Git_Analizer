@@ -6,7 +6,6 @@ public class Issue {
     @Field("issue")
     private org.eclipse.egit.github.core.Issue issue;
 
-
     private String owner;
     private String repo;
 
