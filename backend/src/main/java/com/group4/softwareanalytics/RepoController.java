@@ -75,10 +75,10 @@ public class RepoController {
             service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
             Repository r = service.getRepository(owner, name);
             Repo repo = new Repo(r);
+//            TODO: delete old file, if any.
+//            repository.deleteById(r.getId());
             repository.save(repo);
-
             fetchIssues(owner, name);
-
             return repo;
 
         } catch (Exception e) {
