@@ -22,6 +22,7 @@
 				</form>
 			</div>
 		</div>
+		<hr>
 		<div class="row mt-2">
 			<div class="col">
 				<repositories-container/>
@@ -54,7 +55,6 @@
 					return;
 				}
 				var parts = url.pathname.split('/');
-				console.log(parts)
 				fetch("/api/repo",
 				{
 					method: 'POST',
