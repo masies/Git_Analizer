@@ -10,4 +10,7 @@ public interface RepoRepository extends MongoRepository<Repo, String>  {
     // TODO: delete by owner and name
     @Query(value="{'id' : $0}", delete = true)
     public void deleteById (long id);
+
+    @Query("{'owner' : ?0 , 'repo' : ?1}")
+    Repo findByOwnerAndRepo(String owner, String repo);
 }

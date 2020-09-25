@@ -1,9 +1,11 @@
 package com.group4.softwareanalytics;
 
+import com.sun.codemodel.internal.JFieldRef;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.IOException;
@@ -14,40 +16,63 @@ public class Repo {
     @Field("repository")
     private Repository repository;
 
-    private Boolean fetchedInfo = false;
-    private Boolean fetchedIssues = false;
-    private Boolean fetchedCommits = false;
+    @Id private String id;
 
-    public Repo(Repository repository) {
+    private String owner;
+    private String repo;
+
+    private RepoStatus status;
+
+    public Repo(Repository repository, String owner, String repo) {
         this.repository = repository;
-        this.fetchedCommits = false;
-        this.fetchedInfo = false;
-        this.fetchedCommits = false;
+        this.status = new RepoStatus();
+        this.owner = owner;
+        this.repo = repo;
+
     }
 
-    public Boolean getFetchedInfo() {
-        return fetchedInfo;
+    public String getId() {
+        return id;
     }
 
-    public void setFetchedInfo(Boolean fetchedInfo) {
-        this.fetchedInfo = fetchedInfo;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public Boolean getFetchedIssues() {
-        return fetchedIssues;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setFetchedIssues(Boolean fetchedIssues) {
-        this.fetchedIssues = fetchedIssues;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
-    public Boolean getFetchedCommits() {
-        return fetchedCommits;
+    public String getRepo() {
+        return repo;
     }
 
-    public void setFetchedCommits(Boolean fetchedCommits) {
-        this.fetchedCommits = fetchedCommits;
+    public void setRepo(String repo) {
+        this.repo = repo;
     }
+
+    public RepoStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RepoStatus status) {
+        this.status = status;
+    }
+
+    public void hasInfoDone(){
+        this.status.setFetchedInfo(true);
+    }
+    public void hasIssuesDone(){
+        this.status.setFetchedIssues(true);
+    }
+    public void hasCommitsDone(){
+        this.status.setFetchedCommits(true);
+    }
+
 
     public Repository getRepository() {
         return repository;

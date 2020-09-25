@@ -6,6 +6,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -34,18 +35,18 @@ public class AsyncService {
             RepositoryService service = new RepositoryService();
             service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
             Repository r = service.getRepository(owner, name);
-
-            Repo repo = new Repo(r);
+            Repo repo = new Repo(r, owner, name);
 //            TODO: delete old file, if any.
 //            repository.deleteById(r.getId());
+            repo.hasInfoDone();
             repository.save(repo);
-            fetchIssues(owner, name);
+            fetchIssues(owner, name, repo);
         } catch (Exception ignored) {
         }
     }
 
 
-    public void fetchIssues(String owner, String name) throws IOException {
+    public void fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
             service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
@@ -68,7 +69,6 @@ public class AsyncService {
             System.out.println(issues.size());
             List<com.group4.softwareanalytics.Issue> issueList = new ArrayList<com.group4.softwareanalytics.Issue>();
 
-
             System.out.println("storing comments and issues..");
             for (Issue issue : issues) {
                 com.group4.softwareanalytics.Issue i = new com.group4.softwareanalytics.Issue(issue, owner, name);
@@ -82,11 +82,15 @@ public class AsyncService {
                     commentList.add(c);
                 }
                 issueCommentRepository.saveAll(commentList);
-
             }
             System.out.println("done with storing comments");
             issueRepository.saveAll(issueList);
             System.out.println("done with storing issues");
+
+            repo.hasIssuesDone();
+            repository.save(repo);
+
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);
