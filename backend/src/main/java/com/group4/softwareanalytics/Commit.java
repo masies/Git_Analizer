@@ -13,13 +13,14 @@ public class Commit {
 
 //    private String commitID;
     private List<String> modifications = new ArrayList<>();
+    private String owner;
+    private String repo;
 
 
-    public Commit(
-//            RevCommit commit,
-                  List<String> modifications) {
-//        this.commit = commit;
+    public Commit(List<String> modifications, String owner, String repo) {
         this.modifications = modifications;
+        this.owner = owner;
+        this.repo = repo;
     }
 
     public List<String> getModifications() {
@@ -30,7 +31,23 @@ public class Commit {
         this.modifications = modifications;
     }
 
-//    public RevCommit getCommit() {
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getRepo() {
+        return repo;
+    }
+
+    public void setRepo(String repo) {
+        this.repo = repo;
+    }
+
+    //    public RevCommit getCommit() {
 //        return commit;
 //    }
 //

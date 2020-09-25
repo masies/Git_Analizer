@@ -44,25 +44,28 @@ public class AsyncService {
     public void fetchData(String owner, String name) throws InterruptedException {
         try {
             RepositoryService service = new RepositoryService();
-            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
+//            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
             Repository r = service.getRepository(owner, name);
             Repo repo = new Repo(r, owner, name);
-//            TODO: delete old file, if any.
-//            repository.deleteById(r.getId());
+
+            repoRepository.findAndRemove(owner,name);
+            issueRepository.findAndRemove(owner,name);
+            issueCommentRepository.findAndRemove(owner,name);
+            commitRepository.findAndRemove(owner,name);
+
             repo.hasInfoDone();
             repoRepository.save(repo);
             fetchIssues(owner, name, repo);
-            fetchCommits(repo);
+            fetchCommits(owner, name, repo);
         } catch (Exception ignored) {
         }
     }
 
-    public void fetchCommits(Repo r) throws IOException, GitAPIException {
+    public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         System.out.println("Fetching commits...");
         String repo_url = "https://github.com/mcostalba/Stockfish";
         String dest_url = "./Repo";
         List<Commit> commitList = new ArrayList<Commit>();
-        List<RevCommit> revCommitList = new ArrayList<RevCommit>();
         List<String> branches = new ArrayList<>();
 
         if (!Files.exists(Paths.get(dest_url))) {
@@ -80,7 +83,7 @@ public class AsyncService {
             branches.add(branch.getName());
         }
 
-        revCommitList = CommitExtractor.getCommits(branches.get(0),git,repo);
+        List<RevCommit> revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
 
         for(RevCommit revCommit: revCommitList)
         {
@@ -90,7 +93,7 @@ public class AsyncService {
             for (DiffEntry diffEntry : diffEntries) {
                 modifications.add(diffEntry.getChangeType().toString());
             }
-            Commit c = new Commit( modifications);
+            Commit c = new Commit(modifications, owner, repoName);
             commitList.add(c);
         }
         commitRepository.saveAll(commitList);
