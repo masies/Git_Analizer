@@ -16,13 +16,13 @@ import java.util.List;
 public class CommitController {
 
     @Autowired
-    private CommitRepository repository;
+    private CommitRepository commitRepository;
 
 
     @GetMapping("/commits")
     @ResponseBody
     public List<Commit> getCommits() throws IOException {
-        return repository.findAll();
+        return commitRepository.findAll();
     }
 
 }

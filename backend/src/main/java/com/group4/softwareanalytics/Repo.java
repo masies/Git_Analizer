@@ -20,7 +20,6 @@ public class Repo {
 
     private String owner;
     private String repo;
-
     private RepoStatus status;
 
     public Repo(Repository repository, String owner, String repo) {
@@ -28,7 +27,6 @@ public class Repo {
         this.status = new RepoStatus();
         this.owner = owner;
         this.repo = repo;
-
     }
 
     public String getId() {
@@ -72,7 +70,6 @@ public class Repo {
     public void hasCommitsDone(){
         this.status.setFetchedCommits(true);
     }
-
 
     public Repository getRepository() {
         return repository;

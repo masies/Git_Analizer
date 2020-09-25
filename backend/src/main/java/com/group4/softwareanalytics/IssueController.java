@@ -17,22 +17,22 @@ import java.util.List;
 public class IssueController {
 
     @Autowired
-    private IssueRepository repository;
+    private IssueRepository issueRepository;
 
     @GetMapping("/issues")
     @ResponseBody
     public List<Issue> getRepos() throws IOException {
-        return repository.findAll();
+        return issueRepository.findAll();
     }
 
     @RequestMapping("/{owner}/{repo}/issues")
     public @ResponseBody Page<Issue> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
-        return repository.findByOwnerAndRepo(owner,repo, PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
+        return issueRepository.findByOwnerAndRepo(owner,repo, PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
     }
 
     @RequestMapping("/{owner}/{repo}/issues/{number}")
     public @ResponseBody Page<Issue> getAttr( @PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @PathVariable(value="number") String number, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
-        return repository.findByOwnerAndRepoAndId(owner, repo, Integer.parseInt(number), PageRequest.of(Integer.parseInt(page), Integer.parseInt(size)));
+        return issueRepository.findByOwnerAndRepoAndId(owner, repo, Integer.parseInt(number), PageRequest.of(Integer.parseInt(page), Integer.parseInt(size)));
     }
 
 
