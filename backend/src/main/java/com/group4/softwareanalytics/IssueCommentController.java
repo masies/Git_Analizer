@@ -15,18 +15,16 @@ public class IssueCommentController {
     @Autowired
     private IssueCommentRepository repository;
 
-    @GetMapping("/issueComments")
+    @GetMapping("/issue/comments")
     @ResponseBody
     public List<IssueComment> getRepos() throws IOException {
         return repository.findAll();
     }
 
-    @RequestMapping("/{owner}/{repo}/{issuesNumber}/comments")
+    @RequestMapping("/{owner}/{repo}/issues/{issuesNumber}/comments")
     public @ResponseBody Page<IssueComment> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @PathVariable(value="issuesNumber") String number, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "10") String size) {
         return repository.findByOwnerAndRepoAndIssueNumber(owner,repo,Integer.parseInt(number), PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
     }
-
-
 }
 
 
