@@ -5,6 +5,9 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,8 +63,10 @@ public class RepoController {
 
     @GetMapping("/repo")
     @ResponseBody
-    public List<Repo> getRepos() throws IOException {
-        return repository.findAll();
+    public Page<Repo> getRepos(@RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "3") int size)  throws IOException {
+        Pageable paging = PageRequest.of(page, size);
+        return repository.findAll(paging);
     }
 
     @PostMapping("/repo")
