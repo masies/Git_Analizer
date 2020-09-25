@@ -29,7 +29,7 @@ public class Issue {
         return issue;
     }
 
-    public void setRepository(org.eclipse.egit.github.core.Issue issue) {
+    public void setIssue(org.eclipse.egit.github.core.Issue issue) {
         this.issue = issue;
     }
 

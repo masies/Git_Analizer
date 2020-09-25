@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AsyncService {
@@ -48,10 +50,22 @@ public class AsyncService {
             IssueService service = new IssueService();
             service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
 
-            // gather all the issues
-            List<Issue> issues = service.getIssues(owner, name,
-                    // TODO: take all the issues and not just the open ones
+            // gather all the open issues
+            List<Issue> issuesOpen = service.getIssues(owner, name,
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
+            System.out.println("OPEN ISSUES: "+ issuesOpen.size());
+
+            // gather all the closed issues
+            List<Issue> issuesClosed = service.getIssues(owner, name,
+                    Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_CLOSED));
+            System.out.println("CLOSED ISSUES: "+ issuesClosed.size());
+
+            // merge the two list of issues (maybe in future we need to have a field for open/closed)
+            List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
+                             .collect(Collectors.toList());
+            System.out.println("ALL ISSUES: "+ issues.size());
+
+            System.out.println(issues.size());
             List<com.group4.softwareanalytics.Issue> issueList = new ArrayList<com.group4.softwareanalytics.Issue>();
 
 
