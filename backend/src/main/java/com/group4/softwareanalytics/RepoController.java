@@ -42,49 +42,6 @@ public class RepoController {
     @Autowired
     private AsyncService asyncService;
 
-    public void fetchCommits() throws IOException, GitAPIException {
-        String repo_url = "https://github.com/mcostalba/Stockfish";
-        String dest_url = "./Repo";
-        List<Commit> commitList = new ArrayList<Commit>();
-        List<RevCommit> revCommitList = new ArrayList<RevCommit>();
-        List<String> branches = new ArrayList<>();
-
-        if (!Files.exists(Paths.get(dest_url))) {
-            CommitExtractor.DownloadRepo(repo_url, dest_url);
-        }
-
-        org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
-
-        Git git = new Git(repo);
-
-        List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
-
-        for(Ref branch: refs)
-        {
-            branches.add(branch.getName());
-        }
-
-        revCommitList = CommitExtractor.getCommits(branches.get(0),git,repo);
-
-        for(RevCommit revCommit: revCommitList)
-        {
-            List<DiffEntry> diffEntries = CommitExtractor.getModifications(git, revCommit.getName());
-            List<String> modifications = new ArrayList<>();
-
-            for (DiffEntry diffEntry : diffEntries) {
-                modifications.add(diffEntry.getChangeType().toString());
-            }
-            Commit c = new Commit( modifications);
-            commitList.add(c);
-        }
-        commitRepository.saveAll(commitList);
-    }
-
-    @PostMapping("/commitsFetch")
-    @ResponseBody
-    public void postCommits() throws IOException, GitAPIException {
-        fetchCommits();
-    }
 
     @GetMapping("/repo")
     @ResponseBody
