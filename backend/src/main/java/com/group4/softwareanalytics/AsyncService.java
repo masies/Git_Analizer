@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -99,13 +98,14 @@ public class AsyncService {
             String fullMessage = revCommit.getFullMessage();
             String shortMessage = revCommit.getShortMessage();
             String commitName = revCommit.getName();
+            String diffCombined = CommitExtractor.getDiffComb(git,commitName);
             int commitType = revCommit.getType();
 
             //TODO: check is the right timezone. https://archive.eclipse.org/jgit/docs/jgit-2.0.0.201206130900-r/apidocs/org/eclipse/jgit/revwalk/RevCommit.html#getCommitTime()
             long millis = revCommit.getCommitTime();
             Date d = new Date(millis*1000);
 
-            Commit c = new Commit(modifications, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, d);
+            Commit c = new Commit(modifications, owner, repoName, diffCombined, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, d);
             commitList.add(c);
         }
         commitRepository.saveAll(commitList);
