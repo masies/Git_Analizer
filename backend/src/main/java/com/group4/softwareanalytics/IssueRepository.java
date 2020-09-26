@@ -13,7 +13,7 @@ public interface IssueRepository extends MongoRepository<Issue,String> {
     Page<Issue> findByOwnerAndRepo(String owner, String repo, Pageable pageable);
 
     @Query("{'owner' : ?0 , 'repo' : ?1, 'issue.number' : ?2}")
-    Page<Issue> findByOwnerAndRepoAndId(String owner, String repo, int number, Pageable pageable);
+    Issue findByOwnerAndRepoAndId(String owner, String repo, int number);
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
     public void findAndRemove (String owner, String repo);

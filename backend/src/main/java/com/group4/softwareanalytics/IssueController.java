@@ -28,8 +28,8 @@ public class IssueController {
     }
 
     @RequestMapping("/{owner}/{repo}/issues/{number}")
-    public @ResponseBody Page<Issue> getAttr( @PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @PathVariable(value="number") String number, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
-        return issueRepository.findByOwnerAndRepoAndId(owner, repo, Integer.parseInt(number), PageRequest.of(Integer.parseInt(page), Integer.parseInt(size)));
+    public @ResponseBody Issue getAttr( @PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @PathVariable(value="number") String number) {
+        return issueRepository.findByOwnerAndRepoAndId(owner, repo, Integer.parseInt(number));
     }
 
 
