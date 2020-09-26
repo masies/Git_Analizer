@@ -13,3 +13,14 @@ public class SoftwareAnalytics {
 	}
 }
 
+// routes
+//http://localhost:8080/api/repo/ClearCanvas/ClearCanvas/status - status of a repo
+//:TODO add rout to get specific repo e.g. http://localhost:8080/api/repo/ClearCanvas/ClearCanvas
+//http://localhost:8080/api/ClearCanvas/ClearCanvas/commits - commits of a repo (paged)
+//http://localhost:8080/api/ClearCanvas/ClearCanvas/issues - issues of a repo (paged)
+//http://localhost:8080/api/ClearCanvas/ClearCanvas/issues/252 - specific issue of a repo
+//http://localhost:8080/api/ClearCanvas/ClearCanvas/issues/233/comments - comments of a specific issue of a repo (paged)
+//
+//http://localhost:8080/api/commits - all commits
+//http://localhost:8080/api/issues - all issues
+//http://localhost:8080/api/repo - all repos

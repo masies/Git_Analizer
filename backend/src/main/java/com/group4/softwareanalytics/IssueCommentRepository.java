@@ -11,4 +11,7 @@ public interface IssueCommentRepository extends MongoRepository<IssueComment,Str
     @Query("{'owner' : ?0 , 'repo' : ?1, 'issueNumber' : ?2}")
     Page<IssueComment> findByOwnerAndRepoAndIssueNumber(String owner, String repo, int number, Pageable pageable);
 
+    @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
+    public void findAndRemove (String owner, String repo);
+
 }
