@@ -2,7 +2,9 @@ package com.group4.softwareanalytics;
 
 import org.springframework.data.annotation.Id;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Commit {
@@ -20,10 +22,9 @@ public class Commit {
     private String shortMessage;
     private String commitName;
     private int commitType;
-    private String commitDate;
-    private String date;
+    private Date commitDate;
 
-    public Commit(List<String> modifications, String owner, String repo, String developerName, String developerMail, String encodingName, String fullMessage, String shortMessage, String commitName, int commitType, String commitDate) {
+    public Commit(List<String> modifications, String owner, String repo, String developerName, String developerMail, String encodingName, String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate) {
         this.modifications = modifications;
         this.owner = owner;
         this.repo = repo;
@@ -35,7 +36,6 @@ public class Commit {
         this.commitName = commitName;
         this.commitType = commitType;
         this.commitDate = commitDate;
-        this.date = date;
     }
 
     public String getId() {
@@ -102,20 +102,12 @@ public class Commit {
         this.commitType = commitType;
     }
 
-    public String getCommitDate() {
+    public Date getCommitDate() {
         return commitDate;
     }
 
-    public void setCommitDate(String commitDate) {
+    public void setCommitDate(Date commitDate) {
         this.commitDate = commitDate;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public List<String> getModifications() {

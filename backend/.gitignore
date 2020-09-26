@@ -1,5 +1,6 @@
 target
 .idea/$PRODUCT_WORKSPACE_FILE$
+./repo
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij

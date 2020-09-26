@@ -54,7 +54,7 @@ public class AsyncService {
 
             repo.hasInfoDone();
             repoRepository.save(repo);
-            fetchIssues(owner, name, repo);
+//            fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
         } catch (Exception ignored) {
         }
@@ -63,7 +63,7 @@ public class AsyncService {
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         System.out.println("Fetching commits...");
         String repo_url = "https://github.com/"+ owner +"/"+ repoName;
-        String dest_url = "./Repo";
+        String dest_url = "./repo/" + owner +"/"+ repoName;
         List<Commit> commitList = new ArrayList<Commit>();
         List<String> branches = new ArrayList<>();
 
@@ -102,14 +102,10 @@ public class AsyncService {
             int commitType = revCommit.getType();
 
             //TODO: check is the right timezone. https://archive.eclipse.org/jgit/docs/jgit-2.0.0.201206130900-r/apidocs/org/eclipse/jgit/revwalk/RevCommit.html#getCommitTime()
-            int millis = revCommit.getCommitTime()*1000;
-            Date date = new Date(millis);
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE,MMMM d,yyyy h:mm,a", Locale.ENGLISH);
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            String commitDate = sdf.format(date);
+            long millis = revCommit.getCommitTime();
+            Date d = new Date(millis*1000);
 
-
-            Commit c = new Commit(modifications, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, commitDate);
+            Commit c = new Commit(modifications, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, d);
             commitList.add(c);
         }
         commitRepository.saveAll(commitList);
