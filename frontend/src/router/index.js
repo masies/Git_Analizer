@@ -6,6 +6,7 @@ import Commit from '../views/Commit.vue';
 import Issue from '../views/Issue.vue';
 import CommitsList from '../views/CommitsList.vue';
 import IssuesList from '../views/IssuesList.vue';
+import RepositoryList from '../views/RepositoryList.vue';
 
 
 Vue.use(VueRouter);
@@ -20,6 +21,11 @@ const routes = [
   path: '/repository/:owner/:name',
   name: 'repository',
   component: Repository,
+},
+{
+  path: '/repository',
+  name: 'repositoryList',
+  component: RepositoryList,
 },
 {
   path: '/repository/:owner/:name/issues',
