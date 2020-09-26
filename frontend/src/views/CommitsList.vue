@@ -1,8 +1,35 @@
 <template>
-	<div class="container mt-3">
-		<div class="row">
-			<div class="col-3" v-for="item in data">
-				<issues-list-item :data="item"/>
+	<div class="container mt-3" v-if="data">
+		<div class="row position-relative a" v-for="(items, day) in groupedByDay">
+			<div class="TimelineItem-badge">
+				<svg height="16" class="octicon octicon-git-commit" viewBox="0 0 16 16" version="1.1" width="16" aria-hidden="true"><path fill-rule="evenodd" d="M10.5 7.75a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm1.43.75a4.002 4.002 0 01-7.86 0H.75a.75.75 0 110-1.5h3.32a4.001 4.001 0 017.86 0h3.32a.75.75 0 110 1.5h-3.32z"></path></svg>
+			</div>
+			<div class="col">
+				<p class="mb-0">Commits on {{ getFormattedDate(day) }}</p>
+				<div class="row rounded list-group m-0">
+					<div class="col-12 list-group-item" v-for="item in items">
+						<commits-list-item :data="item"/>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row mt-3">
+			<div class="col mx-auto">		
+				<paginate
+				v-model="currentPage"
+				:page-count="data.totalPages"
+				:click-handler="changePage"
+				:prev-text="'Prev'"
+				:next-text="'Next'"
+				:container-class="'pagination pagination-dark justify-content-center'"
+				:page-class="'page-item'"
+				:page-link-class="'page-link'" 
+				:prev-class="'page-item'"
+				:prev-link-class="'page-link'"
+				:next-class="'page-item'"
+				:next-link-class="'page-link'" 
+				/>
 			</div>
 		</div>
 	</div>
@@ -10,9 +37,10 @@
 
 <script>
 	export default {
-		data: () => {
+		data: function () {
 			return {
 				data: null,
+				currentPage: this.$route.query.page ? parseInt(this.$route.query.page) : 1,
 			}
 		},
 		mounted(){
@@ -20,12 +48,68 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits`)
+				fetch(`/api/${this.$route.params.owner}/${this.$route.params.name}/commits?page=${this.currentPage-1}`)
 				.then(response => {
 					return response.json()
 				})
 				.then(data => this.data = data);
+			},
+			changePage: function(){
+				this.$router.push({ query: {...this.$route.query, page: this.currentPage }}) 
+				window.scroll({
+					top: 0,
+					left: 0,
+					behavior: 'smooth'
+				})
+			},
+			getFormattedDate(date){
+				return this.$moment(date).format('MMM D, YYYY')
+			}
+		},
+		computed: {
+			groupedByDay: function(){
+				return _.groupBy(this.data.content, (x) => {
+					return this.$moment(x.commitDate).startOf('day').format();
+				});
+			}
+		},
+		watch: {
+			"$route.query": function (id) {
+				this.loadData();
 			}
 		}
 	};
 </script>
+<style scoped>
+.list-group-item:hover{
+	background-color: #f6f8fa;
+}
+.a::before{
+	position: absolute;
+	top: 0;
+	display: none;
+	bottom: 0;
+	left: 0;
+	display: block;
+	width: 2px;
+	content: "";
+	background-color: #e1e4e8;
+	margin-left: 15px;
+}
+
+.TimelineItem-badge {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	width: 32px;
+	height: 32px;
+	margin-right: -15px;
+	margin-top: -5px;
+	color: #444d56;
+	align-items: center;
+	border-radius: 50%;
+	justify-content: center;
+	flex-shrink: 0;
+	background-color: #fff;
+}
+</style>
