@@ -23,7 +23,7 @@ public class RepoController {
     @GetMapping("/repo")
     @ResponseBody
     public Page<Repo> getRepos(@RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "3") int size) throws IOException {
+                               @RequestParam(defaultValue = "20") int size) throws IOException {
         Pageable paging = PageRequest.of(page, size);
         return repoRepository.findAll(paging);
     }
