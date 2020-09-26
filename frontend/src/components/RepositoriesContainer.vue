@@ -4,7 +4,7 @@
 			<h2>Repositories</h2>
 			<div class="row" v-if="data">
 				<div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch" v-for="item in data.content">
-					<repository-item :data="item"/>
+					<repository-list-item :data="item"/>
 				</div>
 			</div>
 		</div>

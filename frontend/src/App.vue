@@ -9,8 +9,11 @@
 
 				<div class="collapse navbar-collapse" id="mainNavbar">
 					<ul class="navbar-nav mr-auto">
-						<li class="nav-item active">
-							<router-link to="/">Index</router-link> 
+						<li class="nav-item">
+							<router-link class="nav-link" to="/" exact>Index</router-link> 
+						</li>
+						<li class="nav-item">
+							<router-link class="nav-link" :to="{name: 'repositoryList'}">Repositories</router-link> 
 						</li>
 					</ul>
 				</div>
@@ -21,6 +24,9 @@
 </template>
 
 <style lang="scss">
+.router-link-active{
+	color: #fff !important;
+}
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;

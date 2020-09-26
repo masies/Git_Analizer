@@ -4,9 +4,11 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
+import Paginate from 'vuejs-paginate'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'material-design-icons/iconfont/material-icons.css';
 
+Vue.component('paginate', Paginate)
 
 const files = require.context('./', true, /\.vue$/i)
 files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
