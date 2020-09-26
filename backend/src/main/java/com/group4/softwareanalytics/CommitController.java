@@ -24,7 +24,7 @@ public class CommitController {
         return commitRepository.findAll();
     }
 
-    @RequestMapping("/{owner}/{repo}/commits")
+    @RequestMapping("/repo/{owner}/{repo}/commits")
     public @ResponseBody
     Page<Commit> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
         return commitRepository.findByOwnerAndRepo(owner,repo, PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));

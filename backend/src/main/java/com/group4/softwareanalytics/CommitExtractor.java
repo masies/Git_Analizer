@@ -12,6 +12,7 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +22,7 @@ public class CommitExtractor {
     public static void DownloadRepo(String url, String destUrl)
     {
         try {
-            System.out.println("Cloning "+ url +" into "+ url);
+            System.out.println("Cloning "+ url +" into "+ destUrl);
             Git.cloneRepository()
                     .setURI(url)
                     .setDirectory(Paths.get(destUrl).toFile())
@@ -53,9 +54,11 @@ public class CommitExtractor {
             ObjectId newTree = git.getRepository().resolve(commitID + "^{tree}");
             newTreeIter.reset(reader, newTree);
 
-            DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
-            diffFormatter.setRepository(git.getRepository());
-            List<DiffEntry> entries = diffFormatter.scan(oldTreeIter, newTreeIter);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            List<DiffEntry> entries = git.diff().setOutputStream(stream)
+                    .setOldTree(oldTreeIter)
+                    .setNewTree(newTreeIter)
+                    .call();
             entriesList.addAll(entries);
         }
         catch (Exception e)
@@ -66,4 +69,29 @@ public class CommitExtractor {
         return entriesList;
     }
 
+    public static String getDiffComb(Git git, String commitID) throws IOException, GitAPIException {
+        List<DiffEntry> entriesList = new ArrayList<>();
+        String diffCombine = " ";
+        try {
+            ObjectReader reader = git.getRepository().newObjectReader();
+            CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+            ObjectId oldTree = git.getRepository().resolve(commitID + "~1^{tree}");
+            oldTreeIter.reset(reader, oldTree);
+            CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+            ObjectId newTree = git.getRepository().resolve(commitID + "^{tree}");
+            newTreeIter.reset(reader, newTree);
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            List<DiffEntry> entries = git.diff().setOutputStream(stream)
+                    .setOldTree(oldTreeIter)
+                    .setNewTree(newTreeIter)
+                    .call();
+            String finalString = new String(stream.toByteArray());
+            diffCombine = finalString;
+        } catch (Exception e) {
+            // commits with no modification
+        }
+
+        return diffCombine;
+    }
 }

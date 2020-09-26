@@ -2,8 +2,6 @@ package com.group4.softwareanalytics;
 
 import org.springframework.data.annotation.Id;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +13,7 @@ public class Commit {
     private String owner;
     private String repo;
 
+    private String diffCombined;
     private String developerName;
     private String developerMail;
     private String encodingName;
@@ -22,12 +21,16 @@ public class Commit {
     private String shortMessage;
     private String commitName;
     private int commitType;
+
+
+
     private Date commitDate;
 
-    public Commit(List<String> modifications, String owner, String repo, String developerName, String developerMail, String encodingName, String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate) {
+    public Commit(List<String> modifications, String owner, String repo, String diffCombined, String developerName, String developerMail, String encodingName, String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate) {
         this.modifications = modifications;
         this.owner = owner;
         this.repo = repo;
+        this.diffCombined = diffCombined;
         this.developerName = developerName;
         this.developerMail = developerMail;
         this.encodingName = encodingName;
@@ -133,5 +136,9 @@ public class Commit {
     public void setRepo(String repo) {
         this.repo = repo;
     }
+
+    public String getDiffCombined() { return diffCombined; }
+
+    public void setDiffCombined(String diffCombined) { this.diffCombined = diffCombined; }
 
 }
