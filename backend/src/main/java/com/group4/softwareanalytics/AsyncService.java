@@ -44,7 +44,7 @@ public class AsyncService {
     public void fetchData(String owner, String name) throws InterruptedException {
         try {
             RepositoryService service = new RepositoryService();
-//            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
+            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
             Repository r = service.getRepository(owner, name);
             Repo repo = new Repo(r, owner, name);
 
