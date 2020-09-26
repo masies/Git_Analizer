@@ -8,6 +8,7 @@ import Paginate from 'vuejs-paginate'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'material-design-icons/iconfont/material-icons.css';
 
+Vue.use(require('vue-moment'));
 Vue.component('paginate', Paginate)
 
 const files = require.context('./', true, /\.vue$/i)
