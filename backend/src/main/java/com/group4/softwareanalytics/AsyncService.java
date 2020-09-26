@@ -54,7 +54,7 @@ public class AsyncService {
 
             repo.hasInfoDone();
             repoRepository.save(repo);
-//            fetchIssues(owner, name, repo);
+            fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
         } catch (Exception ignored) {
         }
