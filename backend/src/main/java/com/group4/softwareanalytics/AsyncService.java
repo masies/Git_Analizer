@@ -100,8 +100,6 @@ public class AsyncService {
             String commitName = revCommit.getName();
             String diffCombined = CommitExtractor.getDiffComb(git,commitName);
             int commitType = revCommit.getType();
-
-            //TODO: check is the right timezone. https://archive.eclipse.org/jgit/docs/jgit-2.0.0.201206130900-r/apidocs/org/eclipse/jgit/revwalk/RevCommit.html#getCommitTime()
             long millis = revCommit.getCommitTime();
             Date d = new Date(millis*1000);
 

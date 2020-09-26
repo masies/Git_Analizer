@@ -59,12 +59,6 @@ public class CommitExtractor {
                     .setOldTree(oldTreeIter)
                     .setNewTree(newTreeIter)
                     .call();
-//            String finalString = new String(stream.toByteArray());
-//            System.out.println(finalString);
-//
-//            DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
-//            diffFormatter.setRepository(git.getRepository());
-//            List<DiffEntry> entries = diffFormatter.scan(oldTreeIter, newTreeIter);
             entriesList.addAll(entries);
         }
         catch (Exception e)
