@@ -34,6 +34,11 @@ public class RepoController {
         return r.getStatus();
     }
 
+    @RequestMapping("/repo/{owner}/{repo}")
+    public @ResponseBody Repo getRepo(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
+        return repoRepository.findByOwnerAndRepo(owner,repo);
+    }
+
     @PostMapping("/repo")
     @ResponseBody
     public Repo fetchRepo(@RequestBody Map<String, Object> body) throws InterruptedException {
