@@ -1,13 +1,25 @@
 package com.group4.softwareanalytics;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class Issue {
     @Field("issue")
     private org.eclipse.egit.github.core.Issue issue;
 
+    @Id
+    private String id;
+
     private String owner;
     private String repo;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getOwner() {
         return owner;

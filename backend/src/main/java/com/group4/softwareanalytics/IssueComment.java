@@ -1,10 +1,13 @@
 package com.group4.softwareanalytics;
 
 import org.eclipse.egit.github.core.Comment;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class IssueComment {
     @Field("comment")
+    @Id
+    private String id;
     private Comment comment;
     private String owner;
     private String repo;
@@ -15,6 +18,14 @@ public class IssueComment {
         this.owner = owner;
         this.repo = repo;
         this.issueNumber = issueNumber;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Comment getComment() {

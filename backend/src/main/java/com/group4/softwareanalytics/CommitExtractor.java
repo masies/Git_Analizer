@@ -13,8 +13,7 @@ import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CommitExtractor {
     public static void DownloadRepo(String url, String destUrl)

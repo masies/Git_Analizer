@@ -19,9 +19,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -93,7 +92,24 @@ public class AsyncService {
             for (DiffEntry diffEntry : diffEntries) {
                 modifications.add(diffEntry.getChangeType().toString());
             }
-            Commit c = new Commit(modifications, owner, repoName);
+
+            String developerName = revCommit.getAuthorIdent().getName();
+            String developerMail = revCommit.getAuthorIdent().getEmailAddress();
+            String encodingName = revCommit.getEncodingName();
+            String fullMessage = revCommit.getFullMessage();
+            String shortMessage = revCommit.getShortMessage();
+            String commitName = revCommit.getName();
+            int commitType = revCommit.getType();
+
+            //TODO: check is the right timezone. https://archive.eclipse.org/jgit/docs/jgit-2.0.0.201206130900-r/apidocs/org/eclipse/jgit/revwalk/RevCommit.html#getCommitTime()
+            int millis = revCommit.getCommitTime()*1000;
+            Date date = new Date(millis);
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE,MMMM d,yyyy h:mm,a", Locale.ENGLISH);
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String commitDate = sdf.format(date);
+
+
+            Commit c = new Commit(modifications, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, commitDate);
             commitList.add(c);
         }
         commitRepository.saveAll(commitList);
