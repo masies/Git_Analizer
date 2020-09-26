@@ -1,8 +1,5 @@
 package com.group4.softwareanalytics;
 
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.springframework.data.mongodb.core.mapping.Field;
-
 import java.util.ArrayList;
 import java.util.List;
 

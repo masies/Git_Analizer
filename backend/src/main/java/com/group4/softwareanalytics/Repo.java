@@ -1,15 +1,8 @@
 package com.group4.softwareanalytics;
 
-import com.sun.codemodel.internal.JFieldRef;
-import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.io.IOException;
-import java.util.*;
 
 public class Repo {
 
