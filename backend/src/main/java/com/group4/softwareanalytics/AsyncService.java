@@ -63,7 +63,7 @@ public class AsyncService {
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         System.out.println("Fetching commits...");
-        String repo_url = "https://github.com/mcostalba/Stockfish";
+        String repo_url = "https://github.com/"+ owner +"/"+ repoName;
         String dest_url = "./Repo";
         List<Commit> commitList = new ArrayList<Commit>();
         List<String> branches = new ArrayList<>();
