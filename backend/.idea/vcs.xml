@@ -3,7 +3,8 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Repo" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Repo/ClearCanvas/ClearCanvas" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/RepoClearCanvas/ClearCanvas" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo/ClearCanvas/ClearCanvas" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo/mcostalba/Stockfish" vcs="Git" />
   </component>
 </project>
