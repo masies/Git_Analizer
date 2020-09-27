@@ -4,8 +4,8 @@ import Home from '../views/Home.vue';
 import Repository from '../views/Repository.vue';
 import Commit from '../views/Commit.vue';
 import Issue from '../views/Issue.vue';
-import CommitsList from '../views/CommitsList.vue';
-import IssuesList from '../views/IssuesList.vue';
+import CommitsListContainer from '../views/CommitsListContainer.vue';
+import IssuesListContainer from '../views/IssuesListContainer.vue';
 import RepositoryList from '../views/RepositoryList.vue';
 
 
@@ -29,13 +29,13 @@ const routes = [
 },
 {
   path: '/repository/:owner/:name/issues',
-  name: 'issuesList',
-  component: IssuesList,
+  name: 'issuesListContainer',
+  component: IssuesListContainer,
 },
 {
   path: '/repository/:owner/:name/commits',
-  name: 'commitsList',
-  component: CommitsList,
+  name: 'commitsListContainer',
+  component: CommitsListContainer,
 },
 {
   path: '/repository/:owner/:name/issue/:id',

@@ -31,7 +31,7 @@ public class RepoController {
     @RequestMapping("/repo/{owner}/{repo}/status")
     public @ResponseBody RepoStatus getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         Repo r = repoRepository.findByOwnerAndRepo(owner,repo);
-        return r.getStatus();
+        return r != null ?  r.getStatus() : new RepoStatus();
     }
 
     @RequestMapping("/repo/{owner}/{repo}")
