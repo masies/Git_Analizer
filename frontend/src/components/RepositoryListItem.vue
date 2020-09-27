@@ -30,7 +30,7 @@
 			<p class="card-text">
 				{{ repository.description }}
 			</p>
-			<button class="btn btn-primary" @click="updateRepository">Update</button>
+			<button class="btn btn-primary btn-sm" @click="updateRepository">Update</button>
 		</div>
 	</div>
 </template>

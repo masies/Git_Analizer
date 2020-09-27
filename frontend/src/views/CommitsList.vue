@@ -1,8 +1,8 @@
 <template>
 	<div class="container mt-3" v-if="data">
-		<div class="row position-relative a" v-for="(items, day) in groupedByDay">
-			<div class="TimelineItem-badge">
-				<svg height="16" class="octicon octicon-git-commit" viewBox="0 0 16 16" version="1.1" width="16" aria-hidden="true"><path fill-rule="evenodd" d="M10.5 7.75a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm1.43.75a4.002 4.002 0 01-7.86 0H.75a.75.75 0 110-1.5h3.32a4.001 4.001 0 017.86 0h3.32a.75.75 0 110 1.5h-3.32z"></path></svg>
+		<div class="row position-relative timeline-bar" v-for="(items, day) in groupedByDay">
+			<div class="timeline-badge">
+				<svg height="16" viewBox="0 0 16 16" version="1.1" width="16" aria-hidden="true"><path fill-rule="evenodd" d="M10.5 7.75a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm1.43.75a4.002 4.002 0 01-7.86 0H.75a.75.75 0 110-1.5h3.32a4.001 4.001 0 017.86 0h3.32a.75.75 0 110 1.5h-3.32z"></path></svg>
 			</div>
 			<div class="col">
 				<p class="mb-0">Commits on {{ getFormattedDate(day) }}</p>
@@ -48,7 +48,7 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/${this.$route.params.owner}/${this.$route.params.name}/commits?page=${this.currentPage-1}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits?page=${this.currentPage-1}`)
 				.then(response => {
 					return response.json()
 				})
@@ -84,7 +84,7 @@
 .list-group-item:hover{
 	background-color: #f6f8fa;
 }
-.a::before{
+.timeline-bar::before{
 	position: absolute;
 	top: 0;
 	display: none;
@@ -97,7 +97,7 @@
 	margin-left: 15px;
 }
 
-.TimelineItem-badge {
+.timeline-badge {
 	position: relative;
 	z-index: 1;
 	display: flex;
