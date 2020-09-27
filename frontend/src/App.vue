@@ -19,7 +19,9 @@
 				</div>
 			</div>
 		</nav>
-		<router-view/>
+		<main class="flex-fill">
+			<router-view />
+		</main>
 	</div>
 </template>
 

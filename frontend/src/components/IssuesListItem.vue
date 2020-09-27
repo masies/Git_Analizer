@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="col">
 			<router-link class="text-dark text-decoration-none" :to="{name: 'issue', params: {owner: data.owner,name: data.repo, id: issue.number}}">
-				<h5 class="mb-0">{{ issue.title }}</h5>			
+				<p class="mb-0 font-weight-bold">{{ issue.title }}</p>			
 			</router-link> 
 			<div>
 				<span class="badge badge-pill mr-1" :style="{'background-color': '#'+label.color }" v-for="label in issue.labels">

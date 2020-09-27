@@ -1,5 +1,5 @@
 <template>
-	<div class="container mt-3" v-if="data">
+	<div v-if="data">
 		<div class="row position-relative timeline-bar" v-for="(items, day) in groupedByDay">
 			<div class="timeline-badge">
 				<svg height="16" viewBox="0 0 16 16" version="1.1" width="16" aria-hidden="true"><path fill-rule="evenodd" d="M10.5 7.75a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm1.43.75a4.002 4.002 0 01-7.86 0H.75a.75.75 0 110-1.5h3.32a4.001 4.001 0 017.86 0h3.32a.75.75 0 110 1.5h-3.32z"></path></svg>
@@ -13,8 +13,12 @@
 				</div>
 			</div>
 		</div>
-		
-		<div class="row mt-3">
+		<div class="col-12" v-if="!Object.keys(groupedByDay).length">
+			<div class="alert alert-secondary" role="alert">
+				No commits found!
+			</div>
+		</div>
+		<div class="row mt-3" v-if="showPagination">
 			<div class="col mx-auto">		
 				<paginate
 				v-model="currentPage"
@@ -32,11 +36,24 @@
 				/>
 			</div>
 		</div>
+		<router-link :to="{name: 'commitsListContainer', params: {owner: owner, name: name}}" class="btn btn-sm btn-primary w-100 mt-2" v-if="!showPagination && Object.keys(groupedByDay).length">
+			Show more
+		</router-link>
 	</div>
 </template>
 
 <script>
 	export default {
+		props: {
+			size: {
+				type: Number,
+				default: 20
+			},
+			showPagination: {
+				type: Boolean,
+				default: true
+			}
+		},
 		data: function () {
 			return {
 				data: null,
@@ -48,7 +65,7 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits?page=${this.currentPage-1}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits?page=${this.currentPage-1}&size=${this.size}`)
 				.then(response => {
 					return response.json()
 				})
@@ -71,6 +88,12 @@
 				return _.groupBy(this.data.content, (x) => {
 					return this.$moment(x.commitDate).startOf('day').format();
 				});
+			},
+			owner: function(){
+				return this.$route.params.owner;
+			},
+			name: function(){
+				return this.$route.params.name;
 			}
 		},
 		watch: {
