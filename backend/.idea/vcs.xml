@@ -5,7 +5,8 @@
     <mapping directory="$PROJECT_DIR$/Repo" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/RepoClearCanvas/ClearCanvas" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/repo/ClearCanvas/ClearCanvas" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/repo/mcostalba/PoorFish" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo/itlwei/Chess" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/repo/mcostalba/Stockfish" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo/oakmac/chessboardjs" vcs="Git" />
   </component>
 </project>

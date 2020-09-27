@@ -1,6 +1,7 @@
 package com.group4.softwareanalytics;
 
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -139,6 +140,8 @@ public class AsyncService {
 
             System.out.println("storing comments and issues..");
             for (Issue issue : issues) {
+                System.out.println("procsessing "+ issue.toString());
+
                 com.group4.softwareanalytics.Issue i = new com.group4.softwareanalytics.Issue(issue, owner, name);
                 issueList.add(i);
 
