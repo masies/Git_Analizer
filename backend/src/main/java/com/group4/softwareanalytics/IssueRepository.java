@@ -9,7 +9,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(collectionResourceRel = "issue", path = "issue")
 public interface IssueRepository extends MongoRepository<Issue,String> {
-    @Query("{'owner' : ?0 , 'repo' : ?1, 'issue.pullRequest.htmlUrl' :  null }")
+    @Query("{'owner' : ?0 , 'repo' : ?1, 'issue.htmlUrl' : {$regex : '.*issues*'}}")
     Page<Issue> findByOwnerAndRepo(String owner, String repo, Pageable pageable);
 
     @Query("{'owner' : ?0 , 'repo' : ?1, 'issue.number' : ?2}")

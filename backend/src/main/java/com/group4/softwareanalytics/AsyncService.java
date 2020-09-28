@@ -1,5 +1,6 @@
 package com.group4.softwareanalytics;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -67,9 +69,14 @@ public class AsyncService {
         List<Commit> commitList = new ArrayList<Commit>();
         List<String> branches = new ArrayList<>();
 
-        if (!Files.exists(Paths.get(dest_url))) {
-            CommitExtractor.DownloadRepo(repo_url, dest_url);
+        File dir = new File(dest_url);
+
+        if (dir.exists()) {
+            FileUtils.deleteDirectory(dir);
         }
+
+        CommitExtractor.DownloadRepo(repo_url, dest_url);
+
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
@@ -145,6 +152,7 @@ public class AsyncService {
                 com.group4.softwareanalytics.Issue i = new com.group4.softwareanalytics.Issue(issue, owner, name);
                 issueList.add(i);
 
+
                 // gather all the issue comments
                 List<Comment> comments = service.getComments(owner, name, issue.getNumber());
                 List<IssueComment> commentList = new ArrayList<IssueComment>();
@@ -152,9 +160,12 @@ public class AsyncService {
                     IssueComment c = new IssueComment(comment, owner, name, issue.getNumber());
                     commentList.add(c);
                 }
+
                 issueCommentRepository.saveAll(commentList);
+                System.out.println("done with storing comments");
             }
-            System.out.println("done with storing comments");
+
+            System.out.println("issue " + issueList.size());
             issueRepository.saveAll(issueList);
             System.out.println("done with storing issues");
 
