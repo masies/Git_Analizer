@@ -18,7 +18,7 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/issue/${this.$route.params.id}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/issues/${this.$route.params.id}`)
 				.then(response => {
 					return response.json()
 				})

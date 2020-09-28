@@ -1,7 +1,7 @@
 <template>
 	<div class="container mt-3" v-if="data">
 		<div class="row">
-			<div class="card w-100 mt-2">
+			<div class="col card w-100 mt-2">
 				<div class="card-body">
 					<h5 class="card-title">
 						<router-link :to="{name: 'repository', params: { owner: repository.owner.login, name: repository.name }}">	
