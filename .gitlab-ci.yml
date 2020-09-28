@@ -3,5 +3,5 @@ demo_job_1:
   script: 
     - "echo Test successes"
   tags: 
-    - ci
+    -  test
 
