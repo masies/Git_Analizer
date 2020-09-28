@@ -7,7 +7,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(collectionResourceRel = "repo", path = "repo")
 public interface RepoRepository extends MongoRepository<Repo, String>  {
-    // TODO: delete by owner and name
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
     public void findAndRemove (String owner, String repo);
 
