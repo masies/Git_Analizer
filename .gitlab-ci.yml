@@ -1,5 +1,7 @@
-demo_job_1:
-     tags:
-       - ci
-     script:
-       - echo Test successes 
+--- 
+demo_job_1: 
+  script: 
+    - "echo Test successes"
+  tags: 
+    - ci
+
