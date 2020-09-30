@@ -17,23 +17,23 @@ import java.util.*;
 
 public class CommitExtractor {
 
-    public static void DownloadRepo(String url, String destUrl)
-    {
+    public static void DownloadRepo(String url, String owner, String repoName) {
+        String path = "./repo/" + owner +"/"+ repoName;
         try {
-            System.out.println("Cloning "+ url +" into "+ destUrl);
+            System.out.println("Cloning "+ url +" into "+ path);
             Git.cloneRepository()
                     .setURI(url)
-                    .setDirectory(Paths.get(destUrl).toFile())
+                    .setDirectory(Paths.get(path).toFile())
                     .call();
             System.out.println("------- Repo cloned succesfully! -------");
 
-            ArrayList<Float> metrics = ProjectMetricExtractor.classMetricsExtractor(destUrl);
+            ArrayList<Float> metrics = ProjectMetricExtractor.classMetricsExtractor(path);
             System.out.println("project metrics, latest version");
             if (metrics != null) {
                 ProjectMetricExtractor.metricsPrinter(metrics);
             }
 
-            ProjectMetricExtractor.commitCodeQualityExtractor(destUrl,"5c4937852d2b2b6c4049cd3fe2e6efb08f4003ad");
+//            ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName,"5c4937852d2b2b6c4049cd3fe2e6efb08f4003ad");
         } catch (GitAPIException e) {
             System.out.println("Exception occurred while cloning repo");
             e.printStackTrace();

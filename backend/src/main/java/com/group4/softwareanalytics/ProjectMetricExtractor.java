@@ -83,7 +83,8 @@ public class ProjectMetricExtractor {
         return null;
     }
 
-    public static void commitCodeQualityExtractor(String path, String commit){
+    public static void commitCodeQualityExtractor(String owner, String repoName, String commit){
+        String path = "./repo/" + owner +"/"+ repoName;
         try {
 
             Git git = Git.open( new File(path + "/.git") );

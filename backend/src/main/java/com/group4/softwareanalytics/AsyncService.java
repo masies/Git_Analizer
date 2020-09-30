@@ -75,7 +75,7 @@ public class AsyncService {
             FileUtils.deleteDirectory(dir);
         }
 
-        CommitExtractor.DownloadRepo(repo_url, dest_url);
+        CommitExtractor.DownloadRepo(repo_url, owner, repoName);
 
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
