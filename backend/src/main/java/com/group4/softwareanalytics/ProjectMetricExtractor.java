@@ -3,6 +3,7 @@ package com.group4.softwareanalytics;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,10 +18,10 @@ public class ProjectMetricExtractor {
 
     public static ArrayList<Float> classMetricsExtractor(String path){
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("bash", "-c", "cd "+ path +" && java -jar ./../../../src/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar ./ true 0 false");
-
+        processBuilder.command("bash", "-c", "cd "+ path +" && java -jar ./../../../src/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar ./");
         try {
             Process process = processBuilder.start();
+//          TODO: STUCKED HERE FOR SOME COMMITS HASH
             int exitVal = process.waitFor();
             if (exitVal != 0) {
                 System.out.println("failed obtaining project metrics");
@@ -35,7 +36,6 @@ public class ProjectMetricExtractor {
             BufferedReader br = null;
             String line;
             String cvsSplitBy = ",";
-
             try {
                 br = new BufferedReader(new FileReader(csvFile));
                 br.readLine();
@@ -81,13 +81,15 @@ public class ProjectMetricExtractor {
     public static void checkoutParent(Git git){
         try {
             ObjectId previousCommitId = git.getRepository().resolve( "HEAD^" );
+            System.out.println("i will set HEAD on commit " + previousCommitId.getName());
             git.checkout().setName( previousCommitId.getName() ).call();
+            System.out.println("Now HEAD is set on commit " + previousCommitId.getName());
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
         }
     }
 
-    public static ProjectMetric commitCodeQualityExtractor(String owner, String repoName, String commit){
+    public static ProjectMetric commitCodeQualityExtractor(String owner, String repoName, String commit, String parentCommit){
         String path = "./repo/" + owner +"/"+ repoName;
         System.out.println(commit);
 
@@ -98,11 +100,14 @@ public class ProjectMetricExtractor {
 
             ArrayList<Float> metrics = classMetricsExtractor(path);
             metricsPrinter(metrics);
-            ObjectId previousCommitId = git.getRepository().resolve( "HEAD^" );
-            System.out.println("Parent is");
-            System.out.println(previousCommitId.getName());
 
-            git.checkout().setName(previousCommitId.getName()).call();
+//            ObjectId previousCommitId = git.getRepository().resolve( "HEAD^" );
+
+            System.out.println("i will set HEAD on parent commit: " + parentCommit);
+            git.checkout().setName( parentCommit ).call();
+            System.out.println("Now HEAD is set on commit " + parentCommit);
+
+
             ArrayList<Float> parentMetrics = classMetricsExtractor(path);
             metricsPrinter(parentMetrics);
 

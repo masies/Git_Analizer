@@ -36,7 +36,8 @@ public class CommitController {
     Commit getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repoName") String repoName, @PathVariable(value="commitId") String commitID ) {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner,repoName, commitID);
         if (!commit.getHasMetrics()) {
-            ProjectMetric metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID);
+            String parentCommitID = commit.getCommitParentsIDs().get(0);
+            ProjectMetric metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitID);
             commit.setProjectMetrics(metrics);
             commit.setHasMetrics(true);
             commitRepository.save(commit);
