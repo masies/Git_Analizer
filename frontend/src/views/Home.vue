@@ -22,13 +22,13 @@
 				</form>
 			</div>
 			<div class="col-12 mt-2">
-				<status-bar :owner="owner" :name="name" v-if="showStatusBar" />
+				<status-bar :owner="owner" :name="name" v-if="showStatusBar" @fetchIsComplete="reloadData"/>
 			</div>
 		</div>
 		<hr>
 		<div class="row mt-2">
 			<div class="col">
-				<repositories-container/>
+				<repositories-container ref="repos"/>
 			</div>
 		</div>
 	</div>
@@ -85,6 +85,9 @@
 					return response.json()
 				})
 				.then(data => console.log(data));
+			},
+			reloadData: function() {
+				this.$refs.repos.loadData();
 			}
 		}
 	};

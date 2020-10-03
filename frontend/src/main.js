@@ -7,6 +7,7 @@ import store from './store';
 import Paginate from 'vuejs-paginate'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'material-design-icons/iconfont/material-icons.css';
+import anchorme from "anchorme";
 
 Vue.use(require('vue-moment'));
 Vue.component('paginate', Paginate)
@@ -20,7 +21,25 @@ window._ = require('lodash');
 window.Popper = require('popper.js').default;
 window.$ = window.jQuery = require('jquery');
 
-
+Vue.mixin( {
+	methods: {
+		textToLinksParser: function (text, owner, repo) {
+			text = text.replace(/[@]+[A-Za-z0-9-_]+/g, function(u){
+				var username = u.replace("@","");
+				return `<a href="https://github.com/${username}" target="_blank">@${username}</a>`
+			});
+			text = text.replace(/ +[#]+[A-Za-z0-9-_]+/g, function(u){
+				var number = u.replace("#","").trim();
+				return ` <a href="/repository/${owner}/${repo}/issue/${number}">#${number}</a>`
+			});
+			return anchorme({input: text, options: {
+				attributes: {
+					target: "_blank",
+				}
+			}})
+		},
+	}
+});
 
 Vue.config.productionTip = false;
 

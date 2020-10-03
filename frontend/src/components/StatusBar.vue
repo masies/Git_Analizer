@@ -99,6 +99,13 @@
 			isComplete: function(){
 				return _.values(this.data).filter((x) => !x).length == 0;
 			}
+		},
+		watch: {
+			isComplete: function(){
+				if(this.isComplete){
+					this.$emit("fetchIsComplete")
+				}
+			}
 		}
 	};
 </script>
