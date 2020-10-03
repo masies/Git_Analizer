@@ -1,7 +1,6 @@
 <template>
 	<div class="row">
 		<div class="col">
-
 			<router-link class="text-dark text-decoration-none" :to="{name: 'issue', params: {owner: data.owner,name: data.repo, id: issue.number}}">
 				<p class="mb-0 font-weight-bold">
 					<svg class="octicon octicon-issue-opened open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true" v-if="issue.state=='open'" >
