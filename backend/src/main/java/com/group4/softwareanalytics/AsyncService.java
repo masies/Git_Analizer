@@ -75,8 +75,7 @@ public class AsyncService {
             FileUtils.deleteDirectory(dir);
         }
 
-        CommitExtractor.DownloadRepo(repo_url, dest_url);
-
+        CommitExtractor.DownloadRepo(repo_url, owner, repoName);
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
@@ -91,8 +90,8 @@ public class AsyncService {
 
         List<RevCommit> revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
 
-        for(RevCommit revCommit: revCommitList)
-        {
+        for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
+            RevCommit revCommit = iterator.next();
             List<DiffEntry> diffEntries = CommitExtractor.getModifications(git, revCommit.getName());
             List<String> modifications = new ArrayList<>();
 
@@ -106,12 +105,21 @@ public class AsyncService {
             String fullMessage = revCommit.getFullMessage();
             String shortMessage = revCommit.getShortMessage();
             String commitName = revCommit.getName();
-            String diffCombined = CommitExtractor.getDiffComb(git,commitName);
+
+            ArrayList<String> commitParentsIDs = new ArrayList<>();
+            for (RevCommit parent: revCommit.getParents()) {
+                commitParentsIDs.add(parent.name());
+            }
+
+            String diffCombined = CommitExtractor.getDiffComb(git, commitName);
+
+            ProjectMetric projectMetric = new ProjectMetric(owner,repoName,0,0,0,0,0,0,0,0);
+
             int commitType = revCommit.getType();
             long millis = revCommit.getCommitTime();
-            Date d = new Date(millis*1000);
+            Date date = new Date(millis * 1000);
 
-            Commit c = new Commit(modifications, owner, repoName, diffCombined, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, d);
+            Commit c = new Commit(modifications, owner, repoName, diffCombined, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
             commitList.add(c);
         }
         commitRepository.saveAll(commitList);

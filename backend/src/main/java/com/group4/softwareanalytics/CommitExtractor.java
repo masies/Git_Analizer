@@ -1,39 +1,37 @@
 package com.group4.softwareanalytics;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
-import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-import org.eclipse.jgit.util.io.DisabledOutputStream;
-import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
+
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 
+
 public class CommitExtractor {
-    public static void DownloadRepo(String url, String destUrl)
-    {
+
+    public static void DownloadRepo(String url, String owner, String repoName) {
+        String path = "./repo/" + owner +"/"+ repoName;
         try {
-            System.out.println("Cloning "+ url +" into "+ destUrl);
+            System.out.println("Cloning "+ url +" into "+ path);
             Git.cloneRepository()
                     .setURI(url)
-                    .setDirectory(Paths.get(destUrl).toFile())
+                    .setDirectory(Paths.get(path).toFile())
                     .call();
-            System.out.println("Repo cloned");
+            System.out.println("------- Repo cloned succesfully! -------");
+
         } catch (GitAPIException e) {
             System.out.println("Exception occurred while cloning repo");
             e.printStackTrace();
         }
     }
-
 
     public static List<RevCommit> getCommits(String branchName, Git git, Repository repo) throws IOException, GitAPIException {
         List<RevCommit> commitList = new ArrayList<>();
@@ -43,7 +41,7 @@ public class CommitExtractor {
         return commitList;
     }
 
-    public static List<DiffEntry> getModifications(Git git, String commitID) throws IOException, GitAPIException {
+    public static List<DiffEntry> getModifications(Git git, String commitID) {
         List<DiffEntry> entriesList = new ArrayList<>();
         try {
             ObjectReader reader = git.getRepository().newObjectReader();
@@ -63,14 +61,13 @@ public class CommitExtractor {
         }
         catch (Exception e)
         {
-            // commits with no modification
+            /* commits with no modification */
         }
 
         return entriesList;
     }
 
     public static String getDiffComb(Git git, String commitID) throws IOException, GitAPIException {
-        List<DiffEntry> entriesList = new ArrayList<>();
         String diffCombine = " ";
         try {
             ObjectReader reader = git.getRepository().newObjectReader();
@@ -82,12 +79,11 @@ public class CommitExtractor {
             newTreeIter.reset(reader, newTree);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            List<DiffEntry> entries = git.diff().setOutputStream(stream)
+            git.diff().setOutputStream(stream)
                     .setOldTree(oldTreeIter)
                     .setNewTree(newTreeIter)
                     .call();
-            String finalString = new String(stream.toByteArray());
-            diffCombine = finalString;
+            diffCombine = new String(stream.toByteArray());
         } catch (Exception e) {
             // commits with no modification
         }

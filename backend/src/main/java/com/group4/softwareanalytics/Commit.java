@@ -1,7 +1,9 @@
 package com.group4.softwareanalytics;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,12 +23,15 @@ public class Commit {
     private String shortMessage;
     private String commitName;
     private int commitType;
-
-
-
     private Date commitDate;
+    private boolean hasMetrics;
+    ArrayList<String> commitParentsIDs;
 
-    public Commit(List<String> modifications, String owner, String repo, String diffCombined, String developerName, String developerMail, String encodingName, String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate) {
+    @Field("projectMetrics")
+    private ProjectMetric projectMetrics;
+
+    public Commit(List<String> modifications, String owner, String repo, String diffCombined, String developerName, String developerMail, String encodingName,
+                  String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, ArrayList<String> commitParentsIDs, boolean hasMetrics) {
         this.modifications = modifications;
         this.owner = owner;
         this.repo = repo;
@@ -39,6 +44,25 @@ public class Commit {
         this.commitName = commitName;
         this.commitType = commitType;
         this.commitDate = commitDate;
+        this.projectMetrics = projectMetrics;
+        this.commitParentsIDs = commitParentsIDs;
+        this.hasMetrics = hasMetrics;
+    }
+
+    public boolean getHasMetrics() {
+        return hasMetrics;
+    }
+
+    public void setHasMetrics(boolean hasMetrics) {
+        this.hasMetrics = hasMetrics;
+    }
+
+    public ProjectMetric getProjectMetrics() {
+        return projectMetrics;
+    }
+
+    public void setProjectMetrics(ProjectMetric projectMetrics) {
+        this.projectMetrics = projectMetrics;
     }
 
     public String getId() {
@@ -141,4 +165,11 @@ public class Commit {
 
     public void setDiffCombined(String diffCombined) { this.diffCombined = diffCombined; }
 
+    public ArrayList<String> getCommitParentsIDs() {
+        return commitParentsIDs;
+    }
+
+    public void setCommitParentsIDs(ArrayList<String> commitParentsIDs) {
+        this.commitParentsIDs = commitParentsIDs;
+    }
 }

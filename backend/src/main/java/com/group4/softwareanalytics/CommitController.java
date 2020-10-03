@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,6 +29,20 @@ public class CommitController {
     public @ResponseBody
     Page<Commit> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
         return commitRepository.findByOwnerAndRepo(owner,repo, PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
+    }
+
+    @RequestMapping("/repo/{owner}/{repoName}/commits/{commitId}")
+    public @ResponseBody
+    Commit getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repoName") String repoName, @PathVariable(value="commitId") String commitID ) {
+        Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner,repoName, commitID);
+        if (!commit.getHasMetrics()) {
+            String parentCommitID = commit.getCommitParentsIDs().get(0);
+            ProjectMetric metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitID);
+            commit.setProjectMetrics(metrics);
+            commit.setHasMetrics(true);
+            commitRepository.save(commit);
+        }
+        return commit;
     }
 
 }
