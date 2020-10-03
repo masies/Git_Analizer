@@ -14,4 +14,7 @@ public interface CommitRepository extends MongoRepository<Commit,String> {
     @Query("{'owner' : ?0 , 'repo' : ?1}")
     Page<Commit> findByOwnerAndRepo(String owner, String repo, Pageable pageable);
 
+    @Query("{'owner' : ?0 , 'repo' : ?1, 'commitName' : ?2}")
+    Commit findByOwnerAndRepoAndCommitName(String owner, String repo, String commitID);
+
 }

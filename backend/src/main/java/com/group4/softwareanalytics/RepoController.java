@@ -19,7 +19,6 @@ public class RepoController {
     @Autowired
     private AsyncService asyncService;
 
-
     @GetMapping("/repo")
     @ResponseBody
     public Page<Repo> getRepos(@RequestParam(defaultValue = "0") int page,

@@ -30,9 +30,7 @@ public class ProjectMetricExtractor {
             float averageWMC = 0F;
             float averageLCOM = 0F;
             float averageLOC = 0F;
-
             int numberOfClasses = 0;
-
             String csvFile = path + "/class.csv";
             BufferedReader br = null;
             String line;
@@ -42,7 +40,6 @@ public class ProjectMetricExtractor {
                 br = new BufferedReader(new FileReader(csvFile));
                 br.readLine();
                 while ((line = br.readLine()) != null) {
-                    // use comma as separator
                     String[] metrics = line.split(cvsSplitBy);
                     numberOfClasses = numberOfClasses + 1;
                     averageCBO = averageCBO + Integer.parseInt(metrics[1]);
@@ -50,20 +47,18 @@ public class ProjectMetricExtractor {
                     averageLCOM = averageLCOM + Integer.parseInt(metrics[3]);
                     averageLOC = averageLOC + Integer.parseInt(metrics[4]);
                 }
-                if (numberOfClasses>0){
+                if (numberOfClasses > 0){
                     averageCBO = averageCBO / numberOfClasses;
                     averageWMC = averageWMC / numberOfClasses;
                     averageLCOM = averageLCOM / numberOfClasses;
                     averageLOC = averageLOC / numberOfClasses;
                 }
-
                 ArrayList<Float> avgMetrics = new ArrayList<>();
                 avgMetrics.add(averageCBO);
                 avgMetrics.add(averageWMC);
                 avgMetrics.add(averageLCOM);
                 avgMetrics.add(averageLOC);
                 return avgMetrics;
-
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -80,37 +75,43 @@ public class ProjectMetricExtractor {
             e.printStackTrace();
         }
         System.out.println("Cannot extract class metric, method: classMetricsExtractor");
-        return null;
+        return new ArrayList<>(4);
     }
 
-    public static void commitCodeQualityExtractor(String owner, String repoName, String commit){
-        String path = "./repo/" + owner +"/"+ repoName;
+    public static void checkoutParent(Git git){
         try {
+            ObjectId previousCommitId = git.getRepository().resolve( "HEAD^" );
+            git.checkout().setName( previousCommitId.getName() ).call();
+        } catch (IOException | GitAPIException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static ProjectMetric commitCodeQualityExtractor(String owner, String repoName, String commit){
+        String path = "./repo/" + owner +"/"+ repoName;
+        System.out.println(commit);
+
+        try {
             Git git = Git.open( new File(path + "/.git") );
             // checkout custom commit and get metrics
             git.checkout().setName(commit).call();
 
             ArrayList<Float> metrics = classMetricsExtractor(path);
-            System.out.println();
-            System.out.println("average project metrics at commit: " + commit);
-
-            if (metrics != null) {
-                metricsPrinter(metrics);
-            }
-
-            // checkout parent commit and get metrics
+            metricsPrinter(metrics);
             ObjectId previousCommitId = git.getRepository().resolve( "HEAD^" );
-            git.checkout().setName( previousCommitId.getName() ).call();
-            metrics = classMetricsExtractor(path);
-            System.out.println("average project metrics at parent commit of: " + commit + " which is commit: " + previousCommitId.getName());
-            if (metrics != null) {
-                metricsPrinter(metrics);
-            }
+            System.out.println("Parent is");
+            System.out.println(previousCommitId.getName());
 
+            git.checkout().setName(previousCommitId.getName()).call();
+            ArrayList<Float> parentMetrics = classMetricsExtractor(path);
+            metricsPrinter(parentMetrics);
+
+            System.out.println(parentMetrics.get(0));
+            return new ProjectMetric(owner, repoName, metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), parentMetrics.get(0), parentMetrics.get(1), parentMetrics.get(2), parentMetrics.get(3));
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
+            System.out.println("jere");
         }
-
+        return null;
     }
 }

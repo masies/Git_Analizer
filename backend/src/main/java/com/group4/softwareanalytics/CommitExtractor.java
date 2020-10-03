@@ -27,13 +27,6 @@ public class CommitExtractor {
                     .call();
             System.out.println("------- Repo cloned succesfully! -------");
 
-            ArrayList<Float> metrics = ProjectMetricExtractor.classMetricsExtractor(path);
-            System.out.println("project metrics, latest version");
-            if (metrics != null) {
-                ProjectMetricExtractor.metricsPrinter(metrics);
-            }
-
-//            ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName,"5c4937852d2b2b6c4049cd3fe2e6efb08f4003ad");
         } catch (GitAPIException e) {
             System.out.println("Exception occurred while cloning repo");
             e.printStackTrace();
@@ -68,7 +61,7 @@ public class CommitExtractor {
         }
         catch (Exception e)
         {
-            // commits with no modification
+            /* commits with no modification */
         }
 
         return entriesList;
