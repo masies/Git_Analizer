@@ -1,7 +1,6 @@
 package com.group4.softwareanalytics;
 
 public class ProjectMetric {
-
     private float LOC;
     private float CBO;
     private float WMC;
@@ -22,6 +21,7 @@ public class ProjectMetric {
         this.CBO = CBO;
         this.WMC = WMC;
         this.LCOM = LCOM;
+
         this.parentLOC = parentLOC;
         this.parentCBO = parentCBO;
         this.parentWMC = parentWMC;

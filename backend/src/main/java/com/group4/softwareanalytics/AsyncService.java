@@ -77,6 +77,7 @@ public class AsyncService {
         System.out.println("Fetching commits...");
         String repo_url = "https://github.com/"+ owner +"/"+ repoName;
         String dest_url = "./repo/" + owner +"/"+ repoName;
+
         List<Commit> commitList = new ArrayList<Commit>();
         List<String> branches = new ArrayList<>();
 

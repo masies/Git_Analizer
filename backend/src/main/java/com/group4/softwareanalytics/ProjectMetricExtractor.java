@@ -1,5 +1,8 @@
 package com.group4.softwareanalytics;
 
+import com.github.mauricioaniche.ck.CK;
+import com.github.mauricioaniche.ck.CKClassResult;
+import com.github.mauricioaniche.ck.CKNotifier;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -13,16 +16,36 @@ import java.util.ArrayList;
 
 public class ProjectMetricExtractor {
     public static void metricsPrinter(ArrayList<Float> metrics){
-        System.out.println("CBO= " + metrics.get(0).toString() + " , WMC=" + metrics.get(1).toString() + " , LCOM=" + metrics.get(2).toString() + " , LOC=" + metrics.get(3).toString() );
+        System.out.println("CBO: " + metrics.get(0).toString() + " , WMC:" + metrics.get(1).toString() + " , LCOM:" + metrics.get(2).toString() + " , LOC:" + metrics.get(3).toString() );
     }
 
     public static ArrayList<Float> classMetricsExtractor(String path){
+
+//        CK report = new CK();
+//        report.calculate(path, new CKNotifier() {
+//            @Override
+//            public void notify(CKClassResult ckClassResult) {
+//                System.out.println(ckClassResult.getFile());
+//                System.out.println(ckClassResult.getCbo());
+//                System.out.println(ckClassResult.getLoc());
+//                System.out.println(ckClassResult.getLcom());
+//                System.out.println(ckClassResult.getWmc());
+//            }
+//        });
+        System.out.println("CK called");
+
+
+
+
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("bash", "-c", "cd "+ path +" && java -jar ./../../../src/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar ./");
+        processBuilder.command("bash", "-c", "cd "+ path +" && java -jar ./../../../src/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar ./ true 0 false");
         try {
             Process process = processBuilder.start();
 //          TODO: STUCKED HERE FOR SOME COMMITS HASH
             int exitVal = process.waitFor();
+            System.out.println("PROCESS CK FINISHED");
+
+
             if (exitVal != 0) {
                 System.out.println("failed obtaining project metrics");
             }
@@ -89,7 +112,7 @@ public class ProjectMetricExtractor {
         }
     }
 
-    public static ProjectMetric commitCodeQualityExtractor(String owner, String repoName, String commit, String parentCommit){
+    public static ProjectMetric commitCodeQualityExtractor(String owner, String repoName, String commit, ArrayList<String> parentCommits){
         String path = "./repo/" + owner +"/"+ repoName;
         System.out.println(commit);
 
@@ -103,13 +126,23 @@ public class ProjectMetricExtractor {
 
 //            ObjectId previousCommitId = git.getRepository().resolve( "HEAD^" );
 
-            System.out.println("i will set HEAD on parent commit: " + parentCommit);
-            git.checkout().setName( parentCommit ).call();
-            System.out.println("Now HEAD is set on commit " + parentCommit);
+            ArrayList<Float> parentMetrics = new ArrayList<>();
+            if (parentCommits.size() == 1){
+                System.out.println(parentCommits);
+                System.out.println("i will set HEAD on parent commit: " + parentCommits.get(0));
+                git.checkout().setName( parentCommits.get(0) ).call();
+                System.out.println("Now HEAD is set on commit " + parentCommits.get(0));
 
+                parentMetrics = classMetricsExtractor(path);
+                metricsPrinter(parentMetrics);
+            } else {
+                System.out.println("Commit with more than one parent");
+                parentMetrics.add(0F);
+                parentMetrics.add(0F);
+                parentMetrics.add(0F);
+                parentMetrics.add(0F);
+            }
 
-            ArrayList<Float> parentMetrics = classMetricsExtractor(path);
-            metricsPrinter(parentMetrics);
 
             System.out.println(parentMetrics.get(0));
             return new ProjectMetric(metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), parentMetrics.get(0), parentMetrics.get(1), parentMetrics.get(2), parentMetrics.get(3));
