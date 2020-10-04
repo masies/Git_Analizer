@@ -2,8 +2,6 @@ package com.group4.softwareanalytics;
 
 public class ProjectMetric {
 
-    private String owner;
-    private String repo;
     private float LOC;
     private float CBO;
     private float WMC;
@@ -19,9 +17,7 @@ public class ProjectMetric {
     private float deltaWMC;
     private float deltaLCOM;
 
-    public ProjectMetric( String owner, String repo, float CBO, float WMC, float LOC, float LCOM, float parentCBO, float parentWMC, float parentLOC, float parentLCOM ) {
-        this.owner = owner;
-        this.repo = repo;
+    public ProjectMetric( float CBO, float WMC, float LOC, float LCOM, float parentCBO, float parentWMC, float parentLOC, float parentLCOM ) {
         this.LOC = LOC;
         this.CBO = CBO;
         this.WMC = WMC;
@@ -35,22 +31,6 @@ public class ProjectMetric {
         this.deltaLCOM = parentLCOM - LCOM;
         this.deltaLOC = parentLOC - LOC;
         this.deltaWMC = parentWMC - WMC;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getRepo() {
-        return repo;
-    }
-
-    public void setRepo(String repo) {
-        this.repo = repo;
     }
 
     public float getLOC() {

@@ -112,7 +112,7 @@ public class ProjectMetricExtractor {
             metricsPrinter(parentMetrics);
 
             System.out.println(parentMetrics.get(0));
-            return new ProjectMetric(owner, repoName, metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), parentMetrics.get(0), parentMetrics.get(1), parentMetrics.get(2), parentMetrics.get(3));
+            return new ProjectMetric(metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), parentMetrics.get(0), parentMetrics.get(1), parentMetrics.get(2), parentMetrics.get(3));
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
             System.out.println("jere");

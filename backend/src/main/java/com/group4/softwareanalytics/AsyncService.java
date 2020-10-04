@@ -56,7 +56,18 @@ public class AsyncService {
 
             repo.hasInfoDone();
             repoRepository.save(repo);
-            fetchIssues(owner, name, repo);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        fetchIssues(owner, name, repo);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
             fetchCommits(owner, name, repo);
         } catch (Exception ignored) {
         }
@@ -113,7 +124,7 @@ public class AsyncService {
 
             String diffCombined = CommitExtractor.getDiffComb(git, commitName);
 
-            ProjectMetric projectMetric = new ProjectMetric(owner,repoName,0,0,0,0,0,0,0,0);
+            ProjectMetric projectMetric = new ProjectMetric(0,0,0,0,0,0,0,0);
 
             int commitType = revCommit.getType();
             long millis = revCommit.getCommitTime();
@@ -129,7 +140,7 @@ public class AsyncService {
         repoRepository.save(r);
     }
 
-
+    @Async
     public void fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
