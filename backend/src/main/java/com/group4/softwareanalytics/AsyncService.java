@@ -104,12 +104,6 @@ public class AsyncService {
 
         for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
             RevCommit revCommit = iterator.next();
-            List<DiffEntry> diffEntries = CommitExtractor.getModifications(git, revCommit.getName());
-            List<String> modifications = new ArrayList<>();
-
-            for (DiffEntry diffEntry : diffEntries) {
-                modifications.add(diffEntry.getChangeType().toString());
-            }
 
             String developerName = revCommit.getAuthorIdent().getName();
             String developerMail = revCommit.getAuthorIdent().getEmailAddress();
@@ -118,12 +112,15 @@ public class AsyncService {
             String shortMessage = revCommit.getShortMessage();
             String commitName = revCommit.getName();
 
+            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName);
+
+
             ArrayList<String> commitParentsIDs = new ArrayList<>();
             for (RevCommit parent: revCommit.getParents()) {
                 commitParentsIDs.add(parent.name());
             }
 
-            String diffCombined = CommitExtractor.getDiffComb(git, commitName);
+//            CommitExtractor.getDiff(git,commitName);
 
             ProjectMetric projectMetric = new ProjectMetric(0,0,0,0,0,0,0,0);
 
@@ -131,7 +128,7 @@ public class AsyncService {
             long millis = revCommit.getCommitTime();
             Date date = new Date(millis * 1000);
 
-            Commit c = new Commit(modifications, owner, repoName, diffCombined, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
+            Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
             commitList.add(c);
         }
         commitRepository.saveAll(commitList);

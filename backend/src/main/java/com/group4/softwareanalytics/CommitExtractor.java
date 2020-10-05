@@ -3,16 +3,18 @@ package com.group4.softwareanalytics;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
-
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
+
+import static jdk.internal.util.xml.XMLStreamWriter.DEFAULT_ENCODING;
 
 
 public class CommitExtractor {
@@ -41,52 +43,32 @@ public class CommitExtractor {
         return commitList;
     }
 
-    public static List<DiffEntry> getModifications(Git git, String commitID) {
-        List<DiffEntry> entriesList = new ArrayList<>();
+    public static List<CommitDiff> getModifications(Git git, String commit) {
+        List<CommitDiff> entriesList = new ArrayList<>();
         try {
             ObjectReader reader = git.getRepository().newObjectReader();
             CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-            ObjectId oldTree = git.getRepository().resolve(commitID + "~1^{tree}");
+            ObjectId oldTree = git.getRepository().resolve(commit + "~1^{tree}");
             oldTreeIter.reset(reader, oldTree);
             CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-            ObjectId newTree = git.getRepository().resolve(commitID + "^{tree}");
+            ObjectId newTree = git.getRepository().resolve(commit + "^{tree}");
             newTreeIter.reset(reader, newTree);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            List<DiffEntry> entries = git.diff().setOutputStream(stream)
-                    .setOldTree(oldTreeIter)
-                    .setNewTree(newTreeIter)
-                    .call();
-            entriesList.addAll(entries);
+            DiffFormatter df = new DiffFormatter(stream);
+
+            df.setRepository( git.getRepository() );
+            for (DiffEntry entry:df.scan( oldTreeIter, newTreeIter )) {
+                df.format(entry);
+                String diffText = stream.toString(DEFAULT_ENCODING);
+                CommitDiff cd = new CommitDiff(entry.getOldPath(), entry.getNewPath(), entry.getChangeType().name(), diffText);
+                entriesList.add(cd);
+                stream.reset();
+            }
         }
         catch (Exception e) {
             /* commits with no modification */
         }
-
         return entriesList;
-    }
-
-    public static String getDiffComb(Git git, String commitID) throws IOException, GitAPIException {
-        String diffCombine = " ";
-        try {
-            ObjectReader reader = git.getRepository().newObjectReader();
-            CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-            ObjectId oldTree = git.getRepository().resolve(commitID + "~1^{tree}");
-            oldTreeIter.reset(reader, oldTree);
-            CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-            ObjectId newTree = git.getRepository().resolve(commitID + "^{tree}");
-            newTreeIter.reset(reader, newTree);
-
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            git.diff().setOutputStream(stream)
-                    .setOldTree(oldTreeIter)
-                    .setNewTree(newTreeIter)
-                    .call();
-            diffCombine = new String(stream.toByteArray());
-        } catch (Exception e) {
-            // commits with no modification
-        }
-
-        return diffCombine;
     }
 }

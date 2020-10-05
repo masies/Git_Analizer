@@ -11,11 +11,10 @@ public class Commit {
     @Id
     private String id;
 
-    private List<String> modifications;
+    private List<CommitDiff> modifications;
     private String owner;
     private String repo;
 
-    private String diffCombined;
     private String developerName;
     private String developerMail;
     private String encodingName;
@@ -30,12 +29,11 @@ public class Commit {
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
 
-    public Commit(List<String> modifications, String owner, String repo, String diffCombined, String developerName, String developerMail, String encodingName,
+    public Commit(List<CommitDiff> modifications, String owner, String repo, String developerName, String developerMail, String encodingName,
                   String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, ArrayList<String> commitParentsIDs, boolean hasMetrics) {
         this.modifications = modifications;
         this.owner = owner;
         this.repo = repo;
-        this.diffCombined = diffCombined;
         this.developerName = developerName;
         this.developerMail = developerMail;
         this.encodingName = encodingName;
@@ -137,11 +135,11 @@ public class Commit {
         this.commitDate = commitDate;
     }
 
-    public List<String> getModifications() {
+    public List<CommitDiff> getModifications() {
         return modifications;
     }
 
-    public void setModifications(List<String> modifications) {
+    public void setModifications(List<CommitDiff> modifications) {
         this.modifications = modifications;
     }
 
@@ -160,10 +158,6 @@ public class Commit {
     public void setRepo(String repo) {
         this.repo = repo;
     }
-
-    public String getDiffCombined() { return diffCombined; }
-
-    public void setDiffCombined(String diffCombined) { this.diffCombined = diffCombined; }
 
     public ArrayList<String> getCommitParentsIDs() {
         return commitParentsIDs;

@@ -5,6 +5,8 @@ import com.github.mauricioaniche.ck.CKNotifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MetricResults implements CKNotifier {
     private float averageCBO = 0F;
@@ -13,13 +15,20 @@ public class MetricResults implements CKNotifier {
     private float averageLOC = 0F;
     private int numberOfClasses = 0;
 
+    private Set<String> javaFiles = new HashSet<>();
+
     @Override
     public void notify(CKClassResult ckClassResult) {
-        this.numberOfClasses = this.numberOfClasses + 1;
-        this.averageCBO += ckClassResult.getCbo();
-        this.averageLCOM += ckClassResult.getLcom();
-        this.averageWMC += ckClassResult.getWmc();
-        this.averageLOC += ckClassResult.getLoc();
+        System.out.println(ckClassResult.getFile());
+        // TODO: add control if file list is empty
+//        if (javaFiles.contains(ckClassResult.getFile())){
+//            System.out.println("file counted");
+            this.numberOfClasses = this.numberOfClasses + 1;
+            this.averageCBO += ckClassResult.getCbo();
+            this.averageLCOM += ckClassResult.getLcom();
+            this.averageWMC += ckClassResult.getWmc();
+            this.averageLOC += ckClassResult.getLoc();
+//        }
     }
 
     public ArrayList<Float> getResults(){
@@ -30,5 +39,13 @@ public class MetricResults implements CKNotifier {
             averageLOC = averageLOC / numberOfClasses;
         }
         return new ArrayList<Float>(Arrays.asList(averageCBO,averageWMC,averageLCOM,averageLOC));
+    }
+
+    public Set<String> getJavaFiles() {
+        return javaFiles;
+    }
+
+    public void setJavaFiles(Set<String> javaFiles) {
+        this.javaFiles = javaFiles;
     }
 }
