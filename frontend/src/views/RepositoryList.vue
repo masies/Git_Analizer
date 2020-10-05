@@ -1,6 +1,18 @@
 <template>
 	<div class="container mt-3" v-if="data">
 		<div class="row">
+			<div class="col-12 col-md-6 col-lg-4">
+				<div class="input-group">
+					<input type="text" class="form-control" placeholder="Search" v-model="query">
+					<div class="input-group-append">
+						<button class="btn btn-outline-secondary" type="button" @click="loadData">
+							<i class="material-icons">search</i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch" v-for="item in data.content">
 				<repository-list-item :data="item"/>
 			</div>
@@ -32,6 +44,7 @@
 			return {
 				data: null,
 				currentPage: this.$route.query.page ? parseInt(this.$route.query.page) : 1,
+				query: ""
 			}
 		},
 		mounted(){
@@ -39,7 +52,7 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/repo?page=${this.currentPage-1}`)
+				fetch(`/api/repo/search?page=${this.currentPage-1}&q=${this.query}`)
 				.then(response => {
 					return response.json()
 				})
@@ -61,3 +74,9 @@
 		}
 	};
 </script>
+<style scoped>
+.material-icons{
+	font-size: 18px;
+	vertical-align: middle!important;
+}
+</style>

@@ -24,14 +24,30 @@ window.$ = window.jQuery = require('jquery');
 Vue.mixin( {
 	methods: {
 		textToLinksParser: function (text, owner, repo) {
+			// Link issue with hash -> @1234
+			var re = new RegExp(`https:\/\/github.com\/${owner}\/${repo}\/(issues|pull)\/[0-9]*`, 'gi')
+			text = text.replace(re, function(u){
+				var parts = u.split('/');
+				var number = parts.pop() || parts.pop();
+				return ` <a href="/repository/${owner}/${repo}/issue/${number}">#${number}</a>`
+			});
+
+			// Link username -> @myUsername
 			text = text.replace(/[@]+[A-Za-z0-9-_]+/g, function(u){
 				var username = u.replace("@","");
 				return `<a href="https://github.com/${username}" target="_blank">@${username}</a>`
 			});
-			text = text.replace(/ +[#]+[A-Za-z0-9-_]+/g, function(u){
+			// Link issue with hash -> @1234
+			text = text.replace(/^[#]+[A-Za-z0-9-_]+/g, function(u){
 				var number = u.replace("#","").trim();
 				return ` <a href="/repository/${owner}/${repo}/issue/${number}">#${number}</a>`
 			});
+
+			// Link commit hash (40 chars) -> 0123456789012345678901234567890123456789
+			text = text.replace(/^\b[0-9a-f]{40}\b/g, function(id){
+				return ` <a href="/repository/${owner}/${repo}/commit/${id}">${id}</a>`
+			});
+			// General links
 			return anchorme({input: text, options: {
 				attributes: {
 					target: "_blank",
