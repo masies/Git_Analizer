@@ -32,6 +32,9 @@ Vue.mixin( {
 				var number = u.replace("#","").trim();
 				return ` <a href="/repository/${owner}/${repo}/issue/${number}">#${number}</a>`
 			});
+			text = text.replace(/\b[0-9a-f]{5,40}\b/g, function(id){
+				return ` <a href="/repository/${owner}/${repo}/commit/${id}">${id}</a>`
+			});
 			return anchorme({input: text, options: {
 				attributes: {
 					target: "_blank",

@@ -14,7 +14,7 @@
 				<hr>
 			</div>
 		</div>
-		<comments-list-item :data="{comment: issue}"/>	
+		<comments-list-item :data="{comment: issue}" v-if="issue.body != ''"/>	
 		<div v-if="comments" class="mb-3">
 			<comments-list-item class="mt-3" :data="comment" v-for="comment in comments.content"/>	
 		</div>
