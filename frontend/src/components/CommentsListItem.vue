@@ -37,7 +37,7 @@
 			},
 			parsedBody: function(){
 				var parseLines = this.comment.body.replace(/(?:\r\n|\r|\n)/g, '<br>');
-				return this.textToLinksParser(parseLines, this.data.owner, this.data.repo)
+				return this.textToLinksParser(parseLines, this.$route.params.owner, this.$route.params.name)
 			}
 		}
 	};

@@ -28,6 +28,15 @@ public class RepoController {
         return repoRepository.findAll(paging);
     }
 
+    @GetMapping("/repo/search")
+    @ResponseBody
+    public Page<Repo> getRepos(@RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "20") int size,
+                               @RequestParam(defaultValue = "") String q) throws IOException {
+        Pageable paging = PageRequest.of(page, size);
+        return repoRepository.findByQuery(q, paging);
+    }
+
     @RequestMapping("/repo/{owner}/{repo}/status")
     public @ResponseBody RepoStatus getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         Repo r = repoRepository.findByOwnerAndRepo(owner,repo);
