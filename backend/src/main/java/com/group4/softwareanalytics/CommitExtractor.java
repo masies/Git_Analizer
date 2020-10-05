@@ -59,8 +59,7 @@ public class CommitExtractor {
                     .call();
             entriesList.addAll(entries);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             /* commits with no modification */
         }
 
