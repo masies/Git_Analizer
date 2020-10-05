@@ -1,5 +1,5 @@
 <template>
-	<div class="container mt-3" v-if="data">
+	<div class="container mt-3 mb-3" v-if="data">
 		<div class="row">
 			<div class="col card w-100 mt-2">
 				<div class="card-body">

@@ -3,6 +3,11 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="d-inline mr-1">{{ issue.title }}</h3><h3 class="text-muted d-inline">#{{ issue.number }}</h3>
+				<div>
+					<span class="badge badge-pill mr-1" :style="{'background-color': '#'+label.color }" v-for="label in issue.labels">
+						{{ label.name }}
+					</span>
+				</div>
 				<p class="text-muted mb-0">
 					<svg class="octicon octicon-issue-opened open mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true" v-if="issue.state=='open'" >
 						<path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zm-.25-6.25a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z"></path>
@@ -16,7 +21,7 @@
 		</div>
 		<comments-list-item :data="{comment: issue}" v-if="issue.body != ''"/>	
 		<div v-if="comments" class="mb-3">
-			<comments-list-item class="mt-3" :data="comment" v-for="comment in comments.content"/>	
+			<comments-list-item class="mt-3" :data="comment" v-for="comment in comments.content" :key="comment.comment.id"/>	
 		</div>
 	</div>
 </template>
