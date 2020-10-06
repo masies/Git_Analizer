@@ -31,7 +31,8 @@
 					<p class="card-text">
 						{{ repository.description }}
 					</p>
-					<button class="btn btn-primary btn-sm" @click="updateRepository">Update</button>
+					<button class="btn btn-primary btn-sm" @click="updateRepository" :disabled="showStatusBar">Update</button>
+					<status-bar :owner="repository.owner.login" :name="repository.name" v-if="showStatusBar" class="mt-2"/>
 				</div>
 			</div>
 		</div>
@@ -55,6 +56,7 @@
 		data: () => {
 			return {
 				data: null,
+				showStatusBar: false
 			}
 		},
 		mounted(){
@@ -69,6 +71,7 @@
 				.then(data => this.data = data);
 			},
 			updateRepository: function(){
+				this.showStatusBar = true;
 				fetch("/api/repo",
 				{
 					method: 'POST',
