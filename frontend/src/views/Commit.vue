@@ -1,6 +1,6 @@
 <template>
-	<div class="container mt-3">
-		<div class="card" v-if="commit">
+	<div class="container mt-3" v-if="commit">
+		<div class="card">
 			<div class="card-header">
 				<h3 class="d-inline mr-1">{{ commit.shortMessage }}</h3>
 			</div>
@@ -60,6 +60,8 @@
 				</span>
 			</div>
 		</div>
+
+		<commit-diff-item v-for="diff in commit.modifications" :data="diff" class="mt-3"/>
 	</div>
 </template>
 
