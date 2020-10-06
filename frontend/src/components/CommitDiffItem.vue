@@ -3,6 +3,50 @@
 		<div class="card-header">
 			{{ data.oldPath }}
 		</div>
+		<div class="card-header" v-if="data.changeType == 'MODIFY' && metrics">
+			<div class="row text-center">
+				<div class="col">
+					{{ metrics.loc.toFixed(2) }} 
+					<span>
+						<span v-if="changeLOC > 0">▴</span>
+						<span v-else-if="changeLOC < 0">▾</span>
+						<span v-else>-</span>{{changeLOC}}%
+					</span>
+					<br>
+					<span title="Lines Of Code" data-toggle="tooltip" data-placement="bottom">LOC</span>
+				</div>
+				<div class="col">
+					{{ metrics.cbo.toFixed(2) }} 
+					<span :class="{'text-danger': changeCBO > 0, 'text-success': changeCBO < 0}">
+						<span v-if="changeCBO > 0">▴</span>
+						<span v-else-if="changeCBO < 0">▾</span>
+						<span v-else>-</span>{{ changeCBO }}%
+					</span>
+					<br>
+					<span title="Coupling between Objects" data-toggle="tooltip" data-placement="bottom">CBO</span>
+				</div>
+				<div class="col">
+					{{ metrics.wmc.toFixed(2) }} 
+					<span :class="{'text-danger': changeWMC > 0, 'text-success': changeWMC < 0}">
+						<span v-if="changeWMC > 0">▴</span>
+						<span v-else-if="changeWMC < 0">▾</span>
+						<span v-else>-</span>{{ changeWMC }}%
+					</span>
+					<br>
+					<span title="Weighted Methods for Class" data-toggle="tooltip" data-placement="bottom">WMC</span>
+				</div>
+				<div class="col">
+					{{ metrics.lcom.toFixed(2) }} 
+					<span :class="{'text-danger': changeLCOM > 0, 'text-success': changeLCOM < 0}">
+						<span v-if="changeLCOM > 0">▴</span>
+						<span v-else-if="changeLCOM < 0">▾</span>
+						<span v-else>-</span>{{ changeLCOM }}%
+					</span>
+					<br>
+					<span title="Lack of Cohesion in Methods" data-toggle="tooltip" data-placement="bottom">LCOM</span>
+				</div>
+			</div>
+		</div>
 		<div class="card-body p-0" style="overflow-x: scroll;">
 			<div class="container-fluid" v-for="chunk in chunks">
 				<div class="row diff-chunk">
@@ -63,11 +107,41 @@
 					return change.ln2
 				}
 				return "";
+			},
+			calculateChange: function(curr, old){
+				return (old ? (old - curr) / old * 100.0 * -1 : 0).toFixed(2);
 			}
 		},
 		computed: {
 			chunks: function(){
 				return parse(this.data.diffs)[0].chunks;
+			},
+			metrics: function(){
+				return this.data.metrics
+			},
+			changeLOC: function(){
+				if(!metrics){
+					return 0;
+				}
+				return this.calculateChange(this.metrics.loc, this.metrics.parentLOC);
+			},
+			changeLCOM: function(){
+				if(!metrics){
+					return 0;
+				}
+				return this.calculateChange(this.metrics.lcom, this.metrics.parentLCOM);
+			},
+			changeWMC: function(){
+				if(!metrics){
+					return 0;
+				}
+				return this.calculateChange(this.metrics.wmc, this.metrics.parentWMC);
+			},
+			changeCBO: function(){
+				if(!metrics){
+					return 0;
+				}
+				return this.calculateChange(this.metrics.cbo, this.metrics.parentCBO);
 			}
 		}
 	};

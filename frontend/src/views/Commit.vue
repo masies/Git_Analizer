@@ -1,5 +1,5 @@
 <template>
-	<div class="container mt-3" v-if="commit">
+	<div class="container mt-3 mb-3" v-if="commit">
 		<div class="card">
 			<div class="card-header">
 				<h3 class="d-inline mr-1">{{ commit.shortMessage }}</h3>
