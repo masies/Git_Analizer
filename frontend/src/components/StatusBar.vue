@@ -56,7 +56,6 @@
 			}
 		},
 		mounted(){
-			this.loadData();
 			this.interval = setInterval(this.loadData, 5000)
 		},
 		methods: {

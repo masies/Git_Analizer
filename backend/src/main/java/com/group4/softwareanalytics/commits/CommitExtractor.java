@@ -77,6 +77,7 @@ public class CommitExtractor {
                     currentMetrics = results.getResults();
 
                     if (commitParentsIDs.size() == 1){
+                        results = new MetricResults();
                         git.checkout().setName( commitParentsIDs.get(0) ).call();
                         ck.calculate(repoOldPath,results);
                         parentMetrics = results.getResults();
