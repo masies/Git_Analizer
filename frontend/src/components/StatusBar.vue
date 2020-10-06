@@ -91,7 +91,7 @@
 				}
 			},
 			'data.fetchedInfo': function(newVal, oldVal){
-				this.status.push("Fetching reposiotry info complete!")
+				this.status.push("Fetching reposiotry information complete!")
 			},
 			'data.fetchedIssues': function(newVal, oldVal){
 				this.status.push("Fetching reposiotry issues complete!")
