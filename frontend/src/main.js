@@ -38,7 +38,7 @@ Vue.mixin( {
 				return `<a href="https://github.com/${username}" target="_blank">@${username}</a>`
 			});
 			// Link issue with hash -> @1234
-			text = text.replace(/^[#]+[A-Za-z0-9-_]+/g, function(u){
+			text = text.replace(/ +[#]+[A-Za-z0-9-_]+/g, function(u){
 				var number = u.replace("#","").trim();
 				return ` <a href="/repository/${owner}/${repo}/issue/${number}">#${number}</a>`
 			});
