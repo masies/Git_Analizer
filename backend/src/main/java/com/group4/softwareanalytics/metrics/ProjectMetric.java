@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.metrics;
 
 public class ProjectMetric {
     private float LOC;

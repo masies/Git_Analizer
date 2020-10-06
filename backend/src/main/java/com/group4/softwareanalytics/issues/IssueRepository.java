@@ -1,5 +1,6 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.issues;
 
+import com.group4.softwareanalytics.issues.Issue;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

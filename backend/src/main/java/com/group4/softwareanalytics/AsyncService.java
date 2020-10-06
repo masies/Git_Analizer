@@ -1,8 +1,17 @@
 package com.group4.softwareanalytics;
 
+import com.group4.softwareanalytics.commits.Commit;
+import com.group4.softwareanalytics.commits.CommitDiff;
+import com.group4.softwareanalytics.commits.CommitExtractor;
+import com.group4.softwareanalytics.commits.CommitRepository;
+import com.group4.softwareanalytics.issues.comments.IssueComment;
+import com.group4.softwareanalytics.issues.comments.IssueCommentRepository;
+import com.group4.softwareanalytics.issues.IssueRepository;
+import com.group4.softwareanalytics.metrics.ProjectMetric;
+import com.group4.softwareanalytics.repository.Repo;
+import com.group4.softwareanalytics.repository.RepoRepository;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -10,7 +19,6 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -20,8 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -112,15 +118,12 @@ public class AsyncService {
             String shortMessage = revCommit.getShortMessage();
             String commitName = revCommit.getName();
 
-            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName);
-
-
             ArrayList<String> commitParentsIDs = new ArrayList<>();
             for (RevCommit parent: revCommit.getParents()) {
                 commitParentsIDs.add(parent.name());
             }
 
-//            CommitExtractor.getDiff(git,commitName);
+            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
 
             ProjectMetric projectMetric = new ProjectMetric(0,0,0,0,0,0,0,0);
 
@@ -160,13 +163,13 @@ public class AsyncService {
             System.out.println("ALL ISSUES: "+ issues.size());
 
             System.out.println(issues.size());
-            List<com.group4.softwareanalytics.Issue> issueList = new ArrayList<com.group4.softwareanalytics.Issue>();
+            List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<com.group4.softwareanalytics.issues.Issue>();
 
             System.out.println("storing comments and issues..");
             for (Issue issue : issues) {
                 System.out.println("procsessing "+ issue.toString());
 
-                com.group4.softwareanalytics.Issue i = new com.group4.softwareanalytics.Issue(issue, owner, name);
+                com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name);
                 issueList.add(i);
 
 

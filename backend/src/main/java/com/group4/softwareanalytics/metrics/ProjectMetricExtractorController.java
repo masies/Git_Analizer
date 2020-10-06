@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.metrics;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;

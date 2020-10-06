@@ -1,6 +1,8 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.commits;
 
 
+import com.group4.softwareanalytics.metrics.ProjectMetric;
+import com.group4.softwareanalytics.metrics.ProjectMetricExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.issues;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

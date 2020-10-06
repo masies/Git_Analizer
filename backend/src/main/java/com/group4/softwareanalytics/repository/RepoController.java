@@ -1,5 +1,6 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.repository;
 
+import com.group4.softwareanalytics.AsyncService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +39,8 @@ public class RepoController {
     }
 
     @RequestMapping("/repo/{owner}/{repo}/status")
-    public @ResponseBody RepoStatus getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
+    public @ResponseBody
+    RepoStatus getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         Repo r = repoRepository.findByOwnerAndRepo(owner,repo);
         return r != null ?  r.getStatus() : new RepoStatus();
     }

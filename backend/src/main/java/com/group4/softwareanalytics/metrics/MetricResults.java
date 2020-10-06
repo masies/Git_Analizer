@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.metrics;
 
 import com.github.mauricioaniche.ck.CKClassResult;
 import com.github.mauricioaniche.ck.CKNotifier;
@@ -19,7 +19,7 @@ public class MetricResults implements CKNotifier {
 
     @Override
     public void notify(CKClassResult ckClassResult) {
-        System.out.println(ckClassResult.getFile());
+//        System.out.println(ckClassResult.getFile());
         // TODO: add control if file list is empty
 //        if (javaFiles.contains(ckClassResult.getFile())){
 //            System.out.println("file counted");
@@ -38,7 +38,7 @@ public class MetricResults implements CKNotifier {
             averageLCOM = averageLCOM / numberOfClasses;
             averageLOC = averageLOC / numberOfClasses;
         }
-        return new ArrayList<Float>(Arrays.asList(averageCBO,averageWMC,averageLCOM,averageLOC));
+        return new ArrayList<Float>(Arrays.asList(averageCBO, averageWMC, averageLOC, averageLCOM));
     }
 
     public Set<String> getJavaFiles() {

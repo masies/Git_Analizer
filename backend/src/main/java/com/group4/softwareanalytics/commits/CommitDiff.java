@@ -1,6 +1,13 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.commits;
 
+import com.github.mauricioaniche.ck.CK;
+import com.group4.softwareanalytics.metrics.MetricResults;
+import com.group4.softwareanalytics.metrics.ProjectMetric;
 import org.eclipse.jgit.diff.DiffEntry;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class CommitDiff {
 
@@ -8,12 +15,22 @@ public class CommitDiff {
     private String oldPath;
     private String newPath;
     private String diffs;
+    private ProjectMetric metrics;
 
-    public CommitDiff(String oldPath, String newPath, String changeType, String diffs) {
+    public CommitDiff(String oldPath, String newPath, String changeType, String diffs, ProjectMetric metrics) {
         this.changeType = changeType;
         this.oldPath = oldPath;
         this.newPath = newPath;
         this.diffs = diffs;
+        this.metrics = metrics;
+    }
+
+    public ProjectMetric getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(ProjectMetric metrics) {
+        this.metrics = metrics;
     }
 
     public String getDiffs() {

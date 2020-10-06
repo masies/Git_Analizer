@@ -1,5 +1,6 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.commits;
 
+import com.group4.softwareanalytics.metrics.ProjectMetric;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 

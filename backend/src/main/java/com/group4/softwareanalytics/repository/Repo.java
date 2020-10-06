@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.repository;
 
 import org.eclipse.egit.github.core.Repository;
 import org.springframework.data.annotation.Id;

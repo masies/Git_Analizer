@@ -1,5 +1,8 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.commits;
 
+import com.github.mauricioaniche.ck.CK;
+import com.group4.softwareanalytics.metrics.MetricResults;
+import com.group4.softwareanalytics.metrics.ProjectMetric;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -43,7 +46,7 @@ public class CommitExtractor {
         return commitList;
     }
 
-    public static List<CommitDiff> getModifications(Git git, String commit) {
+    public static List<CommitDiff> getModifications(Git git, String commit, String path, ArrayList<String> commitParentsIDs) {
         List<CommitDiff> entriesList = new ArrayList<>();
         try {
             ObjectReader reader = git.getRepository().newObjectReader();
@@ -55,13 +58,36 @@ public class CommitExtractor {
             newTreeIter.reset(reader, newTree);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            DiffFormatter df = new DiffFormatter(stream);
+            DiffFormatter diffFormatter = new DiffFormatter(stream);
 
-            df.setRepository( git.getRepository() );
-            for (DiffEntry entry:df.scan( oldTreeIter, newTreeIter )) {
-                df.format(entry);
+            diffFormatter.setRepository( git.getRepository() );
+            for (DiffEntry entry:diffFormatter.scan( oldTreeIter, newTreeIter )) {
+                diffFormatter.format(entry);
                 String diffText = stream.toString(DEFAULT_ENCODING);
-                CommitDiff cd = new CommitDiff(entry.getOldPath(), entry.getNewPath(), entry.getChangeType().name(), diffText);
+                ArrayList<Float> currentMetrics = new ArrayList<>();
+                ArrayList<Float> parentMetrics = new ArrayList<>();
+
+                if (entry.getChangeType().name() == "MODIFY"){
+
+                    String repoNewPath = path + "/" + entry.getNewPath();;
+                    String repoOldPath = path + "/" + entry.getOldPath();;
+                    MetricResults results = new MetricResults();
+                    CK ck = new CK();
+                    ck.calculate(repoNewPath,results);
+                    currentMetrics = results.getResults();
+
+                    if (commitParentsIDs.size() == 1){
+                        git.checkout().setName( commitParentsIDs.get(0) ).call();
+                        ck.calculate(repoOldPath,results);
+                        parentMetrics = results.getResults();
+                        git.checkout().setName( commit ).call();
+                    }
+                }
+
+                ProjectMetric pm = new ProjectMetric(currentMetrics.get(0), currentMetrics.get(1), currentMetrics.get(2), currentMetrics.get(3), parentMetrics.get(0), parentMetrics.get(1), parentMetrics.get(2), parentMetrics.get(3));
+
+                CommitDiff cd = new CommitDiff(entry.getOldPath(), entry.getNewPath(), entry.getChangeType().name(), diffText, pm);
+
                 entriesList.add(cd);
                 stream.reset();
             }
