@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics;
+package com.group4.softwareanalytics.issues.comments;
 
 import org.eclipse.egit.github.core.Comment;
 import org.springframework.data.annotation.Id;
