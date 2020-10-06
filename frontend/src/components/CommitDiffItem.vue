@@ -120,25 +120,25 @@
 				return this.data.metrics
 			},
 			changeLOC: function(){
-				if(!metrics){
+				if(!this.metrics){
 					return 0;
 				}
 				return this.calculateChange(this.metrics.loc, this.metrics.parentLOC);
 			},
 			changeLCOM: function(){
-				if(!metrics){
+				if(!this.metrics){
 					return 0;
 				}
 				return this.calculateChange(this.metrics.lcom, this.metrics.parentLCOM);
 			},
 			changeWMC: function(){
-				if(!metrics){
+				if(!this.metrics){
 					return 0;
 				}
 				return this.calculateChange(this.metrics.wmc, this.metrics.parentWMC);
 			},
 			changeCBO: function(){
-				if(!metrics){
+				if(!this.metrics){
 					return 0;
 				}
 				return this.calculateChange(this.metrics.cbo, this.metrics.parentCBO);
