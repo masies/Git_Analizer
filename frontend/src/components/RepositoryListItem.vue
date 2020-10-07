@@ -6,7 +6,7 @@
 					{{ repository.owner.login }}/{{ repository.name }}
 				</router-link>
 			</h5>
-			<h6 class="card-subtitle mb-2 text-muted">
+			<h6 class="card-subtitle mb-2 text-muted" v-if="repository.language">
 				<span class="repo-language-color" :style="{'background-color': languageColor.color}"></span>
 				{{ repository.language }}
 			</h6>
