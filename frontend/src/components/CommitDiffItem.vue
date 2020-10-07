@@ -1,16 +1,20 @@
 <template>
 	<div class="card">
-		<div class="card-header">
+		<div class="card-header"  @click="toggleCommit">
 			{{ data.oldPath }}
+			<span class="float-right">
+				<i class="material-icons" v-if="toggle">keyboard_arrow_up</i>
+				<i class="material-icons" v-else>keyboard_arrow_down</i>
+			</span>
 		</div>
-		<div class="card-header" v-if="data.changeType == 'MODIFY' && metrics">
+		<div class="card-header" v-if="data.changeType == 'MODIFY' && metrics && showMetrics" @click="toggleCommit">
 			<div class="row text-center">
 				<div class="col">
 					{{ metrics.loc.toFixed(2) }} 
 					<span>
 						<span v-if="changeLOC > 0">▴</span>
 						<span v-else-if="changeLOC < 0">▾</span>
-						<span v-else>-</span>{{changeLOC}}%
+						<span v-else>- </span>{{changeLOC}}%
 					</span>
 					<br>
 					<span title="Lines Of Code" data-toggle="tooltip" data-placement="bottom">LOC</span>
@@ -20,7 +24,7 @@
 					<span :class="{'text-danger': changeCBO > 0, 'text-success': changeCBO < 0}">
 						<span v-if="changeCBO > 0">▴</span>
 						<span v-else-if="changeCBO < 0">▾</span>
-						<span v-else>-</span>{{ changeCBO }}%
+						<span v-else> - </span>{{ changeCBO }}%
 					</span>
 					<br>
 					<span title="Coupling between Objects" data-toggle="tooltip" data-placement="bottom">CBO</span>
@@ -30,7 +34,7 @@
 					<span :class="{'text-danger': changeWMC > 0, 'text-success': changeWMC < 0}">
 						<span v-if="changeWMC > 0">▴</span>
 						<span v-else-if="changeWMC < 0">▾</span>
-						<span v-else>-</span>{{ changeWMC }}%
+						<span v-else> - </span>{{ changeWMC }}%
 					</span>
 					<br>
 					<span title="Weighted Methods for Class" data-toggle="tooltip" data-placement="bottom">WMC</span>
@@ -40,14 +44,14 @@
 					<span :class="{'text-danger': changeLCOM > 0, 'text-success': changeLCOM < 0}">
 						<span v-if="changeLCOM > 0">▴</span>
 						<span v-else-if="changeLCOM < 0">▾</span>
-						<span v-else>-</span>{{ changeLCOM }}%
+						<span v-else> - </span>{{ changeLCOM }}%
 					</span>
 					<br>
 					<span title="Lack of Cohesion in Methods" data-toggle="tooltip" data-placement="bottom">LCOM</span>
 				</div>
 			</div>
 		</div>
-		<div class="card-body p-0" style="overflow-x: scroll;">
+		<div class="card-body p-0 collapse" style="overflow-x: scroll;" ref="collapse">
 			<div class="container-fluid" v-for="chunk in chunks">
 				<div class="row diff-chunk">
 					<div class="col-2 diff-line">
@@ -79,17 +83,22 @@
 		props: {
 			data: {
 				type: Object,
-				default: null
+				default: null,
 			}
 		},
 		data: () => {
 			return {
+				toggle: false
 			}
 		},
 		mounted(){
 
 		},
 		methods: {
+			toggleCommit: function(){
+				this.toggle = !this.toggle;
+				$(this.$refs.collapse).collapse('toggle')
+			},
 			getLine1: function(change){
 				if(change.type == "del"){
 					return change.ln
@@ -109,12 +118,16 @@
 				return "";
 			},
 			calculateChange: function(curr, old){
-				return (old ? (old - curr) / old * 100.0 * -1 : 0).toFixed(2);
+				var val = (old ? (old - curr) / old * 100.0 * -1 : 0).toFixed(2);
+				return val;
 			}
 		},
 		computed: {
 			chunks: function(){
 				return parse(this.data.diffs)[0].chunks;
+			},
+			showMetrics: function(){
+				return this.metrics.loc || this.metrics.lcom || this.metrics.wmc || this.metrics.cbo
 			},
 			metrics: function(){
 				return this.data.metrics
