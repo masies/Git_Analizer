@@ -32,7 +32,7 @@
 						{{ repository.description }}
 					</p>
 					<button class="btn btn-primary btn-sm" @click="updateRepository" :disabled="showStatusBar">Update</button>
-					<status-bar :owner="repository.owner.login" :name="repository.name" v-if="showStatusBar" class="mt-2"/>
+					<status-bar :owner="repository.owner.login" :name="repository.name" v-if="showStatusBar" class="mt-2" @fetchIsComplete="reloadData"/>
 				</div>
 			</div>
 		</div>
@@ -40,12 +40,12 @@
 			<div class="col-12 col-lg-6">
 				<h5 class="mb-0">Issues</h5>
 				<hr>
-				<issues-list :size="10" :showPagination="false" />
+				<issues-list :size="10" :showPagination="false" ref="issuesList"/>
 			</div>
 			<div class="col-12 col-lg-6 mt-3 mt-lg-0">
 				<h5 class="mb-0">Commits</h5>
 				<hr>
-				<commits-list :size="10" :showPagination="false" />
+				<commits-list :size="10" :showPagination="false" ref="commitsList"/>
 			</div>
 		</div> 
 	</div> 
@@ -87,6 +87,10 @@
 					return response.json()
 				})
 				.then(data => console.log(data));
+			},
+			reloadData: function() {
+				this.$refs.issuesList.loadData();
+				this.$refs.commitsList.loadData();
 			}
 		},
 		computed: {
