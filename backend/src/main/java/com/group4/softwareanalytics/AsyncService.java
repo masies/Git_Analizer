@@ -11,10 +11,9 @@ import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.PullRequestService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
@@ -123,7 +122,8 @@ public class AsyncService {
                 commitParentsIDs.add(parent.name());
             }
 
-            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
+            List<CommitDiff> diffEntries = new ArrayList<>();
+//            diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
 
             ProjectMetric projectMetric = new ProjectMetric(0,0,0,0,0,0,0,0);
 
@@ -145,24 +145,19 @@ public class AsyncService {
     public void fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
+
             service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
 
-            // gather all the open issues
             List<Issue> issuesOpen = service.getIssues(owner, name,
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
-            System.out.println("OPEN ISSUES: "+ issuesOpen.size());
 
-            // gather all the closed issues
             List<Issue> issuesClosed = service.getIssues(owner, name,
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_CLOSED));
-            System.out.println("CLOSED ISSUES: "+ issuesClosed.size());
 
-            // merge the two list of issues
             List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                              .collect(Collectors.toList());
-            System.out.println("ALL ISSUES: "+ issues.size());
 
-            System.out.println(issues.size());
+            System.out.println("Found" + issues.size() + "Issues");
             List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<com.group4.softwareanalytics.issues.Issue>();
 
             System.out.println("storing comments and issues..");
@@ -171,8 +166,6 @@ public class AsyncService {
 
                 com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name);
                 issueList.add(i);
-
-
                 // gather all the issue comments
                 List<Comment> comments = service.getComments(owner, name, issue.getNumber());
                 List<IssueComment> commentList = new ArrayList<IssueComment>();
@@ -180,12 +173,9 @@ public class AsyncService {
                     IssueComment c = new IssueComment(comment, owner, name, issue.getNumber());
                     commentList.add(c);
                 }
-
                 issueCommentRepository.saveAll(commentList);
-                System.out.println("done with storing comments");
             }
 
-            System.out.println("issue " + issueList.size());
             issueRepository.saveAll(issueList);
             System.out.println("done with storing issues");
 
