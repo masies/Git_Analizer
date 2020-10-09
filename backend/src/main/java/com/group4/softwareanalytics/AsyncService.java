@@ -79,7 +79,6 @@ public class AsyncService {
     }
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
-        System.out.println("Fetching commits...");
         String repo_url = "https://github.com/"+ owner +"/"+ repoName;
         String dest_url = "./repo/" + owner +"/"+ repoName;
 
@@ -136,7 +135,7 @@ public class AsyncService {
         }
         commitRepository.saveAll(commitList);
 
-        System.out.println("done fetching commits");
+        System.out.println("------- Commits fetched successfully! -------");
         r.hasCommitsDone();
         repoRepository.save(r);
     }
@@ -157,13 +156,10 @@ public class AsyncService {
             List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                              .collect(Collectors.toList());
 
-            System.out.println("Found" + issues.size() + "Issues");
+            System.out.println("Found " + issues.size() + " Issues, start fetching them...");
             List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<com.group4.softwareanalytics.issues.Issue>();
 
-            System.out.println("storing comments and issues..");
             for (Issue issue : issues) {
-                System.out.println("procsessing "+ issue.toString());
-
                 com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name);
                 issueList.add(i);
                 // gather all the issue comments
@@ -177,7 +173,8 @@ public class AsyncService {
             }
 
             issueRepository.saveAll(issueList);
-            System.out.println("done with storing issues");
+            System.out.println("------- Issues fetched successfully! -------");
+
 
             repo.hasIssuesDone();
             repoRepository.save(repo);
