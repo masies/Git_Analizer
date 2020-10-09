@@ -55,6 +55,13 @@ public class RepoController {
     public Repo fetchRepo(@RequestBody Map<String, Object> body) throws InterruptedException {
         String owner = body.getOrDefault("owner", "google").toString();
         String name = body.getOrDefault("name", "guava").toString();
+        Repo repo = repoRepository.findByOwnerAndRepo(owner,name);
+        if (repo != null){
+            if (!repo.getStatus().getFetchedInfo() || !repo.getStatus().getFetchedCommits() || !repo.getStatus().getFetchedIssues()){
+                System.out.println("====== Repo is still on process");
+                return null;
+            }
+        }
         asyncService.fetchData(owner, name);
         return null;
     }
