@@ -1,14 +1,23 @@
 package com.group4.softwareanalytics;
 
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.Issue;
+import com.group4.softwareanalytics.commits.Commit;
+import com.group4.softwareanalytics.commits.CommitDiff;
+import com.group4.softwareanalytics.commits.CommitExtractor;
+import com.group4.softwareanalytics.commits.CommitRepository;
+import com.group4.softwareanalytics.issues.comments.IssueComment;
+import com.group4.softwareanalytics.issues.comments.IssueCommentRepository;
+import com.group4.softwareanalytics.issues.IssueRepository;
+import com.group4.softwareanalytics.metrics.ProjectMetric;
+import com.group4.softwareanalytics.repository.Repo;
+import com.group4.softwareanalytics.repository.RepoRepository;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.PullRequestService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -16,9 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,22 +61,37 @@ public class AsyncService {
 
             repo.hasInfoDone();
             repoRepository.save(repo);
-            fetchIssues(owner, name, repo);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        fetchIssues(owner, name, repo);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
             fetchCommits(owner, name, repo);
         } catch (Exception ignored) {
         }
     }
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
-        System.out.println("Fetching commits...");
         String repo_url = "https://github.com/"+ owner +"/"+ repoName;
         String dest_url = "./repo/" + owner +"/"+ repoName;
+
         List<Commit> commitList = new ArrayList<Commit>();
         List<String> branches = new ArrayList<>();
 
-        if (!Files.exists(Paths.get(dest_url))) {
-            CommitExtractor.DownloadRepo(repo_url, dest_url);
+        File dir = new File(dest_url);
+
+        if (dir.exists()) {
+            FileUtils.deleteDirectory(dir);
         }
+
+        CommitExtractor.DownloadRepo(repo_url, owner, repoName);
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
@@ -83,14 +106,8 @@ public class AsyncService {
 
         List<RevCommit> revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
 
-        for(RevCommit revCommit: revCommitList)
-        {
-            List<DiffEntry> diffEntries = CommitExtractor.getModifications(git, revCommit.getName());
-            List<String> modifications = new ArrayList<>();
-
-            for (DiffEntry diffEntry : diffEntries) {
-                modifications.add(diffEntry.getChangeType().toString());
-            }
+        for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
+            RevCommit revCommit = iterator.next();
 
             String developerName = revCommit.getAuthorIdent().getName();
             String developerMail = revCommit.getAuthorIdent().getEmailAddress();
@@ -98,50 +115,53 @@ public class AsyncService {
             String fullMessage = revCommit.getFullMessage();
             String shortMessage = revCommit.getShortMessage();
             String commitName = revCommit.getName();
-            String diffCombined = CommitExtractor.getDiffComb(git,commitName);
+
+            ArrayList<String> commitParentsIDs = new ArrayList<>();
+            for (RevCommit parent: revCommit.getParents()) {
+                commitParentsIDs.add(parent.name());
+            }
+
+            List<CommitDiff> diffEntries = new ArrayList<>();
+//            diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
+
+            ProjectMetric projectMetric = new ProjectMetric(0,0,0,0,0,0,0,0);
+
             int commitType = revCommit.getType();
             long millis = revCommit.getCommitTime();
-            Date d = new Date(millis*1000);
+            Date date = new Date(millis * 1000);
 
-            Commit c = new Commit(modifications, owner, repoName, diffCombined, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, d);
+            Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
             commitList.add(c);
         }
         commitRepository.saveAll(commitList);
 
-        System.out.println("done fetching commits");
+        System.out.println("------- Commits fetched successfully! -------");
         r.hasCommitsDone();
         repoRepository.save(r);
     }
 
-
+    @Async
     public void fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
+
             service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
 
-            // gather all the open issues
             List<Issue> issuesOpen = service.getIssues(owner, name,
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
-            System.out.println("OPEN ISSUES: "+ issuesOpen.size());
 
-            // gather all the closed issues
             List<Issue> issuesClosed = service.getIssues(owner, name,
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_CLOSED));
-            System.out.println("CLOSED ISSUES: "+ issuesClosed.size());
 
-            // merge the two list of issues
             List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                              .collect(Collectors.toList());
-            System.out.println("ALL ISSUES: "+ issues.size());
 
-            System.out.println(issues.size());
-            List<com.group4.softwareanalytics.Issue> issueList = new ArrayList<com.group4.softwareanalytics.Issue>();
+            System.out.println("Found " + issues.size() + " Issues, start fetching them...");
+            List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<com.group4.softwareanalytics.issues.Issue>();
 
-            System.out.println("storing comments and issues..");
             for (Issue issue : issues) {
-                com.group4.softwareanalytics.Issue i = new com.group4.softwareanalytics.Issue(issue, owner, name);
+                com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name);
                 issueList.add(i);
-
                 // gather all the issue comments
                 List<Comment> comments = service.getComments(owner, name, issue.getNumber());
                 List<IssueComment> commentList = new ArrayList<IssueComment>();
@@ -151,9 +171,10 @@ public class AsyncService {
                 }
                 issueCommentRepository.saveAll(commentList);
             }
-            System.out.println("done with storing comments");
+
             issueRepository.saveAll(issueList);
-            System.out.println("done with storing issues");
+            System.out.println("------- Issues fetched successfully! -------");
+
 
             repo.hasIssuesDone();
             repoRepository.save(repo);

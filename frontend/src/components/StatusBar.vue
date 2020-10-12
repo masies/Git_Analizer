@@ -3,7 +3,8 @@
 		<div class="col-12">		
 			<div class="progress">
 				<div class="progress-bar" role="progressbar" :style="{width: percentage+'%'}" :aria-valuenow="percentage" aria-valuemin="0" aria-valuemax="100">
-					<span :class="{loading: !isComplete}">{{ currentStatus }}</span>
+					<span :class="{loading: !isComplete}" v-if="!isComplete">Fetching repository</span>
+					<span v-if="isComplete">Fetching complete!</span>
 				</div>
 			</div>
 		</div>
@@ -13,24 +14,14 @@
 			</a>
 			<div class="collapse" id="details">
 				<div class="card card-body p-2">
-					<p class="mb-0">
-						<samp :class="{loading: !data.fetchedInfo}">
-							> Fetching repository information<span v-if="data.fetchedInfo"> - complete!</span>
+					<p class="mb-0" v-for="state in status">
+						<samp>
+							{{ state }}
 						</samp>
 					</p>
-					<p class="mb-0">
-						<samp v-if="data.fetchedInfo" :class="{loading: !data.fetchedIssues}">
-							> Fetching issues<span v-if="data.fetchedIssues"> - complete!</span>
-						</samp>
-					</p>
-					<p class="mb-0">
-						<samp v-if="data.fetchedIssues" :class="{loading: !data.fetchedCommits}">
-							> Fetching commits<span v-if="data.fetchedCommits"> - complete!</span>
-						</samp>
-					</p>
-					<p class="mb-0">
-						<samp v-if="isComplete">
-							> Fetching complete, repository information are ready at 
+					<p class="mb-0" v-if="isComplete">
+						<samp>
+							Fetching complete, repository information are ready at 
 							<router-link :to="{name: 'repository', params: {owner: owner, name: name}}">
 								{{ owner }}/{{ name }}
 							</router-link>
@@ -60,11 +51,11 @@
 					fetchedInfo: false,
 					fetchedIssues: false,
 					fetchedCommits: false
-				}
+				},
+				status: ["Fetching repository information...", "Fetching repository issues...", "Fetching repository commits..."]
 			}
 		},
 		mounted(){
-			this.loadData();
 			this.interval = setInterval(this.loadData, 5000)
 		},
 		methods: {
@@ -76,7 +67,11 @@
 				.then(response => {
 					return response.json()
 				})
-				.then(data => this.data = data);
+				.then(data => {
+					this.$set(this.data, "fetchedInfo", data.fetchedInfo)
+					this.$set(this.data, "fetchedIssues", data.fetchedIssues)
+					this.$set(this.data, "fetchedCommits", data.fetchedCommits)
+				});
 			}
 		},
 		computed: {
@@ -85,22 +80,27 @@
 				var done = _.values(this.data).filter((x) => x).length;
 				return done/size*100
 			},
-			currentStatus: function(){
-				if(!this.data.fetchedInfo){
-					return "Fetching repository information"
-				}else if(!this.data.fetchedIssues){
-					return "Fetching issues"
-				}else if(!this.data.fetchedCommits){
-					return "Fetching commits"
-				}else{
-					return "Fetching complete"
-				}
-			},
 			isComplete: function(){
 				return _.values(this.data).filter((x) => !x).length == 0;
 			}
+		},
+		watch: {
+			isComplete: function(){
+				if(this.isComplete){
+					this.$emit("fetchIsComplete")
+				}
+			},
+			'data.fetchedInfo': function(newVal, oldVal){
+				this.status.push("Fetching reposiotry information complete!")
+			},
+			'data.fetchedIssues': function(newVal, oldVal){
+				this.status.push("Fetching reposiotry issues complete!")
+			},
+			'data.fetchedCommits': function(newVal, oldVal){
+				this.status.push("Fetching reposiotry commits complete!")
+			}
 		}
-	};
+	}
 </script>
 <style scoped>
 .progress{

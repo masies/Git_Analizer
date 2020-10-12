@@ -1,12 +1,12 @@
 <template>
-	<div class="card w-100 mt-2">
+	<div class="card w-100 mt-2 shadow-sm">
 		<div class="card-body">
 			<h5 class="card-title">
 				<router-link :to="{name: 'repository', params: { owner: repository.owner.login, name: repository.name }}">	
 					{{ repository.owner.login }}/{{ repository.name }}
 				</router-link>
 			</h5>
-			<h6 class="card-subtitle mb-2 text-muted">
+			<h6 class="card-subtitle mb-2 text-muted" v-if="repository.language">
 				<span class="repo-language-color" :style="{'background-color': languageColor.color}"></span>
 				{{ repository.language }}
 			</h6>
@@ -30,7 +30,8 @@
 			<p class="card-text">
 				{{ repository.description }}
 			</p>
-			<button class="btn btn-primary btn-sm" @click="updateRepository">Update</button>
+			<button class="btn btn-primary btn-sm" @click="updateRepository" :disabled="showStatusBar">Update</button>
+			<status-bar :owner="repository.owner.login" :name="repository.name" v-if="showStatusBar" class="mt-2"/>
 		</div>
 	</div>
 </template>
@@ -45,6 +46,7 @@
 		},
 		data: () => {
 			return {
+				showStatusBar: false
 			}
 		},
 		computed: {
@@ -57,6 +59,7 @@
 		},
 		methods: {
 			updateRepository: function(){
+				this.showStatusBar = true;
 				fetch("/api/repo",
 				{
 					method: 'POST',
@@ -68,10 +71,6 @@
 						name: this.repository.name
 					}),
 				})
-				.then(response => {
-					return response.json()
-				})
-				.then(data => console.log(data));
 			}
 		},
 		mounted(){

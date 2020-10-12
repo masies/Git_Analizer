@@ -118,5 +118,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:2.2" level="project" />
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
+    <orderEntry type="library" name="ck-0.6.3-SNAPSHOT-jar-with-dependencies (3)" level="project" />
+    <orderEntry type="library" name="ck-0.6.3-SNAPSHOT-jar-with-dependencies" level="project" />
   </component>
 </module>
