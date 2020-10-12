@@ -1,5 +1,6 @@
 package com.group4.softwareanalytics;
 
+import com.group4.softwareanalytics.commits.CommitExtractor;
 import com.sun.tools.hat.internal.model.JavaValue;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
