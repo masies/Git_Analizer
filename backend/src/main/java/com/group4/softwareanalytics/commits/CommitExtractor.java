@@ -17,9 +17,6 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static jdk.internal.util.xml.XMLStreamWriter.DEFAULT_ENCODING;
-
-
 public class CommitExtractor {
 
     public static void DownloadRepo(String url, String owner, String repoName) {
