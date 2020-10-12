@@ -20,6 +20,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.sample</groupId>
+            <artifactId>sample</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>org.kohsuke</groupId>
             <artifactId>github-api</artifactId>
             <version>1.116</version>
