@@ -63,7 +63,7 @@ public class CommitExtractor {
             diffFormatter.setRepository( git.getRepository() );
             for (DiffEntry entry:diffFormatter.scan( oldTreeIter, newTreeIter )) {
                 diffFormatter.format(entry);
-                String diffText = stream.toString(DEFAULT_ENCODING);
+                String diffText = stream.toString();
                 ArrayList<Float> currentMetrics = new ArrayList<>();
                 ArrayList<Float> parentMetrics = new ArrayList<>();
 
