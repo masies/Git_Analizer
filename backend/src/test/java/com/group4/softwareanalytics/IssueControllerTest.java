@@ -50,9 +50,11 @@ class IssueControllerTest {
 
         List<String> ids = new ArrayList<>();
 
-        for(JsonValue jsonObject: jsonArray)
+        for(JsonValue jsonValue: jsonArray)
         {
-            ids.add(jsonObject.asJsonObject().get("id").toString());
+            jsonReader = Json.createReader(new StringReader(jsonValue.toString()));
+            JsonObject object = jsonReader.readObject();
+            ids.add(object.get("id").toString());
         }
 
         Set<String> setIds = new HashSet<String>(ids);
