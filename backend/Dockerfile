@@ -3,4 +3,4 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 ARG JAR_FILE=./target/group4-software-analytics-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-Dspring.data.mongodb.uri=mongodb://db:27017/SoftwareAnalytics", "-jar","/app.jar"]
