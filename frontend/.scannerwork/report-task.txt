@@ -1,0 +1,6 @@
+projectKey=vueTestKey
+serverUrl=http://rio.inf.usi.ch:9000
+serverVersion=7.4.0.18908
+dashboardUrl=http://rio.inf.usi.ch:9000/dashboard?id=vueTestKey
+ceTaskId=AXUBqgL6CKGD40XAq71J
+ceTaskUrl=http://rio.inf.usi.ch:9000/api/ce/task?id=AXUBqgL6CKGD40XAq71J
