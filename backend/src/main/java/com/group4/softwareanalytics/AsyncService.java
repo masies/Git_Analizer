@@ -11,6 +11,8 @@ import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
@@ -67,8 +69,9 @@ public class AsyncService {
                 public void run() {
                     try {
                         fetchIssues(owner, name, repo);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException e){
+                        Logger logger = LogManager.getLogger(AsyncService.class.getName());
+                        logger.error(e.getMessage(),e);
                     }
                 }
             }).start();
@@ -140,7 +143,8 @@ public class AsyncService {
             r.hasCommitsDone();
             repoRepository.save(r);
         } catch (Exception e){
-            e.printStackTrace();
+            Logger logger = LogManager.getLogger(AsyncService.class.getName());
+            logger.error(e.getMessage(),e);
         }
     }
 
@@ -183,11 +187,11 @@ public class AsyncService {
             repo.hasIssuesDone();
             repoRepository.save(repo);
 
-
-        } catch (IOException e) {
-            System.out.println("Error during issue fetching");
-            e.printStackTrace();
+        } catch (IOException e){
+            Logger logger = LogManager.getLogger(AsyncService.class.getName());
+            logger.error(e.getMessage(),e);
         }
+
     }
 
 }

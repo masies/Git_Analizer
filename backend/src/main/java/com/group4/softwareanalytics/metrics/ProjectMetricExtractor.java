@@ -3,6 +3,9 @@ package com.group4.softwareanalytics.metrics;
 import com.github.mauricioaniche.ck.CK;
 import com.group4.softwareanalytics.metrics.MetricResults;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -51,7 +54,8 @@ public class ProjectMetricExtractor {
                 return new ProjectMetric(metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), 0, 0, 0, 0);
             }
         } catch (Exception e){
-            e.printStackTrace();
+            Logger logger = LogManager.getLogger(ProjectMetricExtractor.class.getName());
+            logger.error(e.getMessage(),e);
         }
         return null;
     }

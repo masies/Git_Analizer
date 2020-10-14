@@ -3,6 +3,8 @@ package com.group4.softwareanalytics.commits;
 import com.github.mauricioaniche.ck.CK;
 import com.group4.softwareanalytics.metrics.MetricResults;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -29,9 +31,9 @@ public class CommitExtractor {
                     .call();
             System.out.println("------- Repo cloned succesfully! -------");
 
-        } catch (GitAPIException e) {
-            System.out.println("Exception occurred while cloning repo");
-            e.printStackTrace();
+        } catch (GitAPIException e){
+            Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
+            logger.error(e.getMessage(),e);
         }
     }
 
@@ -98,9 +100,9 @@ public class CommitExtractor {
                 e.printStackTrace();
             }
         }
-        catch (Exception e) {
+        catch (Exception ignore) {
             /* commits with no modification */
-        }
+        } 
         return entriesList;
     }
 }
