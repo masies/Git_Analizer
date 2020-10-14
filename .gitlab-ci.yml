@@ -1,24 +1,41 @@
-build:
-  artifacts:
-    paths:
-      - build/libs/*.jar
-  image: "gradle:5.0-jdk8-alpine"
-  script:
-    - "gradle build"
-  stage: build
-deploy_staging:
-  environment:
-    name: staging
-    url: "https://mathflake.com"
-  only:
-    - develop
-  script:
-    - "apk upgrade && apk update"
-    - "apk add openssh-client"
-    - "apk add sshpass"
-    - "sshpass -p \"$STAGING_SERVER_PASSWORD\" ssh -o StrictHostKeyChecking=no $STAGING_SERVER_USER@$STAGING_SERVER docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com"
-    - "sshpass -p \"$STAGING_SERVER_PASSWORD\" ssh -o StrictHostKeyChecking=no $STAGING_SERVER_USER@$STAGING_SERVER docker pull registry.gitlab.com/mathflake/api"
-    - "sshpass -p \"$STAGING_SERVER_PASSWORD\" ssh -o StrictHostKeyChecking=no $STAGING_SERVER_USER@$STAGING_SERVER \"docker container stop mathflake_api && docker container rm mathflake_api || true\""
-    - "sshpass -p \"$STAGING_SERVER_PASSWORD\" ssh -o StrictHostKeyChecking=no $STAGING_SERVER_USER@$STAGING_SERVER docker run --name mathflake_api -p 80:80 -d registry.gitlab.com/mathflake/api"
+--- 
+build_frontend: 
+  image: node:10
+  script: 
+    - cd frontend
+    - npm i
+    - npm run build
   stage: deploy
-image: "docker:latest"
+  tags: 
+    - analytics
+#################################################
+build_backend: 
+  image: "maven:3-jdk-14"
+  script: 
+    - cd backend 
+    - mvn -Dmaven.test.skip clean package
+  stage: deploy
+  tags: 
+    - analytics
+############################################################
+sonar_check:
+  image: maven:3-jdk-11
+  stage : deploy
+  services:
+    - mongo
+
+  tags :
+    - analytics
+  # only : ["master"]
+  script :
+    - cd backend
+    - mvn --batch-mode verify sonar:sonar
+      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
+      -Dsonar.host.url="http://rio.inf.usi.ch:9000/"
+      -Dsonar.login="group4"
+      -Dsonar.password="group4"
+      -Dsonar.analysis.mode=publish
+      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
+      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+
