@@ -100,5 +100,15 @@ public class ProjectMetricTest {
         assertEquals(pm.getDeltaLCOM(), 44);
         assertEquals(pm.getDeltaLOC(), 44);
 
+        pm.setDeltaCBO(2);
+        pm.setDeltaWMC(2);
+        pm.setDeltaLCOM(2);
+        pm.setDeltaLOC(2);
+
+        assertEquals(pm.getDeltaCBO(), 2);
+        assertEquals(pm.getDeltaWMC(), 2);
+        assertEquals(pm.getDeltaLCOM(), 2);
+        assertEquals(pm.getDeltaLOC(), 2);
+
     }
 }
