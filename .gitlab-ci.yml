@@ -21,6 +21,9 @@ build_backend:
 sonar_check:
   image: maven:3-jdk-11
   stage : deploy
+  services:
+    - mongo:2.6.12
+
   tags :
     - analytics
   # only : ["master"]
