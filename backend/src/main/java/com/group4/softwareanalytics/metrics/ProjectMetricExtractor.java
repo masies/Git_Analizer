@@ -37,24 +37,21 @@ public class ProjectMetricExtractor {
     public static ProjectMetric commitCodeQualityExtractor(String owner, String repoName, String commit, ArrayList<String> parentCommits){
         String path = "./repo/" + owner +"/"+ repoName;
 
-        try {
-            Git git = Git.open( new File(path + "/.git") );
+        try (Git git = Git.open(new File(path + "/.git"))) {
             git.checkout().setName(commit).call();
 
             ArrayList<Float> metrics = classMetricsExtractor(path);
 
-            if (parentCommits.size() == 1){
-                git.checkout().setName( parentCommits.get(0) ).call();
+            if (parentCommits.size() == 1) {
+                git.checkout().setName(parentCommits.get(0)).call();
                 ArrayList<Float> parentMetrics = classMetricsExtractor(path);
                 return new ProjectMetric(metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), parentMetrics.get(0), parentMetrics.get(1), parentMetrics.get(2), parentMetrics.get(3));
             } else {
                 System.out.println("Commit with more than one parent");
-                return new ProjectMetric(metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), 0,0,0,0);
+                return new ProjectMetric(metrics.get(0), metrics.get(1), metrics.get(2), metrics.get(3), 0, 0, 0, 0);
             }
-
-        } catch (IOException | GitAPIException e) {
+        } catch (Exception e){
             e.printStackTrace();
-            System.out.println("jere");
         }
         return null;
     }
