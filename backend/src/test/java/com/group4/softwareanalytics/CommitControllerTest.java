@@ -42,24 +42,24 @@ class CommitControllerTest {
     @Test
     void testDuplicateCommits() throws Exception {
         RequestBuilder request  = MockMvcRequestBuilders.get("/api/commits");
-//        MvcResult result = mvc.perform(request).andReturn();
+        MvcResult result = mvc.perform(request).andReturn();
 
-//        JsonReader jsonReader = Json.createReader(new StringReader(result.getResponse().getContentAsString()));
-//
-//        JsonArray jsonArray = jsonReader.readArray();
-//
-//        List<String> ids = new ArrayList<>();
-//
-//        for(JsonValue jsonValue: jsonArray)
-//        {
-//            jsonReader = Json.createReader(new StringReader(jsonValue.toString()));
-//            JsonObject object = jsonReader.readObject();
-//            ids.add(object.get("id").toString());
-//        }
-//
-//        Set<String> setIds = new HashSet<String>(ids);
-//
-//        assertEquals(setIds.size(),ids.size());
+        JsonReader jsonReader = Json.createReader(new StringReader(result.getResponse().getContentAsString()));
+
+        JsonArray jsonArray = jsonReader.readArray();
+
+        List<String> ids = new ArrayList<>();
+
+        for(JsonValue jsonValue: jsonArray)
+        {
+            jsonReader = Json.createReader(new StringReader(jsonValue.toString()));
+            JsonObject object = jsonReader.readObject();
+            ids.add(object.get("id").toString());
+        }
+
+        Set<String> setIds = new HashSet<String>(ids);
+
+        assertEquals(setIds.size(),ids.size());
     }
     @Test
     void numberOfCommits() throws Exception {

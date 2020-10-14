@@ -1,5 +1,6 @@
 package com.group4.softwareanalytics;
 
+import com.group4.softwareanalytics.repository.Repo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +31,21 @@ class RepoControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private AsyncService asyncService;
+
+    @Test
+    void testRepoFetch() throws Exception {
+
+        String owner = "HouariZegai";
+        String name = "Calculator";
+
+        Repo repo = asyncService.fetchRepo(owner,name);
+
+        assertNotNull(repo);
+        assertEquals(repo.getRepo(),"Calculator");
+        assertEquals(repo.getOwner(), "HouariZegai");
+    }
 
     @Test
     void duplicateTest() throws Exception {
