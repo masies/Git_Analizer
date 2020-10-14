@@ -95,49 +95,53 @@ public class AsyncService {
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
-        Git git = new Git(repo);
+        List<RevCommit> revCommitList;
+        try (Git git = new Git(repo)) {
 
-        List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
+            List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
 
-        for(Ref branch: refs)
-        {
-            branches.add(branch.getName());
-        }
-
-        List<RevCommit> revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
-
-        for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
-            RevCommit revCommit = iterator.next();
-
-            String developerName = revCommit.getAuthorIdent().getName();
-            String developerMail = revCommit.getAuthorIdent().getEmailAddress();
-            String encodingName = revCommit.getEncodingName();
-            String fullMessage = revCommit.getFullMessage();
-            String shortMessage = revCommit.getShortMessage();
-            String commitName = revCommit.getName();
-
-            ArrayList<String> commitParentsIDs = new ArrayList<>();
-            for (RevCommit parent: revCommit.getParents()) {
-                commitParentsIDs.add(parent.name());
+            for (Ref branch : refs) {
+                branches.add(branch.getName());
             }
 
-            List<CommitDiff> diffEntries = new ArrayList<>();
-//            diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
+            revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
 
-            ProjectMetric projectMetric = new ProjectMetric(0,0,0,0,0,0,0,0);
 
-            int commitType = revCommit.getType();
-            long millis = revCommit.getCommitTime();
-            Date date = new Date(millis * 1000);
+            for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
+                RevCommit revCommit = iterator.next();
 
-            Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
-            commitList.add(c);
+                String developerName = revCommit.getAuthorIdent().getName();
+                String developerMail = revCommit.getAuthorIdent().getEmailAddress();
+                String encodingName = revCommit.getEncodingName();
+                String fullMessage = revCommit.getFullMessage();
+                String shortMessage = revCommit.getShortMessage();
+                String commitName = revCommit.getName();
+
+                ArrayList<String> commitParentsIDs = new ArrayList<>();
+                for (RevCommit parent : revCommit.getParents()) {
+                    commitParentsIDs.add(parent.name());
+                }
+
+                List<CommitDiff> diffEntries = new ArrayList<>();
+                //            diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
+
+                ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
+
+                int commitType = revCommit.getType();
+                long millis = revCommit.getCommitTime();
+                Date date = new Date(millis * 1000);
+
+                Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
+                commitList.add(c);
+            }
+            commitRepository.saveAll(commitList);
+
+            System.out.println("------- Commits fetched successfully! -------");
+            r.hasCommitsDone();
+            repoRepository.save(r);
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        commitRepository.saveAll(commitList);
-
-        System.out.println("------- Commits fetched successfully! -------");
-        r.hasCommitsDone();
-        repoRepository.save(r);
     }
 
     @Async
