@@ -32,13 +32,13 @@ public class CommitController {
         return commitRepository.findAll();
     }
 
-    @RequestMapping("/repo/{owner}/{repo}/commits")
+    @RequestMapping(value = "/repo/{owner}/{repo}/commits", method = {RequestMethod.GET})
     public @ResponseBody
     Page<Commit> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
         return commitRepository.findByOwnerAndRepo(owner,repo, PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
     }
 
-    @RequestMapping("/repo/{owner}/{repoName}/commits/{commitId}")
+    @RequestMapping(value = "/repo/{owner}/{repoName}/commits/{commitId}", method = {RequestMethod.GET})
     public @ResponseBody
     Commit getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repoName") String repoName, @PathVariable(value="commitId") String commitID ) throws IOException {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner,repoName, commitID);

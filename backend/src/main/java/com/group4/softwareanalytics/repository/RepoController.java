@@ -38,14 +38,14 @@ public class RepoController {
         return repoRepository.findByQuery(q, paging);
     }
 
-    @RequestMapping("/repo/{owner}/{repo}/status")
+    @RequestMapping(value = "/repo/{owner}/{repo}/status", method = {RequestMethod.GET})
     public @ResponseBody
     RepoStatus getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         Repo r = repoRepository.findByOwnerAndRepo(owner,repo);
         return r != null ?  r.getStatus() : new RepoStatus();
     }
 
-    @RequestMapping("/repo/{owner}/{repo}")
+    @RequestMapping(value = "/repo/{owner}/{repo}", method = {RequestMethod.GET})
     public @ResponseBody Repo getRepo(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         return repoRepository.findByOwnerAndRepo(owner,repo);
     }
