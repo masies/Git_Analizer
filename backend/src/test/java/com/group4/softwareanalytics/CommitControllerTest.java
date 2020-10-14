@@ -23,6 +23,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import javax.json.*;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,8 +34,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 
 
 @SpringBootTest
@@ -54,7 +54,7 @@ class CommitControllerTest {
 
 
     @Test
-    void testFetchCommits() throws IOException, GitAPIException, InterruptedException {
+    void testFetchCommits() throws IOException, GitAPIException, InterruptedException, InvocationTargetException, IllegalAccessException {
 
         String owner = "HouariZegai";
         String name = "Calculator";
@@ -70,8 +70,15 @@ class CommitControllerTest {
 
         for(Commit commit:commits)
         {
-            assertNotNull(commit.getId());
-            assertNotNull(commit.getCommitName());
+            for (Method m : commit.getClass().getMethods()) {
+                if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
+                    final Object met = m.invoke(commit);
+                    if(m.getName() != "getEncodingName")
+                    {
+                        assertNotNull(met);
+                    }
+                }
+            }
         }
 
 
