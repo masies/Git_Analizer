@@ -22,15 +22,15 @@ sonar_check:
   image: maven:3-jdk-11
   stage : deploy
   services:
-    - mongo:2.6.12
+    - mongo
 
   tags :
     - analytics
   # only : ["master"]
   script :
     - cd backend
-    - mvn clean install
     - mvn --batch-mode verify sonar:sonar
+      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
       -Dsonar.host.url="http://rio.inf.usi.ch:9000/"
       -Dsonar.login="group4"
       -Dsonar.password="group4"
