@@ -32,8 +32,9 @@ public class ProjectMetricExtractor {
             System.out.println("i will set HEAD on commit " + previousCommitId.getName());
             git.checkout().setName( previousCommitId.getName() ).call();
             System.out.println("Now HEAD is set on commit " + previousCommitId.getName());
-        } catch (IOException | GitAPIException e) {
-            e.printStackTrace();
+        } catch (IOException | GitAPIException e){
+            Logger logger = LogManager.getLogger(ProjectMetricExtractor.class.getName());
+            logger.error(e.getMessage(),e);
         }
     }
 

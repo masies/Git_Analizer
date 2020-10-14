@@ -102,7 +102,7 @@ public class CommitExtractor {
         }
         catch (Exception ignore) {
             /* commits with no modification */
-        } 
+        }
         return entriesList;
     }
 }
