@@ -1,41 +1,41 @@
-#--- 
-#build_frontend: 
-#  image: node:10
-#  script: 
-#    - cd frontend
-#    - npm i
-#    - npm run build
-#  stage: deploy
-#  tags: 
-#    - analytics
-##################################################
-#build_backend: 
-#  image: "maven:3-jdk-14"
-#  script: 
-#    - cd backend 
-#    - mvn -Dmaven.test.skip clean package
-#  stage: deploy
-#  tags: 
-#    - analytics
-#############################################################
-#sonar_check:
-#  image: maven:3-jdk-11
-#  stage : deploy
-#  services:
-#    - mongo
-#
-#  tags :
-#    - analytics
-#  # only : ["master"]
-#  script :
-#    - cd backend
-#    - mvn --batch-mode verify sonar:sonar
-#      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
-#      -Dsonar.host.url="http://rio.inf.usi.ch:9000/"
-#      -Dsonar.login="group4"
-#      -Dsonar.password="group4"
-#      -Dsonar.analysis.mode=publish
-#      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
-#      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
-#      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
-#
+--- 
+build_frontend: 
+  image: node:10
+  script: 
+    - cd frontend
+    - npm i
+    - npm run build
+  stage: deploy
+  tags: 
+    - analytics
+#################################################
+build_backend: 
+  image: "maven:3-jdk-14"
+  script: 
+    - cd backend 
+    - mvn -Dmaven.test.skip clean package
+  stage: deploy
+  tags: 
+    - analytics
+############################################################
+sonar_check:
+  image: maven:3-jdk-11
+  stage : deploy
+  services:
+    - mongo
+
+  tags :
+    - analytics
+  # only : ["master"]
+  script :
+    - cd backend
+    - mvn --batch-mode verify sonar:sonar
+      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
+      -Dsonar.host.url="http://rio.inf.usi.ch:9000/"
+      -Dsonar.login="group4"
+      -Dsonar.password="group4"
+      -Dsonar.analysis.mode=publish
+      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
+      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+
