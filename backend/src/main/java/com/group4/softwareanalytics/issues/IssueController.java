@@ -22,12 +22,12 @@ public class IssueController {
         return issueRepository.findAll();
     }
 
-    @RequestMapping("/repo/{owner}/{repo}/issues")
+    @RequestMapping(value = "/repo/{owner}/{repo}/issues", method = {RequestMethod.GET})
     public @ResponseBody Page<Issue> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
         return issueRepository.findByOwnerAndRepo(owner,repo, PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
     }
 
-    @RequestMapping("/repo/{owner}/{repo}/issues/{number}")
+    @RequestMapping(value = "/repo/{owner}/{repo}/issues/{number}", method = {RequestMethod.GET})
     public @ResponseBody Issue getAttr( @PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @PathVariable(value="number") String number) {
         return issueRepository.findByOwnerAndRepoAndId(owner, repo, Integer.parseInt(number));
     }

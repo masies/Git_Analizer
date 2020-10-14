@@ -1,9 +1,14 @@
 package com.group4.softwareanalytics;
 
+import com.group4.softwareanalytics.commits.CommitRepository;
+import com.group4.softwareanalytics.issues.IssueRepository;
+import com.group4.softwareanalytics.repository.Repo;
+import com.group4.softwareanalytics.repository.RepoRepository;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -37,6 +42,39 @@ class IssueControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private AsyncService asyncService;
+    @Autowired
+    private IssueRepository issueRepository;
+    @Autowired
+    private RepoRepository repoRepository;
+
+    @Test
+    void testFetchIssues() throws IOException, GitAPIException, InterruptedException {
+
+        String owner = "HouariZegai";
+        String name = "Calculator";
+
+        Repo r = asyncService.fetchRepo(owner,name);
+        repoRepository.findAndRemove(owner,name);
+
+
+        assertNotNull(r);
+
+        List<com.group4.softwareanalytics.issues.Issue> issues = asyncService.fetchIssues("HouariZegai","Calculator",r);
+
+        assertNotNull(issues);
+
+        issueRepository.findAndRemove(owner,name);
+        repoRepository.findAndRemove(owner,name);
+        for(com.group4.softwareanalytics.issues.Issue issue:issues)
+        {
+            assertNotNull(issue.getId());
+            assertEquals(issue.getRepo(),name);
+            assertEquals(issue.getOwner(),owner);
+        }
+
+    }
 
 
     @Test
