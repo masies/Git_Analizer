@@ -57,7 +57,7 @@ public class MetricsTest {
     private RepoRepository repoRepository;
 
     @Test
-    void testProjectMetrics() throws IOException, GitAPIException {
+    void testProjectMetrics() throws IOException, GitAPIException, InvocationTargetException, IllegalAccessException {
         String owner = "HouariZegai";
         String name = "Calculator";
 
@@ -89,6 +89,14 @@ public class MetricsTest {
         assertEquals(metrics.getCBO(),2);
         assertEquals(metrics.getWMC(),73);
         assertEquals(metrics.getLCOM(),3);
+
+        for (Method m : metrics.getClass().getMethods()) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
+                final Object met = m.invoke(metrics);
+                assertNotNull(met);
+            }
+            }
+
 
         repoRepository.findAndRemove(owner,name);
         commitRepository.findAndRemove(owner,name);
@@ -123,6 +131,6 @@ public class MetricsTest {
 
         repoRepository.findAndRemove(owner,name);
         commitRepository.findAndRemove(owner,name);
-        
+
     }
 }
