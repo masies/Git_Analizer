@@ -121,5 +121,8 @@ public class MetricsTest {
         assertNotNull(diffEntries.get(0).getDiffs());
         assertEquals(diffEntries.get(0).getChangeType(),"MODIFY");
 
+        repoRepository.findAndRemove(owner,name);
+        commitRepository.findAndRemove(owner,name);
+        
     }
 }
