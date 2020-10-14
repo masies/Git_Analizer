@@ -53,10 +53,8 @@ public class AsyncService {
     @Async
     public void fetchData(String owner, String name) throws InterruptedException {
         try {
-            RepositoryService service = new RepositoryService();
-            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
-            Repository r = service.getRepository(owner, name);
-            Repo repo = new Repo(r, owner, name);
+
+            Repo repo = fetchRepo(owner,name);
 
             repoRepository.findAndRemove(owner,name);
             issueRepository.findAndRemove(owner,name);
@@ -83,7 +81,15 @@ public class AsyncService {
         }
     }
 
-    public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
+    public Repo fetchRepo(String owner, String name) throws IOException {
+        RepositoryService service = new RepositoryService();
+        service.getClient().setOAuth2Token("9a7ae8cd24203a8035b91d753326cabc6ade6eac");
+        Repository r = service.getRepository(owner, name);
+        Repo repo = new Repo(r, owner, name);
+        return repo;
+    }
+
+    public List<Commit> fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         String repo_url = "https://github.com/"+ owner +"/"+ repoName;
         String dest_url = "./repo/" + owner +"/"+ repoName;
 
@@ -145,14 +151,16 @@ public class AsyncService {
             System.out.println("------- Commits fetched successfully! -------");
             r.hasCommitsDone();
             repoRepository.save(r);
+            return commitList;
         } catch (Exception e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
+            return commitList;
         }
     }
 
-    @Async
-    public void fetchIssues(String owner, String name, Repo repo) throws IOException {
+    //@Async
+    public List<com.group4.softwareanalytics.issues.Issue> fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
 
@@ -189,10 +197,11 @@ public class AsyncService {
 
             repo.hasIssuesDone();
             repoRepository.save(repo);
-
+            return issueList;
         } catch (IOException e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
+            return null;
         }
 
     }
