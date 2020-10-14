@@ -1,19 +1,19 @@
 --- 
-build_backend: 
-  image: "maven:3-jdk-14"
-  script: 
-    - cd backend 
-    - mvn -Dmaven.test.skip clean package
-  stage: deploy
-  tags: 
-    - analytics
-#################################################
 build_frontend: 
   image: node:10
   script: 
     - cd frontend
     - npm i
     - npm run build
+  stage: deploy
+  tags: 
+    - analytics
+#################################################
+build_backend: 
+  image: "maven:3-jdk-14"
+  script: 
+    - cd backend 
+    - mvn -Dmaven.test.skip clean package
   stage: deploy
   tags: 
     - analytics
