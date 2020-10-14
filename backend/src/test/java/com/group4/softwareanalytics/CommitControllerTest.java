@@ -1,8 +1,13 @@
 package com.group4.softwareanalytics;
 
+import com.group4.softwareanalytics.commits.Commit;
 import com.group4.softwareanalytics.commits.CommitExtractor;
+import com.group4.softwareanalytics.commits.CommitRepository;
+import com.group4.softwareanalytics.repository.Repo;
+import com.group4.softwareanalytics.repository.RepoRepository;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -16,6 +21,7 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.json.*;
+import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,7 +44,38 @@ class CommitControllerTest {
     private MockMvc mvc;
 
 
+    @Autowired
+    private AsyncService asyncService;
+    @Autowired
+    private CommitRepository commitRepository;
+    @Autowired
+    private RepoRepository repoRepository;
 
+
+
+    @Test
+    void testFetchCommits() throws IOException, GitAPIException, InterruptedException {
+
+        String owner = "HouariZegai";
+        String name = "Calculator";
+
+        Repo r = asyncService.fetchRepo(owner,name);
+
+        List<Commit> commits = asyncService.fetchCommits("HouariZegai","Calculator",r);
+
+        repoRepository.findAndRemove(owner,name);
+        commitRepository.findAndRemove(owner,name);
+
+        assertNotNull(commits);
+
+        for(Commit commit:commits)
+        {
+            assertNotNull(commit.getId());
+            assertNotNull(commit.getCommitName());
+        }
+
+
+    }
     @Test
     void testDuplicateCommits() throws Exception {
         RequestBuilder request  = MockMvcRequestBuilders.get("/api/commits");
