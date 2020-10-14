@@ -159,8 +159,8 @@ public class AsyncService {
         }
     }
 
-    @Async
-    public void fetchIssues(String owner, String name, Repo repo) throws IOException {
+    //@Async
+    public List<com.group4.softwareanalytics.issues.Issue> fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
 
@@ -197,10 +197,11 @@ public class AsyncService {
 
             repo.hasIssuesDone();
             repoRepository.save(repo);
-
+            return issueList;
         } catch (IOException e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
+            return null;
         }
 
     }
