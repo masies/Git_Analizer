@@ -48,6 +48,8 @@ public class AsyncService {
     @Autowired
     private CommitRepository commitRepository;
 
+    private CommitExtractor commitExtractor;
+
     @Async
     public void fetchData(String owner, String name) throws InterruptedException {
         try {
@@ -94,7 +96,8 @@ public class AsyncService {
             FileUtils.deleteDirectory(dir);
         }
 
-        CommitExtractor.DownloadRepo(repo_url, owner, repoName);
+        commitExtractor.DownloadRepo(repo_url, owner, repoName);
+
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
@@ -107,7 +110,7 @@ public class AsyncService {
                 branches.add(branch.getName());
             }
 
-            revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
+            revCommitList = commitExtractor.getCommits(branches.get(0), git, repo);
 
 
             for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
