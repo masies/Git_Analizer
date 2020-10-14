@@ -96,9 +96,10 @@ public class CommitExtractor {
                     entriesList.add(cd);
                     stream.reset();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e){
+            Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
+            logger.error(e.getMessage(),e);
+        }
         }
         catch (Exception ignore) {
             /* commits with no modification */
