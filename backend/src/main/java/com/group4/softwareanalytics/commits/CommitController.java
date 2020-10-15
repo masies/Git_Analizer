@@ -48,11 +48,11 @@ public class CommitController {
             commit.setProjectMetrics(metrics);
             commit.setHasMetrics(true);
 
-
             String dest_url = "./repo/" + owner +"/"+ repoName;
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
             Git git = new Git(repo);
 
+            System.out.println("...computing diffs metrics");
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitID, dest_url, parentCommitIDs);
             commit.setModifications(diffEntries);
 

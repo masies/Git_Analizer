@@ -43,9 +43,7 @@ public class ProjectMetricExtractor {
 
         try (Git git = Git.open(new File(path + "/.git"))) {
             git.checkout().setName(commit).call();
-
             ArrayList<Float> metrics = classMetricsExtractor(path);
-
             if (parentCommits.size() == 1) {
                 git.checkout().setName(parentCommits.get(0)).call();
                 ArrayList<Float> parentMetrics = classMetricsExtractor(path);
@@ -58,6 +56,6 @@ public class ProjectMetricExtractor {
             Logger logger = LogManager.getLogger(ProjectMetricExtractor.class.getName());
             logger.error(e.getMessage(),e);
         }
-        return null;
+        return new ProjectMetric(0,0,0,0,0,0,0,0);
     }
 }
