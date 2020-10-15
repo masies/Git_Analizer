@@ -20,6 +20,11 @@ public class RepoController {
     @Autowired
     private AsyncService asyncService;
 
+    @RequestMapping(value = "/repo/{owner}/{repo}/delete", method = {RequestMethod.GET})
+    public @ResponseBody
+    void removeRepo(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
+        repoRepository.findAndRemove(owner,repo);
+    }
 
     @GetMapping("/repo")
     @ResponseBody
