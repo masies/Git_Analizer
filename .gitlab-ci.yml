@@ -51,20 +51,13 @@ test_backend:
 # deploy
 deploy_app:
   image: tmaier/docker-compose:latest
-  image: maven:3-jdk-11
-
   services:
     - docker:dind
-
-  before_script:
-    - cd backend
-    - docker info
-    - docker-compose --version
   stage: deploy
   tags:
     - analytics
   script:
-    - mvn install package
+    - mvn install package -Dmaven.test.skip
     - docker-compose build
   dependencies:
     - build_backend
