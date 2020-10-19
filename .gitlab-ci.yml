@@ -13,11 +13,11 @@ stages:
 #
 ## build the backend
 #build_backend:
-#  script: 
-#    - cd backend 
+#  script:
+#    - cd backend
 #    - mvn -Dmaven.test.skip clean package
 #  stage: build
-#  tags: 
+#  tags:
 #    - analytics
 ## build the frontend
 #build_frontend:
@@ -57,9 +57,9 @@ stages:
 #    - cd backend
 #    - mvn -Dmaven.test.skip clean package
 #    - cp target/group4-software-analytics-0.0.1-SNAPSHOT.jar src
-#    
+#
     
-deploy_app:second:
+deploy_app:
   image: tmaier/docker-compose:latest
   services:
     - docker:dind
