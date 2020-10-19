@@ -1,6 +1,16 @@
 <template>
-	<div class="container mt-3 mb-3" v-if="commit">
-		<div class="card">
+	<div class="container mt-3 mb-3">
+		<div v-if="isLoading" class="row">
+			<div class="col-12 text-center">
+				<div class="spinner-border text-primary" role="status"  style="width: 3rem; height: 3rem;">
+					<span class="sr-only">Loading...</span>
+				</div>
+			</div>
+			<div class="col-12 text-center">
+				<h3>Calculating metrics...</h3>
+			</div>
+		</div>
+		<div class="card" v-if="!isLoading && commit">
 			<div class="card-header">
 				<h3 class="d-inline mr-1">{{ commit.shortMessage }}</h3>
 			</div>
@@ -14,7 +24,7 @@
 							<span v-else>-</span>{{changeLOC}}%
 						</span>
 						<br>
-						<span title="Lines Of Code" data-toggle="tooltip" data-placement="bottom">LOC</span>
+						<span title="Lines Of Code" data-toggle="tooltip" data-placement="bottom"><b>LOC</b></span>
 					</div>
 					<div class="col">
 						{{ metrics.cbo.toFixed(2) }} 
@@ -24,7 +34,7 @@
 							<span v-else>-</span>{{ changeCBO }}%
 						</span>
 						<br>
-						<span title="Coupling between Objects" data-toggle="tooltip" data-placement="bottom">CBO</span>
+						<span title="Coupling between Objects" data-toggle="tooltip" data-placement="bottom"><b>CBO</b></span>
 					</div>
 					<div class="col">
 						{{ metrics.wmc.toFixed(2) }} 
@@ -34,7 +44,7 @@
 							<span v-else>-</span>{{ changeWMC }}%
 						</span>
 						<br>
-						<span title="Weighted Methods for Class" data-toggle="tooltip" data-placement="bottom">WMC</span>
+						<span title="Weighted Methods for Class" data-toggle="tooltip" data-placement="bottom"><b>WMC</b></span>
 					</div>
 					<div class="col">
 						{{ metrics.lcom.toFixed(2) }} 
@@ -44,7 +54,7 @@
 							<span v-else>-</span>{{ changeLCOM }}%
 						</span>
 						<br>
-						<span title="Lack of Cohesion in Methods" data-toggle="tooltip" data-placement="bottom">LCOM</span>
+						<span title="Lack of Cohesion in Methods" data-toggle="tooltip" data-placement="bottom"><b>LCOM</b></span>
 					</div>
 				</div>
 			</div>
@@ -60,8 +70,9 @@
 				</span>
 			</div>
 		</div>
-
-		<commit-diff-item v-for="diff in commit.modifications" :data="diff" class="mt-3"/>
+		<div v-if="!isLoading && commit">
+			<commit-diff-item v-for="diff in commit.modifications" :data="diff" class="mt-3" :key="diff.newPath" />
+		</div>
 	</div>
 </template>
 
@@ -70,6 +81,7 @@
 		data: () => {
 			return {
 				commit: null,
+				isLoading: true,
 			}
 		},
 		mounted(){
@@ -77,12 +89,15 @@
 		},
 		methods: {
 			loadData: function() {
+				this.isLoading = true;
 				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits/${this.$route.params.id}`)
 				.then(response => {
 					return response.json()
 				})
 				.then(data => {
+
 					this.commit = data
+					this.isLoading = false;
 					this.$nextTick(function () {
 						$('[data-toggle="tooltip"]').tooltip()
 					})
