@@ -7,7 +7,7 @@ services:
 
 stages:
     - build
-#    - test
+    - test
     - deploy
     - monitor
 
