@@ -1,63 +1,63 @@
 image: maven:3-jdk-11
 
 stages:
-    - build
-    - test
+#    - build
+#    - test
     - deploy
     - monitor
 
 
-
-#################################################
-#build
-
-# build the backend
-build_backend:
-  script: 
-    - cd backend 
-    - mvn -Dmaven.test.skip clean package
-  stage: build
-  tags: 
-    - analytics
-# build the frontend
-build_frontend:
-  image: node:10
-  script:
-    - cd frontend
-    - npm i
-    - npm run build
-  stage: build
-  tags:
-    - analytics
-############################################################
-#test
-
-# Test stage jobs
-
-
-test_backend:
-  stage: test
-  tags:
-    - analytics
-  services:
-    - mongo
-  script:
-    - cd backend
-    - mvn test
-      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
-  dependencies:
-    - build_backend
-#######################################################
-# deploy
-deploy_app:first:
-  stage: deploy
-  tags:
-    - analytics
-  script:
-    - cd backend
-    - mvn -Dmaven.test.skip clean package
-    - cp target/group4-software-analytics-0.0.1-SNAPSHOT.jar src
-    
+#
+##################################################
+##build
+#
+## build the backend
+#build_backend:
+#  script: 
+#    - cd backend 
+#    - mvn -Dmaven.test.skip clean package
+#  stage: build
+#  tags: 
+#    - analytics
+## build the frontend
+#build_frontend:
+#  image: node:10
+#  script:
+#    - cd frontend
+#    - npm i
+#    - npm run build
+#  stage: build
+#  tags:
+#    - analytics
+#############################################################
+##test
+#
+## Test stage jobs
+#
+#
+#test_backend:
+#  stage: test
+#  tags:
+#    - analytics
+#  services:
+#    - mongo
+#  script:
+#    - cd backend
+#    - mvn test
+#      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
+#  dependencies:
+#    - build_backend
+########################################################
+## deploy
+#deploy_app:first:
+#  stage: deploy
+#  tags:
+#    - analytics
+#  script:
+#    - cd backend
+#    - mvn -Dmaven.test.skip clean package
+#    - cp target/group4-software-analytics-0.0.1-SNAPSHOT.jar src
+#    
     
 deploy_app:second:
   image: tmaier/docker-compose:latest
@@ -66,9 +66,11 @@ deploy_app:second:
   stage: deploy
   tags:
     - analytics
+  before_script:
+    - cd backend
+    - mvn -Dmaven.test.skip clean package
   script:
     - cd backend
-    - cp src/group4-software-analytics-0.0.1-SNAPSHOT.jar target
     - docker-compose build
   dependencies:
     - build_backend
