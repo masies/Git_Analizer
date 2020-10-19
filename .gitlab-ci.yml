@@ -56,6 +56,7 @@ deploy_app:first:
   script:
     - cd backend
     - mvn -Dmaven.test.skip clean package
+    - cp target/group4-software-analytics-0.0.1-SNAPSHOT.jar src
     
     
 deploy_app:second:
@@ -66,7 +67,8 @@ deploy_app:second:
   tags:
     - analytics
   script:
-    - cd backend 
+    - cd backend
+    - cp src/group4-software-analytics-0.0.1-SNAPSHOT.jar target
     - docker-compose build
   dependencies:
     - build_backend
