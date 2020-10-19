@@ -1,52 +1,52 @@
 image: maven:3-jdk-11
 
 stages:
-#    - build
-#    - test
-    - deploy
+    - build
+    - test
+#    - deploy
     - monitor
 
 
-#
-##################################################
-##build
-#
-## build the backend
-#build_backend:
-#  script:
-#    - cd backend
-#    - mvn -Dmaven.test.skip clean package
-#  stage: build
-#  tags:
-#    - analytics
-## build the frontend
-#build_frontend:
-#  image: node:10
-#  script:
-#    - cd frontend
-#    - npm i
-#    - npm run build
-#  stage: build
-#  tags:
-#    - analytics
-#############################################################
-##test
-#
-## Test stage jobs
-#
-#
-#test_backend:
-#  stage: test
-#  tags:
-#    - analytics
-#  services:
-#    - mongo
-#  script:
-#    - cd backend
-#    - mvn test
-#      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
-#  dependencies:
-#    - build_backend
+
+#################################################
+#build
+
+# build the backend
+build_backend:
+  script:
+    - cd backend
+    - mvn -Dmaven.test.skip clean package
+  stage: build
+  tags:
+    - analytics
+# build the frontend
+build_frontend:
+  image: node:10
+  script:
+    - cd frontend
+    - npm i
+    - npm run build
+  stage: build
+  tags:
+    - analytics
+############################################################
+#test
+
+# Test stage jobs
+
+
+test_backend:
+  stage: test
+  tags:
+    - analytics
+  services:
+    - mongo
+  script:
+    - cd backend
+    - mvn test
+      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
+  dependencies:
+    - build_backend
 ########################################################
 ## deploy
 #deploy_app:first:
@@ -58,22 +58,22 @@ stages:
 #    - mvn -Dmaven.test.skip clean package
 #    - cp target/group4-software-analytics-0.0.1-SNAPSHOT.jar src
 #
-    
-deploy_app:
-  image: tmaier/docker-compose:latest
-  services:
-    - docker:dind
-  stage: deploy
-  tags:
-    - analytics
-  before_script:
-    - cd backend
-    - mvn -Dmaven.test.skip clean package
-  script:
-    - cd backend
-    - docker-compose build
-#  dependencies:
-#    - build_backend
+#
+#deploy_app:
+#  image: tmaier/docker-compose:latest
+#  services:
+#    - docker:dind
+#  stage: deploy
+#  tags:
+#    - analytics
+#  before_script:
+#    - cd backend
+#    - mvn -Dmaven.test.skip clean package
+#  script:
+#    - cd backend
+#    - docker-compose build
+##  dependencies:
+##    - build_backend
 
     
 ##################################################
