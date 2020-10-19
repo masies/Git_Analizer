@@ -164,7 +164,7 @@ public class AsyncService {
         try {
             IssueService service = new IssueService();
 
-            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
+            service.getClient().setOAuth2Token("ab6bd4f53af3a9a35077c9d06dfb48047240fe8e");
 
             List<Issue> issuesOpen = service.getIssues(owner, name,
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));

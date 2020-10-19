@@ -73,7 +73,7 @@ class CommitControllerTest {
             for (Method m : commit.getClass().getMethods()) {
                 if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
                     final Object met = m.invoke(commit);
-                    if(m.getName() != "getEncodingName")
+                    if(!m.getName().equals("getEncodingName"))
                     {
                         assertNotNull(met);
                     }
