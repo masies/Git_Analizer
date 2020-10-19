@@ -14,11 +14,10 @@ stages:
 
 
 #################################################
-
 #build
+
 # build the backend
-build_backend: 
-#  image: "maven:3-jdk-11"
+build_backend:
   script: 
     - cd backend 
     - mvn -Dmaven.test.skip clean package
@@ -42,30 +41,29 @@ build_frontend:
 
 
 test_backend:
-#  image: "maven:3-jdk-11"
   stage: test
+  tags:
+    - analytics
+  services:
+    - mongo
+  script:
+    - cd backend
+    - mvn test
+      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
+  dependencies:
+    - build_backend
+#######################################################
+#deploy
+deploy_app:
+  image: docker:19.03.12
+  stage: deploy
   tags:
     - analytics
   script:
     - cd backend
-    - mvn test
-        -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
-#######################################################
-#deploy
-deploy_app:
-    image: docker:19.03.12
-    stage: deploy
-    tags:
-        - analytics
-    
-    script:
-        - cd backend
-        - docker-compose build
-
-
-
-
-    
+    - docker-compose build
+  dependencies:
+    - build_backend
     
 ##################################################
 
