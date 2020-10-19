@@ -63,6 +63,7 @@ deploy_app:
   tags:
     - analytics
   script:
+    - mvn install package
     - docker-compose build
   dependencies:
     - build_backend
