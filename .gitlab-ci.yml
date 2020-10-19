@@ -7,7 +7,7 @@ services:
 
 stages:
     - build
-    - test
+#    - test
     - deploy
     - monitor
 
@@ -35,23 +35,23 @@ build_frontend:
   tags:
     - analytics
 ############################################################
-#test
-
-# Test stage jobs
-
-
-test_backend:
-  stage: test
-  tags:
-    - analytics
-  services:
-    - mongo
-  script:
-    - cd backend
-    - mvn test
-      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
-  dependencies:
-    - build_backend
+##test
+#
+## Test stage jobs
+#
+#
+#test_backend:
+#  stage: test
+#  tags:
+#    - analytics
+#  services:
+#    - mongo
+#  script:
+#    - cd backend
+#    - mvn test
+#      -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
+#  dependencies:
+#    - build_backend
 #######################################################
 #deploy
 deploy_app:
