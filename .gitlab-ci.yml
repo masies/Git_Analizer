@@ -49,7 +49,7 @@ test_backend:
     - build_backend
 #######################################################
 # deploy
-deploy_app:first
+deploy_app:first:
   stage: deploy
   tags:
     - analytics
@@ -58,7 +58,7 @@ deploy_app:first
     - mvn -Dmaven.test.skip clean package
     
     
-deploy_app:second
+deploy_app:second:
   image: tmaier/docker-compose:latest
   services:
     - docker:dind
