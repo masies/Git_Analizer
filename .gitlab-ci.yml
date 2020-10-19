@@ -1,26 +1,66 @@
---- 
-build_frontend: 
-  image: node:10
-  script: 
-    - cd frontend
-    - npm i
-    - npm run build
-  stage: deploy
-  tags: 
-    - analytics
+image: maven:3-jdk-12
+
+variables:
+
+services:
+    - docker:dind
+
+stages:
+    - build
+    - test
+    - deploy
+    - monitor
+
+
+
 #################################################
+
+# build the backend
 build_backend: 
   image: "maven:3-jdk-14"
   script: 
     - cd backend 
     - mvn -Dmaven.test.skip clean package
-  stage: deploy
+  stage: build
   tags: 
     - analytics
 ############################################################
+
+
+# Test stage jobs
+
+
+test_backend:
+  image: "maven:3-jdk-14"
+  stage: test
+  tags:
+    - analytics
+  script:
+    - cd backend
+    - mvn test
+#######################################################
+
+# deploy the frontend
+
+
+build_frontend:
+  image: node:10
+  script:
+    - cd frontend
+    - npm i
+    - npm run build
+  stage: deploy
+  tags:
+    - analytics
+    
+    
+##################################################
+
+
+# monitor
 sonar_check:
   image: maven:3-jdk-11
-  stage : deploy
+  stage : monitor
   services:
     - mongo
 
