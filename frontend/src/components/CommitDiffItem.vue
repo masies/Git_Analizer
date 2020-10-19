@@ -17,7 +17,7 @@
 						<span v-else>- </span>{{changeLOC}}%
 					</span>
 					<br>
-					<span title="Lines Of Code" data-toggle="tooltip" data-placement="bottom">LOC</span>
+					<span title="Lines Of Code" data-toggle="tooltip" data-placement="bottom"><b>LOC</b></span>
 				</div>
 				<div class="col">
 					{{ metrics.cbo.toFixed(2) }} 
@@ -27,7 +27,7 @@
 						<span v-else> - </span>{{ changeCBO }}%
 					</span>
 					<br>
-					<span title="Coupling between Objects" data-toggle="tooltip" data-placement="bottom">CBO</span>
+					<span title="Coupling between Objects" data-toggle="tooltip" data-placement="bottom"><b>CBO</b></span>
 				</div>
 				<div class="col">
 					{{ metrics.wmc.toFixed(2) }} 
@@ -37,7 +37,7 @@
 						<span v-else> - </span>{{ changeWMC }}%
 					</span>
 					<br>
-					<span title="Weighted Methods for Class" data-toggle="tooltip" data-placement="bottom">WMC</span>
+					<span title="Weighted Methods for Class" data-toggle="tooltip" data-placement="bottom"><b>WMC</b></span>
 				</div>
 				<div class="col">
 					{{ metrics.lcom.toFixed(2) }} 
@@ -47,7 +47,7 @@
 						<span v-else> - </span>{{ changeLCOM }}%
 					</span>
 					<br>
-					<span title="Lack of Cohesion in Methods" data-toggle="tooltip" data-placement="bottom">LCOM</span>
+					<span title="Lack of Cohesion in Methods" data-toggle="tooltip" data-placement="bottom"><b>LCOM</b></span>
 				</div>
 			</div>
 		</div>
