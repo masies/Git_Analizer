@@ -48,40 +48,25 @@ test_backend:
   dependencies:
     - build_backend
 #######################################################
-#deploy
-#deploy_app:
-#  image: docker:latest
-#  stage: deploy
-#  tags:
-#    - analytics
-#  script:
-#    - cd backend
-#    - docker-compose build
-#  dependencies:
-#    - build_backend
-image: docker:latest
-
-variables:
-  DOCKER_DRIVER: overlay
-
-services:
-  - docker:dind
-
-before_script:
-  - cd
-  - docker info
-  - apk update
-  - apk upgrade
-  - apk add python python-dev py-pip build-base
-  - pip install docker-compose
-
-build:
+# deploy
+deploy_app:
+  image: docker:latest
+  services:
+    - docker:dind
   stage: deploy
   tags:
     - analytics
   script:
+    - cd
+    - docker info
+    - apk update
+    - apk upgrade
+    - apk add python python-dev py-pip build-base
+    - pip install docker-compose
     - cd backend
     - docker-compose build
+  dependencies:
+    - build_backend
 
     
 ##################################################
