@@ -1,5 +1,7 @@
 package com.group4.softwareanalytics;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.group4.softwareanalytics.commits.Commit;
 import com.group4.softwareanalytics.commits.CommitDiff;
 import com.group4.softwareanalytics.commits.CommitExtractor;
@@ -24,12 +26,15 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,6 +54,8 @@ public class AsyncService {
     private CommitRepository commitRepository;
 
     private CommitExtractor commitExtractor;
+    private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
+    private List<Commit> commitList = new ArrayList<>();
 
     @Async
     public void fetchData(String owner, String name) throws InterruptedException {
@@ -64,21 +71,46 @@ public class AsyncService {
             repo.hasInfoDone();
             repoRepository.save(repo);
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        fetchIssues(owner, name, repo);
-                    } catch (IOException e){
-                        Logger logger = LogManager.getLogger(AsyncService.class.getName());
-                        logger.error(e.getMessage(),e);
-                    }
-                }
-            }).start();
+            try {
+                issueList = fetchIssues(owner, name, repo);
+            } catch (IOException e){
+                Logger logger = LogManager.getLogger(AsyncService.class.getName());
+                logger.error(e.getMessage(),e);
+            }
 
-            fetchCommits(owner, name, repo);
+            commitList = fetchCommits(owner, name, repo);
+
         } catch (Exception ignored) {
         }
+    }
+
+    public static void commitFixFinder(List<Commit> commitList, List<com.group4.softwareanalytics.issues.Issue> issueList) {
+
+        for(Commit commit: commitList)
+        {
+            List<String> linkedIssues = new ArrayList<>();
+            String fullText = commit.getShortMessage() + " " + commit.getFullMessage();
+            Pattern r = Pattern.compile("[#][Z0-9]*");
+            Matcher m = r.matcher(fullText);
+
+            if(fullText.contains("fix") || fullText.contains("solve") || fullText.contains("resolve")) {
+                while (m.find()) {
+                        if (m.group().length() > 1) {
+                            for(com.group4.softwareanalytics.issues.Issue issue:issueList)
+                            {
+                                String[] urlString = issue.getIssue().getHtmlUrl().split("/");
+                                if(Integer.parseInt(urlString[urlString.length -1]) == Integer.parseInt(m.group().substring(1)))
+                                {
+                                    linkedIssues.add(issue.getId());
+                                }
+                            }
+                        }
+                }
+             }
+            List<String> linkedIssuesWithoutDuplicates = Lists.newArrayList(Sets.newHashSet(linkedIssues));
+            commit.setLinkedFixedIssues(linkedIssuesWithoutDuplicates);
+        }
+
     }
 
     public Repo fetchRepo(String owner, String name) throws IOException {
@@ -146,6 +178,7 @@ public class AsyncService {
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
                 commitList.add(c);
             }
+            commitFixFinder(commitList,issueList);
             commitRepository.saveAll(commitList);
 
             System.out.println("------- Commits fetched successfully! -------");

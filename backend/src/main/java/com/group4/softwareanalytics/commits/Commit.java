@@ -26,6 +26,15 @@ public class Commit {
     private Date commitDate;
     private boolean hasMetrics;
     ArrayList<String> commitParentsIDs;
+    private List<String> LinkedFixedIssues;
+
+    public List<String> getLinkedFixedIssues() {
+        return LinkedFixedIssues;
+    }
+
+    public void setLinkedFixedIssues(List<String> linkedFixedIssues) {
+        LinkedFixedIssues = linkedFixedIssues;
+    }
 
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
