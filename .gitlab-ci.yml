@@ -51,6 +51,7 @@ test_backend:
 # deploy
 deploy_app:
   image: tmaier/docker-compose:latest
+  image: maven:3-jdk-11
 
   services:
     - docker:dind
