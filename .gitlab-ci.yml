@@ -15,23 +15,34 @@ stages:
 
 #################################################
 
+#build
 # build the backend
 build_backend: 
-  image: "maven:3-jdk-14"
+  image: "maven:3-jdk-11"
   script: 
     - cd backend 
     - mvn -Dmaven.test.skip clean package
   stage: build
   tags: 
     - analytics
+# build the frontend
+build_frontend:
+  image: node:10
+  script:
+    - cd frontend
+    - npm i
+    - npm run build
+  stage: build
+  tags:
+    - analytics
 ############################################################
-
+#test
 
 # Test stage jobs
 
 
 test_backend:
-  image: "maven:3-jdk-14"
+  image: "maven:3-jdk-11"
   stage: test
   tags:
     - analytics
@@ -39,19 +50,20 @@ test_backend:
     - cd backend
     - mvn test
 #######################################################
+#deploy
+deploy_app:
+    image: docker:19.03.12
+    stage: deploy
+    tags:
+        - analytics
+    
+    script:
+        - cd backend
+        - docker-compose build
 
-# deploy the frontend
 
 
-build_frontend:
-  image: node:10
-  script:
-    - cd frontend
-    - npm i
-    - npm run build
-  stage: deploy
-  tags:
-    - analytics
+
     
     
 ##################################################
