@@ -72,8 +72,8 @@ deploy_app:
   script:
     - cd backend
     - docker-compose build
-  dependencies:
-    - build_backend
+#  dependencies:
+#    - build_backend
 
     
 ##################################################
