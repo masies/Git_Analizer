@@ -59,21 +59,21 @@ test_backend:
 #    - cp target/group4-software-analytics-0.0.1-SNAPSHOT.jar src
 #
 #
-#deploy_app:
-#  image: tmaier/docker-compose:latest
-#  services:
-#    - docker:dind
-#  stage: deploy
-#  tags:
-#    - analytics
-#  before_script:
-#    - cd backend
-#    - mvn -Dmaven.test.skip clean package
-#  script:
-#    - cd backend
-#    - docker-compose build
-##  dependencies:
-##    - build_backend
+deploy_app:
+  image: tmaier/docker-compose:latest
+  services:
+    - docker:dind
+  stage: deploy
+  tags:
+    - analytics
+  before_script:
+    - cd backend
+    - mvn -Dmaven.test.skip clean package
+  script:
+    - cd backend
+    - docker-compose build
+#  dependencies:
+#    - build_backend
 
     
 ##################################################
