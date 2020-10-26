@@ -84,29 +84,68 @@ public class AsyncService {
         }
     }
 
+//    public static void commitFixFinder(List<Commit> commitList, List<com.group4.softwareanalytics.issues.Issue> issueList) {
+//
+//        for(Commit commit: commitList)
+//        {
+//            List<String> linkedIssues = new ArrayList<>();
+//            String fullText = commit.getShortMessage() + " " + commit.getFullMessage();
+//            Pattern r = Pattern.compile("[#][Z0-9]*");
+//            Matcher m = r.matcher(fullText);
+//
+//            if(fullText.contains("fix") || fullText.contains("solve") || fullText.contains("resolve")) {
+//                while (m.find()) {
+//                        if (m.group().length() > 1) {
+//                            System.out.println(commit.getCommitName());
+//                            System.out.println(m.group());
+//                            for(com.group4.softwareanalytics.issues.Issue issue:issueList)
+//                            {
+//                                String[] urlString = issue.getIssue().getHtmlUrl().split("/");
+//                                if(Integer.parseInt(urlString[urlString.length -1]) == Integer.parseInt(m.group().substring(1)))
+//                                {
+//                                    linkedIssues.add(issue.getId());
+//                                }
+//                            }
+//                        }
+//                }
+//             }
+//            List<String> linkedIssuesWithoutDuplicates = Lists.newArrayList(Sets.newHashSet(linkedIssues));
+//            commit.setLinkedFixedIssues(linkedIssuesWithoutDuplicates);
+//        }
+//
+//    }
     public static void commitFixFinder(List<Commit> commitList, List<com.group4.softwareanalytics.issues.Issue> issueList) {
+        List<String> keywords = Arrays.asList("fix","solve","resolve");
+        List<String> stopWord = Arrays.asList("must","should","will");
+        for(Commit commit: commitList) {
 
-        for(Commit commit: commitList)
-        {
             List<String> linkedIssues = new ArrayList<>();
-            String fullText = commit.getShortMessage() + " " + commit.getFullMessage();
-            Pattern r = Pattern.compile("[#][Z0-9]*");
-            Matcher m = r.matcher(fullText);
+            String fullText = "Start " + commit.getShortMessage() + " " + commit.getFullMessage();
+            String[] words = fullText.replace("\n", "").replace("\r", "").toLowerCase().split(" ");
 
-            if(fullText.contains("fix") || fullText.contains("solve") || fullText.contains("resolve")) {
-                while (m.find()) {
-                        if (m.group().length() > 1) {
-                            for(com.group4.softwareanalytics.issues.Issue issue:issueList)
+            for(int i=0;i<words.length;i++)
+            {
+                for (String keyword:keywords)
+                {
+
+                    if (words[i].contains(keyword) && !(stopWord.contains(words[i-1])))
+                    {
+                        for(int j=i+1;j<words.length;j++)
+                        {
+                            if(stopWord.contains(words[j]))
                             {
-                                String[] urlString = issue.getIssue().getHtmlUrl().split("/");
-                                if(Integer.parseInt(urlString[urlString.length -1]) == Integer.parseInt(m.group().substring(1)))
-                                {
-                                    linkedIssues.add(issue.getId());
-                                }
+                                break;
                             }
-                        }
-                }
-             }
+                            if(words[j].replaceAll("[-'\',.+^/]*", "").matches("[#][Z0-9]*"))
+                            {
+                                System.out.println(words[i] + "  " + words[j]);
+                                for(com.group4.softwareanalytics.issues.Issue issue:issueList)
+                                {
+                                    String[] urlString = issue.getIssue().getHtmlUrl().split("/");
+                                    if(Integer.parseInt(urlString[urlString.length -1]) == Integer.parseInt(words[j].substring(1)))
+                                    {
+                                        linkedIssues.add(issue.getId());
+                                    } } } } } } }
             List<String> linkedIssuesWithoutDuplicates = Lists.newArrayList(Sets.newHashSet(linkedIssues));
             commit.setLinkedFixedIssues(linkedIssuesWithoutDuplicates);
         }
@@ -188,6 +227,7 @@ public class AsyncService {
         } catch (Exception e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
+            System.out.println(e);
             return commitList;
         }
     }
