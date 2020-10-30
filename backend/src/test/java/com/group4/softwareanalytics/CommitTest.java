@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,6 +49,9 @@ public class CommitTest {
 
         c.setModifications(cd);
         assertEquals(c.getModifications(),cd);
+
+        c.setId("id");
+        assertEquals(c.getId(),"id");
 
         c.setOwner("owner");
         assertEquals(c.getOwner(),"owner");
@@ -86,13 +90,7 @@ public class CommitTest {
         assertEquals(c.getCommitParentsIDs(),ids);
 
         c.setHasMetrics(false);
-        assertEquals(c.getHasMetrics(),false);
-
-
-
-
-
-
+        assertFalse(c.getHasMetrics());
 
     }
 }
