@@ -26,21 +26,13 @@ public class Commit {
     private Date commitDate;
     private boolean hasMetrics;
     ArrayList<String> commitParentsIDs;
-    private List<Integer> LinkedFixedIssues;
-
-    public List<Integer> getLinkedFixedIssues() {
-        return LinkedFixedIssues;
-    }
-
-    public void setLinkedFixedIssues(List<Integer> linkedFixedIssues) {
-        LinkedFixedIssues = linkedFixedIssues;
-    }
+    private ArrayList<Integer> linkedFixedIssues;
 
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
 
     public Commit(List<CommitDiff> modifications, String owner, String repo, String developerName, String developerMail, String encodingName,
-                  String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, ArrayList<String> commitParentsIDs, boolean hasMetrics) {
+                  String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, ArrayList<String> commitParentsIDs, boolean hasMetrics, ArrayList<Integer> linkedFixedIssues) {
         this.modifications = modifications;
         this.owner = owner;
         this.repo = repo;
@@ -55,6 +47,15 @@ public class Commit {
         this.projectMetrics = projectMetrics;
         this.commitParentsIDs = commitParentsIDs;
         this.hasMetrics = hasMetrics;
+        this.linkedFixedIssues = linkedFixedIssues;
+    }
+
+    public ArrayList<Integer> getLinkedFixedIssues() {
+        return linkedFixedIssues;
+    }
+
+    public void setLinkedFixedIssues(ArrayList<Integer> linkedFixedIssues) {
+        this.linkedFixedIssues = linkedFixedIssues;
     }
 
     public boolean getHasMetrics() {

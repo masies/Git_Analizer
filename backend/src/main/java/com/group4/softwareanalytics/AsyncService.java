@@ -17,7 +17,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.PullRequestService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
@@ -26,15 +25,12 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,39 +80,37 @@ public class AsyncService {
         }
     }
 
-    public static void commitFixFinder(List<Commit> commitList, List<com.group4.softwareanalytics.issues.Issue> issueList) {
+    public static ArrayList<Integer> fixedIssuesRelated(RevCommit commit, List<com.group4.softwareanalytics.issues.Issue> issueList) {
         List<String> keywords = Arrays.asList("fix","solve","resolve");
         List<String> stopWord = Arrays.asList("must","should","will");
-        for(Commit commit: commitList) {
 
-            List<Integer> linkedIssues = new ArrayList<>();
-            String fullText = "Start " + commit.getShortMessage() + " " + commit.getFullMessage();
-            String[] words = fullText.replace("\n", "").replace("\r", "").toLowerCase().split(" ");
+        List<Integer> linkedIssues = new ArrayList<>();
+        String fullText = "Start " + commit.getShortMessage() + " " + commit.getFullMessage();
+        String[] words = fullText.replace("\n", "").replace("\r", "").toLowerCase().split(" ");
 
-            for(int i=0;i<words.length;i++) {
-                for (String keyword:keywords) {
-                    if (words[i].contains(keyword) && !(stopWord.contains(words[i-1]))) {
-                        for(int j=i+1;j<words.length;j++) {
-                            if(stopWord.contains(words[j])) {
-                                break;
-                            }
-                            if(words[j].replaceAll("[-'\',.+^/]*", "").matches("[#][Z0-9]*")) {
-                                System.out.println(words[i] + "  " + words[j]);
-                                for(com.group4.softwareanalytics.issues.Issue issue:issueList) {
-                                    String[] urlString = issue.getIssue().getHtmlUrl().split("/");
-                                    if(Integer.parseInt(urlString[urlString.length -1]) == Integer.parseInt(words[j].substring(1))) {
-                                        linkedIssues.add(issue.getIssue().getNumber());
-                                    }
+        for(int i=0;i<words.length;i++) {
+            for (String keyword:keywords) {
+                if (words[i].contains(keyword) && !(stopWord.contains(words[i-1]))) {
+                    for(int j=i+1;j<words.length;j++) {
+                        if(stopWord.contains(words[j])) {
+                            break;
+                        }
+                        if(words[j].replaceAll("[-'\',.+^/]*", "").matches("[#][Z0-9]*")) {
+//                            System.out.println(words[i] + "  " + words[j]);
+                            for(com.group4.softwareanalytics.issues.Issue issue:issueList) {
+                                String[] urlString = issue.getIssue().getHtmlUrl().split("/");
+                                if(Integer.parseInt(urlString[urlString.length -1]) == Integer.parseInt(words[j].substring(1))) {
+                                    linkedIssues.add(issue.getIssue().getNumber());
                                 }
                             }
                         }
                     }
                 }
             }
-            List<Integer> linkedIssuesWithoutDuplicates = Lists.newArrayList(Sets.newHashSet(linkedIssues));
-            commit.setLinkedFixedIssues(linkedIssuesWithoutDuplicates);
         }
-
+        ArrayList<Integer>  linkedIssuesWithoutDuplicates = Lists.newArrayList(Sets.newHashSet(linkedIssues));
+        return linkedIssuesWithoutDuplicates;
+//        commit.setLinkedFixedIssues(linkedIssuesWithoutDuplicates);
     }
 
     public Repo fetchRepo(String owner, String name) throws IOException {
@@ -181,10 +175,11 @@ public class AsyncService {
                 long millis = revCommit.getCommitTime();
                 Date date = new Date(millis * 1000);
 
-                Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
+                ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit,issueList);
+
+                Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
             }
-            commitFixFinder(commitList,issueList);
             commitRepository.saveAll(commitList);
 
             System.out.println("------- Commits fetched successfully! -------");
