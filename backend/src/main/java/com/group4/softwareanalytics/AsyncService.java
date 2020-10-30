@@ -51,7 +51,7 @@ public class AsyncService {
 
     private CommitExtractor commitExtractor;
     private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
-    private List<Commit> commitList = new ArrayList<>();
+//    private List<Commit> commitList = new ArrayList<>();
 
     @Async
     public void fetchData(String owner, String name) throws InterruptedException {
@@ -68,19 +68,19 @@ public class AsyncService {
             repoRepository.save(repo);
 
             try {
-                issueList = fetchIssues(owner, name, repo);
+                fetchIssues(owner, name, repo);
             } catch (IOException e){
                 Logger logger = LogManager.getLogger(AsyncService.class.getName());
                 logger.error(e.getMessage(),e);
             }
 
-            commitList = fetchCommits(owner, name, repo);
+            fetchCommits(owner, name, repo);
 
         } catch (Exception ignored) {
         }
     }
 
-    public static ArrayList<Integer> fixedIssuesRelated(RevCommit commit, List<com.group4.softwareanalytics.issues.Issue> issueList) {
+    private ArrayList<Integer> fixedIssuesRelated(RevCommit commit) {
         List<String> keywords = Arrays.asList("fix","solve","resolve");
         List<String> stopWord = Arrays.asList("must","should","will");
 
@@ -97,6 +97,7 @@ public class AsyncService {
                         }
                         if(words[j].replaceAll("[-'\',.+^/]*", "").matches("[#][Z0-9]*")) {
 //                            System.out.println(words[i] + "  " + words[j]);
+
                             for(com.group4.softwareanalytics.issues.Issue issue:issueList) {
                                 String[] urlString = issue.getIssue().getHtmlUrl().split("/");
                                 if(Integer.parseInt(urlString[urlString.length -1]) == Integer.parseInt(words[j].substring(1))) {
@@ -108,8 +109,7 @@ public class AsyncService {
                 }
             }
         }
-        ArrayList<Integer>  linkedIssuesWithoutDuplicates = Lists.newArrayList(Sets.newHashSet(linkedIssues));
-        return linkedIssuesWithoutDuplicates;
+        return Lists.newArrayList(Sets.newHashSet(linkedIssues));
 //        commit.setLinkedFixedIssues(linkedIssuesWithoutDuplicates);
     }
 
@@ -121,7 +121,7 @@ public class AsyncService {
         return repo;
     }
 
-    public List<Commit> fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
+    public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         String repo_url = "https://github.com/"+ owner +"/"+ repoName;
         String dest_url = "./repo/" + owner +"/"+ repoName;
 
@@ -175,7 +175,7 @@ public class AsyncService {
                 long millis = revCommit.getCommitTime();
                 Date date = new Date(millis * 1000);
 
-                ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit,issueList);
+                ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
 
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
@@ -185,17 +185,15 @@ public class AsyncService {
             System.out.println("------- Commits fetched successfully! -------");
             r.hasCommitsDone();
             repoRepository.save(r);
-            return commitList;
         } catch (Exception e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
             System.out.println(e);
-            return commitList;
         }
     }
 
     //@Async
-    public List<com.group4.softwareanalytics.issues.Issue> fetchIssues(String owner, String name, Repo repo) throws IOException {
+    public void fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
 
@@ -211,7 +209,6 @@ public class AsyncService {
                              .collect(Collectors.toList());
 
             System.out.println("Found " + issues.size() + " Issues, start fetching them...");
-            List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<com.group4.softwareanalytics.issues.Issue>();
 
             for (Issue issue : issues) {
                 com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name);
@@ -232,11 +229,10 @@ public class AsyncService {
 
             repo.hasIssuesDone();
             repoRepository.save(repo);
-            return issueList;
         } catch (IOException e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
-            return null;
+            issueList = null;
         }
 
     }
