@@ -26,13 +26,13 @@ public class Commit {
     private Date commitDate;
     private boolean hasMetrics;
     ArrayList<String> commitParentsIDs;
-    private List<String> LinkedFixedIssues;
+    private List<Integer> LinkedFixedIssues;
 
-    public List<String> getLinkedFixedIssues() {
+    public List<Integer> getLinkedFixedIssues() {
         return LinkedFixedIssues;
     }
 
-    public void setLinkedFixedIssues(List<String> linkedFixedIssues) {
+    public void setLinkedFixedIssues(List<Integer> linkedFixedIssues) {
         LinkedFixedIssues = linkedFixedIssues;
     }
 
