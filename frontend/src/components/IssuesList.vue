@@ -58,7 +58,8 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/issues?page=${this.currentPage-1}&size=${this.size}`)
+				console.log(this.$route)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/issues${this.queryString}&page=${this.currentPage-1}&size=${this.size}`)
 				.then(response => {
 					return response.json()
 				})

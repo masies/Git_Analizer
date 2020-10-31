@@ -13,12 +13,6 @@ public interface CommitRepository extends MongoRepository<Commit,String> {
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
     public void findAndRemove (String owner, String repo);
 
-    @Query("{'owner' : ?0 , 'repo' : ?1}")
-    Page<Commit> findByOwnerAndRepo(String owner, String repo, Pageable pageable);
-
-     @Query("{'owner' : ?0 , 'repo' : ?1, 'developerName': {$regex: ?2 }, 'hasMetrics': false  }}")
-//    Page<Commit> search(String owner, String repo, String developerName, Boolean hasMetrics, Boolean isFixing, Pageable pageable);
-    Page<Commit> search(String owner, String repo, String developerName, Boolean hasMetrics, Pageable pageable);
 
     @Query("{'owner' : ?0 , 'repo' : ?1, 'commitName' : ?2}")
     Commit findByOwnerAndRepoAndCommitName(String owner, String repo, String commitID);

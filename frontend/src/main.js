@@ -54,7 +54,15 @@ Vue.mixin( {
 				}
 			}})
 		},
+	},
+	computed: {
+		queryString: function(){
+			return'?'+Object.keys(this.$route.query).map((key) => {
+				return key + '=' +  encodeURIComponent(this.$route.query[key]);
+			}).join('&');
+		}
 	}
+
 });
 
 Vue.config.productionTip = false;

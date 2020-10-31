@@ -15,12 +15,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.print.Pageable;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -46,6 +49,9 @@ public class CommitController {
             @RequestParam(value = "developerName", defaultValue = "") String developerName,
             @RequestParam(value = "hasMetrics", required = false) Boolean hasMetrics,
             @RequestParam(value = "isFixing", required = false) Boolean isFixing,
+            @RequestParam(value = "text", defaultValue = "") String text,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate,
             @RequestParam(value = "page", defaultValue = "0") String page,
             @RequestParam(value = "size", defaultValue = "20") String size) {
         final Query query = new Query().with(PageRequest.of(Integer.parseInt(page), Integer.parseInt(size)));
@@ -68,8 +74,17 @@ public class CommitController {
         if (developerName != null && !developerName.isEmpty()) {
             criteria.add(Criteria.where("developerName").regex(developerName, "i"));
         }
-        if (!criteria.isEmpty())
+        if (text != null && !text.isEmpty()) {
+            criteria.add(new Criteria().orOperator(Criteria.where("fullMessage").regex(text, "i"), Criteria.where("shortMessage").regex(text, "i")));
+        }
+
+        if (startDate != null && endDate != null) {
+            criteria.add(Criteria.where("commitDate").gte(startDate).lte(endDate));
+        }
+
+        if (!criteria.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[criteria.size()])));
+        }
 
         List<Commit> list = mongoTemplate.find(query, Commit.class);
         return PageableExecutionUtils.getPage(
