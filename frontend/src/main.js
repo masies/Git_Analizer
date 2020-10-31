@@ -57,6 +57,9 @@ Vue.mixin( {
 	},
 	computed: {
 		queryString: function(){
+			var tmp = this.$route.query;
+			delete tmp.page;
+			delete tmp.size;
 			return'?'+Object.keys(this.$route.query).map((key) => {
 				return key + '=' +  encodeURIComponent(this.$route.query[key]);
 			}).join('&');

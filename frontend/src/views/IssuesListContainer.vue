@@ -60,7 +60,7 @@
 				}
 
 				Object.keys(q).forEach((key) => (q[key] == null) && delete q[key]);
-
+				
 				this.$router.replace({query: {
 					...this.$router.query, ...q
 				}})
