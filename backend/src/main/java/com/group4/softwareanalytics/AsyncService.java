@@ -23,6 +23,7 @@ import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.RawText;
 import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,56 +87,81 @@ public class AsyncService {
     private void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         System.out.println("____________ "+ fixingCommits.size() +" FIXING COMMITS __________________");
         for (Commit commit : fixingCommits) {
-            ArrayList<String> pathsModifiedFiles = new ArrayList<>();
 
+            HashSet<String> bugInducingCommitsHashSet= new HashSet<>();
+            HashSet<String> bugInducingDeveloperSet= new HashSet<>();
 
             String dest_url = "./repo/" + commit.getOwner() +"/"+ commit.getRepo();
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+
             Git git = new Git(repo);
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commit.getCommitName(), dest_url, commit.getCommitParentsIDs());
             commit.setModifications(diffEntries);
 
-
             System.out.println("_____________________________________");
             System.out.println("COMMIT :" + commit.getCommitName());
-            System.out.println("HEAD :" + commit.getShortMessage());
             System.out.println("RELATED ISSUES :" + commit.getLinkedFixedIssues().toString());
 
+            HashMap<String,ArrayList<Integer>> modifiedLinesPerJavaClass = new HashMap<>();
 
             for (CommitDiff modification : commit.getModifications()) {
                 if (modification.getChangeType().equals("MODIFY")){
                     if (modification.getNewPath().endsWith(".java")){
-                        pathsModifiedFiles.add(modification.getNewPath());
+                        ArrayList<Integer> modifiedLines = new ArrayList<>();
+                        String diffs = modification.getDiffs();
+
+                        modifiedLinesPerJavaClass.put(modification.getNewPath(), modifiedLines);
                     }
                 }
             }
 
-
-            System.out.println("MODIFIED FILES :" + pathsModifiedFiles);
+            System.out.println("MODIFIED FILES :" + modifiedLinesPerJavaClass.entrySet());
             System.out.println("_____________________________________");
             System.out.println();
 
-            for (String file : pathsModifiedFiles) {
-                String relativePath = "./repo/" + owner +"/"+ repoName + "/" + file;
 
+
+                //TODO: CHECKOUT PARENT
+//            if (commit.getCommitParentsIDs().size() == 1) {
+//                git.checkout().setName(commit.getCommitParentsIDs().get(0)).call();
+//            }
+                //TODO: CHECKOUT BACK THE COMMIT
+//            git.checkout().setName(commit.getCommitName()).call();
+
+            for (Map.Entry<String,ArrayList<Integer>> entry : modifiedLinesPerJavaClass.entrySet()) {
+                System.out.println("-------- MODIFICATION "+entry.getKey()+" -------");
+                String file = entry.getKey();
+                ArrayList<Integer> modifiedLines = entry.getValue();
+
+                String relativePath = "./repo/" + owner +"/"+ repoName + "/" + file;
                 ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
+
 
                 BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
                 final RawText rawText = blameResult.getResultContents();
                 for (int i = 0; i < rawText.size(); i++) {
-                    if (codeLines.contains(i)) {
+                    if (codeLines.contains(i)
+//                            && modifiedLines.contains(i)
+                    ) {
                         final String sourceAuthor = blameResult.getSourceAuthor(i).getName();
                         final String commitHash = blameResult.getSourceCommit(i).name();
                         final Date date = new Date(blameResult.getSourceCommit(i).getCommitTime() * 1000);
-                        System.out.println("++++++++++++++++++++++");
-                        System.out.println(blameResult.getSourceLine(i));
-                        System.out.println(sourceAuthor);
-                        System.out.println(commitHash);
-                        System.out.println(date);
-                        System.out.println("++++++++++++++++++++++");
+//                        System.out.println("++++++++++++++++++++++");
+//                        System.out.println(blameResult.getSourceLine(i));
+//                        System.out.println(sourceAuthor);
+                        // TODO: ADD THESE FIELDS TO THE COMMIT IN SOME WAY
+                        bugInducingDeveloperSet.add(sourceAuthor);
+//                        System.out.println(commitHash);
+                        bugInducingCommitsHashSet.add(commitHash);
+//                        System.out.println(date);
+//                        System.out.println("++++++++++++++++++++++");
                     }
                 }
             }
+            System.out.println("bug inducing developers");
+            System.out.println(bugInducingDeveloperSet);
+            System.out.println("bug inducing commits");
+            System.out.println(bugInducingCommitsHashSet);
         }
     }
 
