@@ -72,9 +72,8 @@ public class CommitExtractor {
                     if (entry.getChangeType().name().equals("MODIFY")) {
 
                         String repoNewPath = path + "/" + entry.getNewPath();
-                        ;
                         String repoOldPath = path + "/" + entry.getOldPath();
-                        ;
+
                         MetricResults results = new MetricResults();
                         CK ck = new CK();
                         ck.calculate(repoNewPath, results);
