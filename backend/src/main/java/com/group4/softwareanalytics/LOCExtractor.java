@@ -18,19 +18,22 @@ import java.util.List;
 
 public class LOCExtractor {
 
-    public static List<String> extractLines(String src)
+    public static ArrayList<Integer> extractLines(String src)
     {
-        List<String> lineNb = new ArrayList<String>();
-
+        ArrayList<String> lineNb = new ArrayList<String>();
         Document doc = getXml(src);
-
         NodeList nodeList = doc.getFirstChild().getChildNodes();
 
+        ArrayList<String> strings = new ArrayList<>(
+                new HashSet<String>(cleanXml(nodeList, lineNb)));
 
-        List<String> finalLineNb = new ArrayList<String>(
-                new HashSet<String>(cleanXml(nodeList,lineNb)));
+        ArrayList<Integer> numbers = new ArrayList<>();
 
-        return finalLineNb;
+        for (String s:strings) {
+            numbers.add(Integer.parseInt(s));
+        }
+
+        return numbers;
     }
 
 

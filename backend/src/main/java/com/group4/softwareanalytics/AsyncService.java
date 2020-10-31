@@ -23,7 +23,6 @@ import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.RawText;
 import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
-import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,20 +114,24 @@ public class AsyncService {
             System.out.println();
 
             for (String file : pathsModifiedFiles) {
-//                String relativePath = "./repo/" + owner +"/"+ repoName + "/" + file;
+                String relativePath = "./repo/" + owner +"/"+ repoName + "/" + file;
+
+                ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
 
                 BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
                 final RawText rawText = blameResult.getResultContents();
                 for (int i = 0; i < rawText.size(); i++) {
-                    final String sourceAuthor = blameResult.getSourceAuthor(i).getName();
-                    final String commitHash = blameResult.getSourceCommit(i).name();
-                    final Date date = new Date(blameResult.getSourceCommit(i).getCommitTime() * 1000);
-                    System.out.println("++++++++++++++++++++++");
-                    System.out.println(blameResult.getSourceLine(i));
-                    System.out.println(sourceAuthor);
-                    System.out.println(commitHash);
-                    System.out.println(date);
-                    System.out.println("++++++++++++++++++++++");
+                    if (codeLines.contains(i)) {
+                        final String sourceAuthor = blameResult.getSourceAuthor(i).getName();
+                        final String commitHash = blameResult.getSourceCommit(i).name();
+                        final Date date = new Date(blameResult.getSourceCommit(i).getCommitTime() * 1000);
+                        System.out.println("++++++++++++++++++++++");
+                        System.out.println(blameResult.getSourceLine(i));
+                        System.out.println(sourceAuthor);
+                        System.out.println(commitHash);
+                        System.out.println(date);
+                        System.out.println("++++++++++++++++++++++");
+                    }
                 }
             }
         }
@@ -145,18 +148,11 @@ public class AsyncService {
 
         for (int i=0; i<words.length; i++) {
             if (keywords.contains(words[i].replaceAll("[^a-zA-Z0-9]", ""))){
-                System.out.print("fullText: ");
-                System.out.println(fullText);
-                System.out.print("words: ");
-                System.out.println(Arrays.toString(words));
                 if (i>0 && !(stopWord.contains(words[i-1].replaceAll("[^a-zA-Z0-9]", "")))) {
                     for(int j=i+1; j<words.length; j++) {
                         words[j] = words[j].replaceAll(",","");
                         if(words[j].matches("[#][0-9]+")) {
                             String relatedIssue = words[j].replaceAll("\\D+","");
-                            System.out.print("relatedIssue: ");
-                            System.out.println(relatedIssue);
-
                             for(com.group4.softwareanalytics.issues.Issue issue:issueList) {
                                 String[] urlString = issue.getIssue().getHtmlUrl().split("/");
                                 try{
