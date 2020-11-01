@@ -65,7 +65,7 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits?page=${this.currentPage-1}&size=${this.size}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits${this.queryString}&page=${this.currentPage-1}&size=${this.size}`)
 				.then(response => {
 					return response.json()
 				})

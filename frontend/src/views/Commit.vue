@@ -14,6 +14,18 @@
 			<div class="card-header">
 				<h3 class="d-inline mr-1">{{ commit.shortMessage }}</h3>
 			</div>
+			<div class="card-header" v-if="commit.linkedFixedIssues.length > 0">
+				<div class="row">
+					<div class="col-12">
+						Related issues: <span v-for="(issue, i) in commit.linkedFixedIssues">
+						<router-link class="text-decoration-none" :to="{name: 'issue', params: {owner: commit.owner, name: commit.repo, id: issue}}">
+						#{{ issue }}<span v-if="i < commit.linkedFixedIssues.length-1">,</span>
+						</router-link>
+					</span>
+					</div>
+					
+				</div>
+			</div>
 			<div class="card-header" v-if="commit.hasMetrics">
 				<div class="row text-center">
 					<div class="col">
