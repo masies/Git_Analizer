@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -98,40 +100,77 @@ public class AsyncService {
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commit.getCommitName(), dest_url, commit.getCommitParentsIDs());
             commit.setModifications(diffEntries);
 
-            System.out.println("_____________________________________");
+//            System.out.println("_____________________________________");
             System.out.println("COMMIT :" + commit.getCommitName());
             System.out.println("RELATED ISSUES :" + commit.getLinkedFixedIssues().toString());
 
             HashMap<String,ArrayList<Integer>> modifiedLinesPerJavaClass = new HashMap<>();
 
+            git.checkout().setName(commit.getCommitName()).call();
+
             for (CommitDiff modification : commit.getModifications()) {
                 if (modification.getChangeType().equals("MODIFY")){
                     if (modification.getNewPath().endsWith(".java")){
-                        ArrayList<Integer> modifiedLines = new ArrayList<>();
+                        ArrayList<Integer> deletedLines = new ArrayList<>();
                         String diffs = modification.getDiffs();
+                        String reg = "@@(\\s[-,+]\\d+[,]\\d+)+\\s@@";
+                        Pattern pattern = Pattern.compile(reg);
+                        ArrayList<String> chunksHeader = new ArrayList();
+                        Matcher matcher = pattern.matcher(diffs);
 
-                        modifiedLinesPerJavaClass.put(modification.getNewPath(), modifiedLines);
+                        while (matcher.find()) {
+                            chunksHeader.add(matcher.group());
+                        }
+
+                        String[] diffsChunks = diffs.split(reg);
+                        for(int i = 1; i<diffsChunks.length; i++){
+
+                            String header = chunksHeader.get(i-1);
+                            ArrayList<Integer> startAndCont = new ArrayList();
+                            String reg2 = "\\d+";
+                            Pattern pattern2 = Pattern.compile(reg2);
+                            Matcher matcher2 = pattern2.matcher(header);
+                            while (matcher2.find()) {
+                                startAndCont.add(Integer.parseInt(matcher2.group()));
+                            }
+                            int start = startAndCont.get(0);
+
+                            String d = diffsChunks[i];
+                            String[] diffLines = d.split("\\r?\\n");
+                            int count = 0;
+                            for (int j = 0; j<diffLines.length; j++) {
+                                if (diffLines[j].startsWith("-")){
+                                    deletedLines.add(start+count-1);
+                                } else if (diffLines[j].startsWith("+")){
+                                    count = count-1;
+                                }
+                                count = count+1;
+                            }
+                        }
+                        modifiedLinesPerJavaClass.put(modification.getNewPath(), deletedLines);
                     }
                 }
             }
 
             System.out.println("MODIFIED FILES :" + modifiedLinesPerJavaClass.entrySet());
-            System.out.println("_____________________________________");
+//            System.out.println("_____________________________________");
             System.out.println();
 
-
-
-                //TODO: CHECKOUT PARENT
-//            if (commit.getCommitParentsIDs().size() == 1) {
-//                git.checkout().setName(commit.getCommitParentsIDs().get(0)).call();
-//            }
-                //TODO: CHECKOUT BACK THE COMMIT
-//            git.checkout().setName(commit.getCommitName()).call();
+            // checkout parent
+            if (commit.getCommitParentsIDs().size() == 1) {
+                git.checkout().setName(commit.getCommitParentsIDs().get(0)).call();
+            } else {
+                // in case we have multiple parents e.g., merge commits, we just skip
+                System.out.println("MULTIPLE PARENTS");
+                continue;
+            }
 
             for (Map.Entry<String,ArrayList<Integer>> entry : modifiedLinesPerJavaClass.entrySet()) {
-                System.out.println("-------- MODIFICATION "+entry.getKey()+" -------");
+                System.out.println("-------- MODIFICATION -------");
+                System.out.println(entry.getKey());
+
                 String file = entry.getKey();
-                ArrayList<Integer> modifiedLines = entry.getValue();
+                ArrayList<Integer> deletedLines = entry.getValue();
 
                 String relativePath = "./repo/" + owner +"/"+ repoName + "/" + file;
                 ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
@@ -140,27 +179,21 @@ public class AsyncService {
                 BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
                 final RawText rawText = blameResult.getResultContents();
                 for (int i = 0; i < rawText.size(); i++) {
-                    if (codeLines.contains(i)
-//                            && modifiedLines.contains(i)
-                    ) {
+                    if (codeLines.contains(i) && deletedLines.contains(i)) {
                         final String sourceAuthor = blameResult.getSourceAuthor(i).getName();
                         final String commitHash = blameResult.getSourceCommit(i).name();
                         final Date date = new Date(blameResult.getSourceCommit(i).getCommitTime() * 1000);
-//                        System.out.println("++++++++++++++++++++++");
-//                        System.out.println(blameResult.getSourceLine(i));
-//                        System.out.println(sourceAuthor);
+//
                         // TODO: ADD THESE FIELDS TO THE COMMIT IN SOME WAY
                         bugInducingDeveloperSet.add(sourceAuthor);
-//                        System.out.println(commitHash);
                         bugInducingCommitsHashSet.add(commitHash);
-//                        System.out.println(date);
-//                        System.out.println("++++++++++++++++++++++");
                     }
                 }
+                System.out.println("-----------------------------");
             }
-            System.out.println("bug inducing developers");
+            System.out.println("bug inducing developers:");
             System.out.println(bugInducingDeveloperSet);
-            System.out.println("bug inducing commits");
+            System.out.println("bug inducing commits:");
             System.out.println(bugInducingCommitsHashSet);
         }
     }
