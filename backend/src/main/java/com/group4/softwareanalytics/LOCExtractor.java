@@ -1,12 +1,16 @@
 package com.group4.softwareanalytics;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,6 +26,7 @@ public class LOCExtractor {
     {
         ArrayList<String> lineNb = new ArrayList<String>();
         Document doc = getXml(src);
+        assert doc != null;
         NodeList nodeList = doc.getFirstChild().getChildNodes();
 
         ArrayList<String> strings = new ArrayList<>(
@@ -54,7 +59,7 @@ public class LOCExtractor {
             }
             else
             {
-                if(node.getNodeName() != "block")
+                if(!node.getNodeName().equals("block"))
                 {
                     try{
                         lineNb.add(node.getAttributes().getNamedItem("pos:start").getNodeValue().split(":")[0]);
@@ -100,9 +105,7 @@ public class LOCExtractor {
             }
 
 
-        } catch (IOException e) {
-
-        } catch (InterruptedException e) {
+        } catch (Exception ignored) {
 
         }
         return null;
@@ -112,6 +115,11 @@ public class LOCExtractor {
     {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (ParserConfigurationException ignored) {
+
+        }
 
 
         DocumentBuilder builder = null;
@@ -126,7 +134,8 @@ public class LOCExtractor {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Logger logger = LogManager.getLogger(LOCExtractor.class.getName());
+            logger.error(e.getMessage(),e);
         }
         return null;
     }

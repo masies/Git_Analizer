@@ -85,7 +85,7 @@ public class AsyncService {
         }
     }
 
-    private void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
+    public void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
 //        System.out.println("____________ "+ fixingCommits.size() +" FIXING COMMITS __________________");
         for (Commit commit : fixingCommits) {
 //            System.out.println("COMMIT :" + commit.getCommitName());
@@ -94,7 +94,11 @@ public class AsyncService {
             String dest_url = "./repo/" + commit.getOwner() +"/"+ commit.getRepo();
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
             Git git = new Git(repo);
-            git.checkout().setName(commit.getCommitName()).call();
+            try {
+                git.checkout().setName(commit.getCommitName()).call();
+            } catch (Exception ignore){
+
+            }
 
             // compute modified files
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commit.getCommitName(), dest_url, commit.getCommitParentsIDs());
