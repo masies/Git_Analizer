@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class IssueTest {
     @Test
     void testIssueTest() {
-        Issue i = new Issue(null, "owner", "repo");
+        Issue i = new Issue(null, "owner", "repo", false);
 
         i.setId("myid");
         assertEquals(i.getId(), "myid");

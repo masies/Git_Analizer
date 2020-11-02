@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 public class Commit {
@@ -26,21 +27,14 @@ public class Commit {
     private Date commitDate;
     private boolean hasMetrics;
     ArrayList<String> commitParentsIDs;
-    private List<Integer> LinkedFixedIssues;
-
-    public List<Integer> getLinkedFixedIssues() {
-        return LinkedFixedIssues;
-    }
-
-    public void setLinkedFixedIssues(List<Integer> linkedFixedIssues) {
-        LinkedFixedIssues = linkedFixedIssues;
-    }
+    private ArrayList<Integer> linkedFixedIssues;
+    private HashSet<Commit> bugInducingCommits;
 
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
 
     public Commit(List<CommitDiff> modifications, String owner, String repo, String developerName, String developerMail, String encodingName,
-                  String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, ArrayList<String> commitParentsIDs, boolean hasMetrics) {
+                  String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, ArrayList<String> commitParentsIDs, boolean hasMetrics, ArrayList<Integer> linkedFixedIssues) {
         this.modifications = modifications;
         this.owner = owner;
         this.repo = repo;
@@ -55,6 +49,23 @@ public class Commit {
         this.projectMetrics = projectMetrics;
         this.commitParentsIDs = commitParentsIDs;
         this.hasMetrics = hasMetrics;
+        this.linkedFixedIssues = linkedFixedIssues;
+    }
+
+    public HashSet<Commit> getBugInducingCommits() {
+        return bugInducingCommits;
+    }
+
+    public void setBugInducingCommits(HashSet<Commit> bugInducingCommits) {
+        this.bugInducingCommits = bugInducingCommits;
+    }
+
+    public ArrayList<Integer> getLinkedFixedIssues() {
+        return linkedFixedIssues;
+    }
+
+    public void setLinkedFixedIssues(ArrayList<Integer> linkedFixedIssues) {
+        this.linkedFixedIssues = linkedFixedIssues;
     }
 
     public boolean getHasMetrics() {

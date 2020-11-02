@@ -45,7 +45,7 @@ public class CommitTest {
         ArrayList<String> ids = new ArrayList<>();
 
         Commit c = new Commit(null,"owner","repo","developer", "developerMail","encodingName",
-                "fullMessage","shortMessage","commitName",0,null,null,null,true);
+                "fullMessage","shortMessage","commitName",0,null,null,null,true,null);
 
         c.setModifications(cd);
         assertEquals(c.getModifications(),cd);
