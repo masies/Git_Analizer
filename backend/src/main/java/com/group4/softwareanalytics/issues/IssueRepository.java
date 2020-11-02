@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.util.List;
+
 
 @RepositoryRestResource(collectionResourceRel = "issue", path = "issue")
 public interface IssueRepository extends MongoRepository<Issue,String> {
@@ -17,7 +19,7 @@ public interface IssueRepository extends MongoRepository<Issue,String> {
     Issue findByOwnerAndRepoAndId(String owner, String repo, int number);
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public void findAndRemove (String owner, String repo);
+    public List<Issue> findAndRemove (String owner, String repo);
 
 }
 
