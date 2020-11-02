@@ -1,9 +1,9 @@
 package com.group4.softwareanalytics;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.group4.softwareanalytics.commits.*;
 import com.group4.softwareanalytics.commits.Commit;
-import com.group4.softwareanalytics.commits.CommitDiff;
-import com.group4.softwareanalytics.commits.CommitExtractor;
-import com.group4.softwareanalytics.commits.CommitRepository;
 import com.group4.softwareanalytics.issues.comments.IssueComment;
 import com.group4.softwareanalytics.issues.comments.IssueCommentRepository;
 import com.group4.softwareanalytics.issues.IssueRepository;
@@ -15,11 +15,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.PullRequestService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.blame.BlameResult;
+import org.eclipse.jgit.diff.RawText;
+import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -27,9 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,13 +52,16 @@ public class AsyncService {
     private CommitRepository commitRepository;
 
     private CommitExtractor commitExtractor;
+    private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
+    private ArrayList<Commit> fixingCommits = new ArrayList<>();
 
     @Async
-    public void fetchData(String owner, String name) throws InterruptedException {
+    public void fetchData(String owner, String name)  {
         try {
+            fixingCommits.clear();
+            issueList.clear();
 
             Repo repo = fetchRepo(owner,name);
-
             repoRepository.findAndRemove(owner,name);
             issueRepository.findAndRemove(owner,name);
             issueCommentRepository.findAndRemove(owner,name);
@@ -64,21 +70,167 @@ public class AsyncService {
             repo.hasInfoDone();
             repoRepository.save(repo);
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        fetchIssues(owner, name, repo);
-                    } catch (IOException e){
-                        Logger logger = LogManager.getLogger(AsyncService.class.getName());
-                        logger.error(e.getMessage(),e);
-                    }
-                }
-            }).start();
+            try {
+                fetchIssues(owner, name, repo);
+            } catch (IOException e){
+                Logger logger = LogManager.getLogger(AsyncService.class.getName());
+                logger.error(e.getMessage(),e);
+            }
 
             fetchCommits(owner, name, repo);
+
+            computeSZZ(owner, name, repo);
+
         } catch (Exception ignored) {
         }
+    }
+
+    public void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
+//        System.out.println("____________ "+ fixingCommits.size() +" FIXING COMMITS __________________");
+        for (Commit commit : fixingCommits) {
+//            System.out.println("COMMIT :" + commit.getCommitName());
+
+            // CHECKOUT this specific commit
+            String dest_url = "./repo/" + commit.getOwner() +"/"+ commit.getRepo();
+            org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+            Git git = new Git(repo);
+            try {
+                git.checkout().setName(commit.getCommitName()).call();
+            } catch (Exception ignore){
+
+            }
+
+            // compute modified files
+            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commit.getCommitName(), dest_url, commit.getCommitParentsIDs());
+            commit.setModifications(diffEntries);
+
+            HashMap<String,ArrayList<Integer>> modifiedLinesPerJavaClass = new HashMap<>();
+
+            for (CommitDiff modification : commit.getModifications()) {
+                if (modification.getChangeType().equals("MODIFY") && modification.getNewPath().endsWith(".java")) {
+                    ArrayList<Integer> deletedLines = new ArrayList<>();
+                    String diffs = modification.getDiffs();
+                    String reg = "@@(\\s[-,+]\\d+[,]\\d+)+\\s@@";
+                    Pattern pattern = Pattern.compile(reg);
+                    ArrayList<String> chunksHeader = new ArrayList<>();
+                    Matcher matcher = pattern.matcher(diffs);
+
+                    while (matcher.find()) {
+                        chunksHeader.add(matcher.group());
+                    }
+
+                    String[] diffsChunks = diffs.split(reg);
+                    for (int i = 1; i < diffsChunks.length; i++) {
+
+                        String header = chunksHeader.get(i - 1);
+                        ArrayList<Integer> startAndCont = new ArrayList<>();
+                        String reg2 = "\\d+";
+                        Pattern pattern2 = Pattern.compile(reg2);
+                        Matcher matcher2 = pattern2.matcher(header);
+
+                        while (matcher2.find()) {
+                            startAndCont.add(Integer.parseInt(matcher2.group()));
+                        }
+                        int start = startAndCont.get(0);
+
+                        // first chunk block
+                        String codeBlock = diffsChunks[i];
+                        String[] diffLines = codeBlock.split("\\r?\\n");
+
+                        int count = 0;
+                        for (String diffLine : diffLines) {
+                            if (diffLine.startsWith("-")) {
+                                deletedLines.add(start + count - 1);
+                            } else if (diffLine.startsWith("+")) {
+                                count = count - 1;
+                            }
+                            count = count + 1;
+                        }
+                    }
+                    modifiedLinesPerJavaClass.put(modification.getNewPath(), deletedLines);
+                }
+            }
+
+            HashSet<String> bugInducingCommitsHashSet= new HashSet<>();
+
+            // checkout parent
+            if (commit.getCommitParentsIDs().size() == 1) {
+                git.checkout().setName(commit.getCommitParentsIDs().get(0)).call();
+            } else {
+                // in case we have multiple parents e.g., merge commits, we just skip
+                System.out.println("MULTIPLE PARENTS, can't compute szz");
+                continue;
+            }
+
+            for (Map.Entry<String,ArrayList<Integer>> entry : modifiedLinesPerJavaClass.entrySet()) {
+                String file = entry.getKey();
+                ArrayList<Integer> deletedLines = entry.getValue();
+
+                String relativePath = "./repo/" + owner +"/"+ repoName + "/" + file;
+                ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
+
+                BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
+                final RawText rawText = blameResult.getResultContents();
+                for (int i = 0; i < rawText.size(); i++) {
+                    if (codeLines.contains(i) && deletedLines.contains(i)) {
+                        final String commitHash = blameResult.getSourceCommit(i).name();
+                        bugInducingCommitsHashSet.add(commitHash);
+                    }
+                }
+            }
+//            System.out.println("bug inducing commits:");
+//            System.out.println(bugInducingCommitsHashSet);
+
+            HashSet<Commit> bugInducingCommitsSet= new HashSet<>();
+
+            for (String bugInducingCommitId: bugInducingCommitsHashSet) {
+                Commit bugInducingCommit = commitRepository.findByOwnerAndRepoAndCommitName(owner,repoName,bugInducingCommitId);
+                bugInducingCommitsSet.add(bugInducingCommit);
+            }
+
+            if (bugInducingCommitsSet.isEmpty()){
+                commit.setBugInducingCommits(null);
+            } else {
+                commit.setBugInducingCommits(bugInducingCommitsSet);
+            }
+
+            commitRepository.save(commit);
+        }
+    }
+
+    private ArrayList<Integer> fixedIssuesRelated(RevCommit commit) {
+        List<String> keywords = Arrays.asList("fix","fixes","fixed","close","closes","closed","resolve","resolves","resolved");
+        List<String> stopWord = Arrays.asList("must","should","will");
+
+        List<Integer> linkedIssues = new ArrayList<>();
+        String fullText = commit.getShortMessage() + " " + commit.getFullMessage();
+        String[] words = fullText.replace("\t", " ").replace("\n", " ").replace("\r", " ").toLowerCase().split(" ");
+
+
+        for (int i=0; i<words.length; i++) {
+            if (keywords.contains(words[i].replaceAll("[^a-zA-Z0-9]", ""))){
+                if (i>0 && !(stopWord.contains(words[i-1].replaceAll("[^a-zA-Z0-9]", "")))) {
+                    for(int j=i+1; j<words.length; j++) {
+                        words[j] = words[j].replaceAll(",","");
+                        if(words[j].matches("[#][0-9]+")) {
+                            String relatedIssue = words[j].replaceAll("\\D+","");
+                            for(com.group4.softwareanalytics.issues.Issue issue:issueList) {
+                                if (!issue.getPR()) {
+                                    String[] urlString = issue.getIssue().getHtmlUrl().split("/");
+                                    try {
+                                        if (Integer.parseInt(urlString[urlString.length - 1]) == Integer.parseInt(relatedIssue)) {
+                                            linkedIssues.add(issue.getIssue().getNumber());
+                                        }
+                                    } catch (Exception ignore) {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Lists.newArrayList(Sets.newHashSet(linkedIssues));
     }
 
     public Repo fetchRepo(String owner, String name) throws IOException {
@@ -89,7 +241,7 @@ public class AsyncService {
         return repo;
     }
 
-    public List<Commit> fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
+    public void fetchCommits(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         String repo_url = "https://github.com/"+ owner +"/"+ repoName;
         String dest_url = "./repo/" + owner +"/"+ repoName;
 
@@ -135,7 +287,6 @@ public class AsyncService {
                 }
 
                 List<CommitDiff> diffEntries = new ArrayList<>();
-                //            diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
 
                 ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -143,29 +294,33 @@ public class AsyncService {
                 long millis = revCommit.getCommitTime();
                 Date date = new Date(millis * 1000);
 
-                Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false);
+                ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
+
+                Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
+                if (!c.getLinkedFixedIssues().isEmpty()){
+                    fixingCommits.add(c);
+                }
             }
             commitRepository.saveAll(commitList);
 
-            System.out.println("------- Commits fetched successfully! -------");
+            System.out.println("------- Commits stored successfully! -------");
+
             r.hasCommitsDone();
             repoRepository.save(r);
-            return commitList;
         } catch (Exception e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
-            return commitList;
+            System.out.println(e);
         }
     }
 
     //@Async
-    public List<com.group4.softwareanalytics.issues.Issue> fetchIssues(String owner, String name, Repo repo) throws IOException {
+    public void fetchIssues(String owner, String name, Repo repo) throws IOException {
         try {
             IssueService service = new IssueService();
 
-            service.getClient().setOAuth2Token("516c48a3eabd845073efe0df4234945fdff65dc0");
-
+            service.getClient().setOAuth2Token("ab6bd4f53af3a9a35077c9d06dfb48047240fe8e");
             List<Issue> issuesOpen = service.getIssues(owner, name,
                     Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
 
@@ -176,10 +331,14 @@ public class AsyncService {
                              .collect(Collectors.toList());
 
             System.out.println("Found " + issues.size() + " Issues, start fetching them...");
-            List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<com.group4.softwareanalytics.issues.Issue>();
 
             for (Issue issue : issues) {
-                com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name);
+                com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
+
+                if(issue.getHtmlUrl().contains("pull")) {
+                    i.setPR(true);
+                }
+
                 issueList.add(i);
                 // gather all the issue comments
                 List<Comment> comments = service.getComments(owner, name, issue.getNumber());
@@ -197,11 +356,10 @@ public class AsyncService {
 
             repo.hasIssuesDone();
             repoRepository.save(repo);
-            return issueList;
         } catch (IOException e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
-            return null;
+            issueList = null;
         }
 
     }
