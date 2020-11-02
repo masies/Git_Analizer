@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 public class Commit {
@@ -27,6 +28,7 @@ public class Commit {
     private boolean hasMetrics;
     ArrayList<String> commitParentsIDs;
     private ArrayList<Integer> linkedFixedIssues;
+    private HashSet<Commit> bugInducingCommits;
 
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
@@ -48,6 +50,14 @@ public class Commit {
         this.commitParentsIDs = commitParentsIDs;
         this.hasMetrics = hasMetrics;
         this.linkedFixedIssues = linkedFixedIssues;
+    }
+
+    public HashSet<Commit> getBugInducingCommits() {
+        return bugInducingCommits;
+    }
+
+    public void setBugInducingCommits(HashSet<Commit> bugInducingCommits) {
+        this.bugInducingCommits = bugInducingCommits;
     }
 
     public ArrayList<Integer> getLinkedFixedIssues() {

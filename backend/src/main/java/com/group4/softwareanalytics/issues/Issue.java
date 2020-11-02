@@ -12,6 +12,22 @@ public class Issue {
 
     private String owner;
     private String repo;
+    private Boolean isPR;
+
+    public Issue(org.eclipse.egit.github.core.Issue issue, String owner, String repo, Boolean isPR) {
+        this.owner = owner;
+        this.repo = repo;
+        this.issue = issue;
+        this.isPR = isPR;
+    }
+
+    public Boolean getPR() {
+        return isPR;
+    }
+
+    public void setPR(Boolean PR) {
+        isPR = PR;
+    }
 
     public String getId() {
         return id;
@@ -45,9 +61,5 @@ public class Issue {
         this.issue = issue;
     }
 
-    public Issue(org.eclipse.egit.github.core.Issue issue, String owner, String repo) {
-        this.owner = owner;
-        this.repo = repo;
-        this.issue = issue;
-    }
+
 }
