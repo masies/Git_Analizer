@@ -184,7 +184,12 @@ public class AsyncService {
                 bugInducingCommitsSet.add(bugInducingCommit);
             }
 
-            commit.setBugInducingCommits(bugInducingCommitsSet);
+            if (bugInducingCommitsSet.isEmpty()){
+                commit.setBugInducingCommits(null);
+            } else {
+                commit.setBugInducingCommits(bugInducingCommitsSet);
+            }
+
             commitRepository.save(commit);
         }
     }
