@@ -1,5 +1,6 @@
 package com.group4.softwareanalytics;
 
+import com.group4.softwareanalytics.commits.Commit;
 import com.group4.softwareanalytics.commits.CommitRepository;
 import com.group4.softwareanalytics.issues.IssueRepository;
 import com.group4.softwareanalytics.repository.Repo;
@@ -56,23 +57,26 @@ class IssueControllerTest {
         String name = "Calculator";
 
         Repo r = asyncService.fetchRepo(owner,name);
+
         repoRepository.findAndRemove(owner,name);
 
 
         assertNotNull(r);
 
-//        List<com.group4.softwareanalytics.issues.Issue> issues = asyncService.fetchIssues("HouariZegai","Calculator",r);
+        asyncService.fetchIssues("HouariZegai","Calculator",r);
 
-//        assertNotNull(issues);
+        List<com.group4.softwareanalytics.issues.Issue> issues = issueRepository.findAndRemove(owner,name);
+
+        assertNotNull(issues);
 
         issueRepository.findAndRemove(owner,name);
         repoRepository.findAndRemove(owner,name);
-//        for(com.group4.softwareanalytics.issues.Issue issue:issues)
-//        {
-//            assertNotNull(issue.getId());
-//            assertEquals(issue.getRepo(),name);
-//            assertEquals(issue.getOwner(),owner);
-//        }
+        for(com.group4.softwareanalytics.issues.Issue issue:issues)
+        {
+            assertNotNull(issue.getId());
+            assertEquals(issue.getRepo(),name);
+            assertEquals(issue.getOwner(),owner);
+        }
 
     }
 
