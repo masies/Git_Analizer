@@ -327,7 +327,6 @@ public class AsyncService {
                 com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
 
                 if(issue.getHtmlUrl().contains("pull")) {
-                    System.out.println(issue.getTitle());
                     i.setPR(true);
                 }
 
