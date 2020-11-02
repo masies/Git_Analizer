@@ -80,14 +80,12 @@ public class MetricsTest {
         assertNotNull(metrics);
 
         //Parent Metrics Check
-        // assertEquals(metrics.getParentLOC(),650);
         assertEquals(metrics.getParentCBO(),2);
         assertEquals(metrics.getParentWMC(),73);
         assertEquals(metrics.getParentLCOM(),3);
 
 
         //Self Metrics Check
-        assertEquals(metrics.getLOC(),650);
         assertEquals(metrics.getCBO(),2);
         assertEquals(metrics.getWMC(),73);
         assertEquals(metrics.getLCOM(),3);

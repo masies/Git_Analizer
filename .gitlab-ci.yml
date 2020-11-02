@@ -55,6 +55,16 @@ test_backend:
   services:
     - mongo
   script:
+    - apt-get update
+    - apt-get -y install sudo
+    - apt-get -y install git
+    - apt-get -y install curl
+    - apt-get -y install libcurl3
+    - apt-get -y install libarchive13
+    - apt-get -y install maven
+    - apt-get -y install openjdk-8-jdk
+    - curl http://131.123.42.38/lmcrs/v1.0.0/srcml_1.0.0-1_ubuntu16.04.deb --output srcml_1.0.0-1_ubuntu16.04.deb
+    - dpkg -i srcml_1.0.0-1_ubuntu16.04.deb
     - cd backend
     - mvn test
       -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
@@ -91,7 +101,6 @@ deploy_app:
 
 # monitor
 sonar_check:
-  image: maven:3-jdk-11
   stage : monitor
   services:
     - mongo
@@ -100,7 +109,18 @@ sonar_check:
     - analytics
   # only : ["master"]
   script :
+    - apt-get update
+    - apt-get -y install sudo
+    - apt-get -y install git
+    - apt-get -y install curl
+    - apt-get -y install libcurl3
+    - apt-get -y install libarchive13
+    - apt-get -y install maven
+    - apt-get -y install openjdk-8-jdk
+    - curl http://131.123.42.38/lmcrs/v1.0.0/srcml_1.0.0-1_ubuntu16.04.deb --output srcml_1.0.0-1_ubuntu16.04.deb
+    - dpkg -i srcml_1.0.0-1_ubuntu16.04.deb
     - cd backend
+    - mvn -Dmaven.test.skip clean package
     - mvn --batch-mode verify sonar:sonar
       -Dspring.data.mongodb.uri="mongodb://mongo:27017/"
       -Dsonar.host.url="http://rio.inf.usi.ch:9000/"
