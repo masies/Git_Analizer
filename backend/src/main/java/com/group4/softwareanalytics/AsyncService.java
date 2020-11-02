@@ -85,7 +85,7 @@ public class AsyncService {
         }
     }
 
-    private void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
+    public void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
 //        System.out.println("____________ "+ fixingCommits.size() +" FIXING COMMITS __________________");
         for (Commit commit : fixingCommits) {
 //            System.out.println("COMMIT :" + commit.getCommitName());
