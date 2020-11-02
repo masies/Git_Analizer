@@ -10,6 +10,7 @@ import org.xml.sax.InputSource;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -114,7 +115,11 @@ public class LOCExtractor {
     {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (ParserConfigurationException ignored) {
+
+        }
 
 
         DocumentBuilder builder = null;
