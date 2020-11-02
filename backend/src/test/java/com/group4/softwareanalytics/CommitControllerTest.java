@@ -1,6 +1,7 @@
 package com.group4.softwareanalytics;
 
 import com.group4.softwareanalytics.commits.Commit;
+import com.group4.softwareanalytics.commits.CommitController;
 import com.group4.softwareanalytics.commits.CommitExtractor;
 import com.group4.softwareanalytics.commits.CommitRepository;
 import com.group4.softwareanalytics.repository.Repo;
@@ -28,10 +29,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,7 +48,8 @@ class CommitControllerTest {
     private CommitRepository commitRepository;
     @Autowired
     private RepoRepository repoRepository;
-
+    @Autowired
+    private CommitController commitController;
 
 
     @Test
@@ -61,27 +60,29 @@ class CommitControllerTest {
 
         Repo r = asyncService.fetchRepo(owner,name);
 
-        List<Commit> commits = asyncService.fetchCommits("HouariZegai","Calculator",r);
+        asyncService.fetchCommits("HouariZegai","Calculator",r);
+
+        List<Commit> commits = commitRepository.findAndRemove(owner,name);
 
         repoRepository.findAndRemove(owner,name);
         commitRepository.findAndRemove(owner,name);
 
         assertNotNull(commits);
 
+        List<String> nullFields = Arrays.asList("getEncodingName","getBugInducingCommits","getLinkedFixedIssues");
+
         for(Commit commit:commits)
         {
             for (Method m : commit.getClass().getMethods()) {
                 if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
                     final Object met = m.invoke(commit);
-                    if(m.getName() != "getEncodingName")
+                    if(!nullFields.contains(m.getName()))
                     {
                         assertNotNull(met);
                     }
                 }
             }
         }
-
-
     }
     @Test
     void testDuplicateCommits() throws Exception {

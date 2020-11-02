@@ -7,7 +7,7 @@
 			<div class="col">
 				<p class="mb-0">Commits on {{ getFormattedDate(day) }}</p>
 				<div class="row rounded list-group m-0">
-					<div class="col-12 list-group-item" v-for="item in items">
+					<div class="col-12 list-group-item" v-for="item in items"  :class="{'bg-light-green': item.bugInducingCommits}">
 						<commits-list-item :data="item"/>
 					</div>
 				</div>
@@ -65,7 +65,7 @@
 		},
 		methods: {
 			loadData: function() {
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits?page=${this.currentPage-1}&size=${this.size}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits${this.queryString}&page=${this.currentPage-1}&size=${this.size}`)
 				.then(response => {
 					return response.json()
 				})
@@ -135,4 +135,13 @@
 	flex-shrink: 0;
 	background-color: #fff;
 }
+
+.bg-light-green{
+	background-color: #e0ffeb;
+}
+
+.bg-light-green:hover{
+	background-color: #cdffd8;
+}
+
 </style>

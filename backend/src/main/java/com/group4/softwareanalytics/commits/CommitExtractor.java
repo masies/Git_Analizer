@@ -66,15 +66,15 @@ public class CommitExtractor {
                 for (DiffEntry entry : diffFormatter.scan(oldTreeIter, newTreeIter)) {
                     diffFormatter.format(entry);
                     String diffText = stream.toString();
+
                     ArrayList<Float> currentMetrics = new ArrayList<>();
                     ArrayList<Float> parentMetrics = new ArrayList<>();
 
                     if (entry.getChangeType().name().equals("MODIFY")) {
 
                         String repoNewPath = path + "/" + entry.getNewPath();
-                        ;
                         String repoOldPath = path + "/" + entry.getOldPath();
-                        ;
+
                         MetricResults results = new MetricResults();
                         CK ck = new CK();
                         ck.calculate(repoNewPath, results);

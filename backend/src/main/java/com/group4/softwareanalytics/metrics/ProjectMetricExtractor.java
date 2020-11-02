@@ -29,9 +29,7 @@ public class ProjectMetricExtractor {
     public static void checkoutParent(Git git){
         try {
             ObjectId previousCommitId = git.getRepository().resolve( "HEAD^" );
-            System.out.println("i will set HEAD on commit " + previousCommitId.getName());
             git.checkout().setName( previousCommitId.getName() ).call();
-            System.out.println("Now HEAD is set on commit " + previousCommitId.getName());
         } catch (IOException | GitAPIException e){
             Logger logger = LogManager.getLogger(ProjectMetricExtractor.class.getName());
             logger.error(e.getMessage(),e);

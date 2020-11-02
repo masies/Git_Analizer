@@ -1,5 +1,5 @@
 <template>
-	<div class="container mt-3" v-if="data">
+	<div class="container mt-3 mb-3" v-if="data">
 		<div class="row">
 			<div class="col-12 col-md-6 col-lg-4">
 				<div class="input-group">
