@@ -55,6 +55,10 @@ public class SzzTest {
 
         Repo r = asyncService.fetchRepo(owner,name);
 
+        repoRepository.findAndRemove(owner,name);
+        issueRepository.findAndRemove(owner,name);
+        commitRepository.findAndRemove(owner,name);
+
         asyncService.fetchIssues(owner,name,r);
 
         asyncService.fetchCommits(owner,name,r);
