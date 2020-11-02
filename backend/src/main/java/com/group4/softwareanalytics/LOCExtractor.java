@@ -22,6 +22,7 @@ public class LOCExtractor {
     {
         ArrayList<String> lineNb = new ArrayList<String>();
         Document doc = getXml(src);
+        assert doc != null;
         NodeList nodeList = doc.getFirstChild().getChildNodes();
 
         ArrayList<String> strings = new ArrayList<>(
@@ -54,7 +55,7 @@ public class LOCExtractor {
             }
             else
             {
-                if(node.getNodeName() != "block")
+                if(!node.getNodeName().equals("block"))
                 {
                     try{
                         lineNb.add(node.getAttributes().getNamedItem("pos:start").getNodeValue().split(":")[0]);
@@ -100,9 +101,7 @@ public class LOCExtractor {
             }
 
 
-        } catch (IOException e) {
-
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
 
         }
         return null;
