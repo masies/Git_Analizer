@@ -18,10 +18,27 @@
 				<div class="row">
 					<div class="col-12">
 						Related issues: <span v-for="(issue, i) in commit.linkedFixedIssues">
-						<router-link class="text-decoration-none" :to="{name: 'issue', params: {owner: commit.owner, name: commit.repo, id: issue}}">
-						#{{ issue }}<span v-if="i < commit.linkedFixedIssues.length-1">,</span>
-						</router-link>
-					</span>
+							<router-link class="text-decoration-none" :to="{name: 'issue', params: {owner: commit.owner, name: commit.repo, id: issue}}">
+								#{{ issue }}<span v-if="i < commit.linkedFixedIssues.length-1">,</span>
+							</router-link>
+						</span>
+					</div>
+					
+				</div>
+			</div>
+			<div class="card-header" v-if="commit.bugInducingCommits">
+				<div class="row">
+					<div class="col-12">
+						This commit fixes bugs induced by: 
+						<ul>
+							<li v-for="commitBug in commit.bugInducingCommits">
+								<router-link class="text-decoration-none" :to="{name: 'commit', params: {owner: commit.owner, name: commit.repo, id: commitBug.commitName}}">
+									{{ commitBug.commitName }}
+								</router-link>
+								developed by <a :href="'https://github.com/'+commitBug.developerName" target="_blank">{{ commitBug.developerName }}</a> on {{ formatDate(commitBug.commitDate) }}
+							</li>
+						</ul>
+						
 					</div>
 					
 				</div>
@@ -118,7 +135,10 @@
 			},
 			calculateChange: function(curr, old){
 				return (old ? (old - curr) / old * 100.0 * -1 : 0).toFixed(2);
-			}
+			},
+			formatDate(date){
+				return this.$moment(date).format("MMM DD, YYYY")
+			},
 		},
 		computed: {
 			metrics: function(){
@@ -145,7 +165,7 @@
 			},
 			changeCBO: function(){
 				return this.calculateChange(this.metrics.cbo, this.metrics.parentCBO);
-			}
+			},
 		},
 		watch: {
 			'$route' (to, from) {
