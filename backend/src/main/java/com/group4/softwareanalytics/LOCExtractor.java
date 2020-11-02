@@ -1,10 +1,13 @@
 package com.group4.softwareanalytics;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
@@ -101,7 +104,7 @@ public class LOCExtractor {
             }
 
 
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception ignored) {
 
         }
         return null;
@@ -111,6 +114,7 @@ public class LOCExtractor {
     {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 
 
         DocumentBuilder builder = null;
@@ -125,7 +129,8 @@ public class LOCExtractor {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Logger logger = LogManager.getLogger(LOCExtractor.class.getName());
+            logger.error(e.getMessage(),e);
         }
         return null;
     }
