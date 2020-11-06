@@ -4,6 +4,7 @@ package com.group4.softwareanalytics.commits;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.metrics.ProjectMetricExtractor;
 import com.group4.softwareanalytics.repository.Repo;
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
@@ -95,11 +96,19 @@ public class CommitController {
 
     @RequestMapping(value = "/repo/{owner}/{repoName}/commits/{commitId}", method = {RequestMethod.GET})
     public @ResponseBody
-    Commit getAttr(@PathVariable(value = "owner") String owner, @PathVariable(value = "repoName") String repoName, @PathVariable(value = "commitId") String commitID) throws IOException {
+    Commit getAttr(@PathVariable(value = "owner") String owner,
+                   @PathVariable(value = "repoName") String repoName,
+                   @PathVariable(value = "commitId") String commitID,
+                   @RequestParam(value = "mode", defaultValue = "quick") String AnalysisMode) throws IOException {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner, repoName, commitID);
-        if (!commit.getHasMetrics()) {
+        System.out.println(AnalysisMode);
+        if (!commit.getHasMetrics() || (AnalysisMode != null && AnalysisMode.equals("deep"))) {
             ArrayList<String> parentCommitIDs = commit.getCommitParentsIDs();
-            ProjectMetric metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);
+            // TODO: add a boolean flag to check if we want to skip this step (quick vs deep analysis)
+            ProjectMetric metrics = new ProjectMetric(0,0,0,0,0,0,0,0);
+            if (AnalysisMode != null && AnalysisMode.equals("deep")) {
+                metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);
+            }
             commit.setProjectMetrics(metrics);
             commit.setHasMetrics(true);
 
@@ -110,8 +119,8 @@ public class CommitController {
             System.out.println("...computing diffs metrics");
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitID, dest_url, parentCommitIDs);
             commit.setModifications(diffEntries);
-
             commitRepository.save(commit);
+            System.out.println("diffs metrics computed");
 
         }
         return commit;
