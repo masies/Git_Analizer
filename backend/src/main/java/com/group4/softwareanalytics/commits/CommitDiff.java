@@ -1,16 +1,7 @@
 package com.group4.softwareanalytics.commits;
-
-import com.github.mauricioaniche.ck.CK;
-import com.group4.softwareanalytics.metrics.MetricResults;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
-import org.eclipse.jgit.diff.DiffEntry;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class CommitDiff {
-
     private String changeType;
     private String oldPath;
     private String newPath;

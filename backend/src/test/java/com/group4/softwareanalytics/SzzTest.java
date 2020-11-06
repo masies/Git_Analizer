@@ -6,18 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import com.group4.softwareanalytics.commits.Commit;
-import com.group4.softwareanalytics.commits.CommitController;
 import com.group4.softwareanalytics.commits.CommitRepository;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-
-import javax.activation.CommandObject;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +18,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 @SpringBootTest
@@ -63,7 +55,7 @@ public class SzzTest {
 
         asyncService.fetchCommits(owner,name,r);
 
-        asyncService.computeSZZ(owner,name,r);
+        asyncService.computeSZZ(owner,name);
 
         List<Commit> commits = commitRepository.findAndRemove(owner,name);
 

@@ -21,13 +21,11 @@ import java.util.*;
 
 public class CommitExtractor {
 
-    public static void DownloadRepo(String url, String owner, String repoName) {
-        String path = "./repo/" + owner +"/"+ repoName;
+    public static void DownloadRepo(String repo_url, String destUrl) {
         try {
-            System.out.println("Cloning "+ url +" into "+ path);
             Git.cloneRepository()
-                    .setURI(url)
-                    .setDirectory(Paths.get(path).toFile())
+                    .setURI(repo_url)
+                    .setDirectory(Paths.get(destUrl).toFile())
                     .call();
             System.out.println("------- Repo cloned succesfully! -------");
 
@@ -37,27 +35,30 @@ public class CommitExtractor {
         }
     }
 
-    public static List<RevCommit> getCommits(String branchName, Git git, Repository repo) throws IOException, GitAPIException {
+    public static List<RevCommit> getCommits(String branchName, Git git, Repository repo)  {
         List<RevCommit> commitList = new ArrayList<>();
-        for (RevCommit commit : git.log().add(repo.resolve(branchName)).call()) {
-            commitList.add(commit);
+        try {
+            for (RevCommit commit : git.log().add(repo.resolve(branchName)).call()) {
+                commitList.add(commit);
+            }
+        } catch (GitAPIException | IOException e) {
+            e.printStackTrace();
         }
         return commitList;
     }
 
-    public static List<CommitDiff> getModifications(Git git, String commit, String path, ArrayList<String> commitParentsIDs) {
+    public static List<CommitDiff> getModifications(Git git, String commitHashID, String path, ArrayList<String> commitParentsIDs) {
         List<CommitDiff> entriesList = new ArrayList<>();
         try {
             CanonicalTreeParser oldTreeIter;
             CanonicalTreeParser newTreeIter;
             try (ObjectReader reader = git.getRepository().newObjectReader()) {
                 oldTreeIter = new CanonicalTreeParser();
-                ObjectId oldTree = git.getRepository().resolve(commit + "~1^{tree}");
+                ObjectId oldTree = git.getRepository().resolve(commitHashID + "~1^{tree}");
                 oldTreeIter.reset(reader, oldTree);
                 newTreeIter = new CanonicalTreeParser();
-                ObjectId newTree = git.getRepository().resolve(commit + "^{tree}");
+                ObjectId newTree = git.getRepository().resolve(commitHashID + "^{tree}");
                 newTreeIter.reset(reader, newTree);
-
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 DiffFormatter diffFormatter = new DiffFormatter(stream);
@@ -70,8 +71,7 @@ public class CommitExtractor {
                     ArrayList<Float> currentMetrics = new ArrayList<>();
                     ArrayList<Float> parentMetrics = new ArrayList<>();
 
-                    if (entry.getChangeType().name().equals("MODIFY")) {
-
+                    if (entry.getChangeType().name().equals("MODIFY") && entry.getNewPath().endsWith(".java")) {
                         String repoNewPath = path + "/" + entry.getNewPath();
                         String repoOldPath = path + "/" + entry.getOldPath();
 
@@ -85,11 +85,18 @@ public class CommitExtractor {
                             git.checkout().setName(commitParentsIDs.get(0)).call();
                             ck.calculate(repoOldPath, results);
                             parentMetrics = results.getResults();
-                            git.checkout().setName(commit).call();
+                            git.checkout().setName(commitHashID).call();
                         }
                     }
 
-                    ProjectMetric pm = new ProjectMetric(currentMetrics.get(0), currentMetrics.get(1), currentMetrics.get(2), currentMetrics.get(3), parentMetrics.get(0), parentMetrics.get(1), parentMetrics.get(2), parentMetrics.get(3));
+                    ProjectMetric pm = new ProjectMetric(currentMetrics.get(0),
+                            currentMetrics.get(1),
+                            currentMetrics.get(2),
+                            currentMetrics.get(3),
+                            parentMetrics.get(0),
+                            parentMetrics.get(1),
+                            parentMetrics.get(2),
+                            parentMetrics.get(3));
 
                     CommitDiff cd = new CommitDiff(entry.getOldPath(), entry.getNewPath(), entry.getChangeType().name(), diffText, pm);
 

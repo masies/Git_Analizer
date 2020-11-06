@@ -99,7 +99,9 @@ public class CommitController {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner, repoName, commitID);
         if (!commit.getHasMetrics()) {
             ArrayList<String> parentCommitIDs = commit.getCommitParentsIDs();
-            ProjectMetric metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);
+            // TODO: add a boolean flag to check if we want to skip this step (quick vs deep analysis)
+            ProjectMetric metrics = new ProjectMetric(0,0,0,0,0,0,0,0);
+            metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);
             commit.setProjectMetrics(metrics);
             commit.setHasMetrics(true);
 

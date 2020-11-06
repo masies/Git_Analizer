@@ -28,9 +28,9 @@ public class Commit {
     private boolean hasMetrics;
     ArrayList<String> commitParentsIDs;
     private ArrayList<Integer> linkedFixedIssues;
-    private HashSet<Commit> bugInducingCommits;
+    private HashSet<CommitGeneralInfo> bugInducingCommits;
     private boolean isBugInducing = false;
-    private HashSet<String> bugFixingCommits = new HashSet<>();
+    private HashSet<CommitGeneralInfo> bugFixingCommits = new HashSet<>();
 
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
@@ -54,16 +54,16 @@ public class Commit {
         this.linkedFixedIssues = linkedFixedIssues;
     }
 
-    public HashSet<String> getBugFixingCommits() {
+    public HashSet<CommitGeneralInfo> getBugFixingCommits() {
         return bugFixingCommits;
     }
 
-    public void setBugFixingCommits(HashSet<String> bugFixingCommits) {
+    public void setBugFixingCommits(HashSet<CommitGeneralInfo> bugFixingCommits) {
         this.bugFixingCommits = bugFixingCommits;
     }
 
-    public void addBugFixingCommit(String c){
-        this.bugFixingCommits.add(c);
+    public void addBugFixingCommit(CommitGeneralInfo i){
+        this.bugFixingCommits.add(i);
     }
 
     public boolean isBugInducing() {
@@ -74,11 +74,11 @@ public class Commit {
         isBugInducing = bugInducing;
     }
 
-    public HashSet<Commit> getBugInducingCommits() {
+    public HashSet<CommitGeneralInfo> getBugInducingCommits() {
         return bugInducingCommits;
     }
 
-    public void setBugInducingCommits(HashSet<Commit> bugInducingCommits) {
+    public void setBugInducingCommits(HashSet<CommitGeneralInfo> bugInducingCommits) {
         this.bugInducingCommits = bugInducingCommits;
     }
 
