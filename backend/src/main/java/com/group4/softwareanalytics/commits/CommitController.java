@@ -95,13 +95,19 @@ public class CommitController {
 
     @RequestMapping(value = "/repo/{owner}/{repoName}/commits/{commitId}", method = {RequestMethod.GET})
     public @ResponseBody
-    Commit getAttr(@PathVariable(value = "owner") String owner, @PathVariable(value = "repoName") String repoName, @PathVariable(value = "commitId") String commitID) throws IOException {
+    Commit getAttr(@PathVariable(value = "owner") String owner,
+                   @PathVariable(value = "repoName") String repoName,
+                   @PathVariable(value = "commitId") String commitID,
+                   @RequestParam(value = "mode", defaultValue = "quick") String AnalysisMode) throws IOException {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner, repoName, commitID);
-        if (!commit.getHasMetrics()) {
+        System.out.println(AnalysisMode);
+        if (!commit.getHasMetrics() || (AnalysisMode != null && AnalysisMode.equals("deep"))) {
             ArrayList<String> parentCommitIDs = commit.getCommitParentsIDs();
             // TODO: add a boolean flag to check if we want to skip this step (quick vs deep analysis)
             ProjectMetric metrics = new ProjectMetric(0,0,0,0,0,0,0,0);
-            metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);
+            if (AnalysisMode != null && AnalysisMode.equals("deep")) {
+                metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);
+            }
             commit.setProjectMetrics(metrics);
             commit.setHasMetrics(true);
 

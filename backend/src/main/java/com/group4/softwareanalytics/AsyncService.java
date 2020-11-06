@@ -70,14 +70,11 @@ public class AsyncService {
             commitRepository.findAndRemove(owner,name);
 
             // mining repo
-            System.out.println("MINING repo");
             Repo repo = fetchRepo(owner,name);
-            System.out.println("MINING issues");
             fetchIssues(owner, name, repo);
-            System.out.println("MINING commits");
             fetchCommits(owner, name, repo);
-            System.out.println("MINING szz");
             computeSZZ(owner, name);
+            System.out.println("SZZ COMPLETED.");
         } catch (Exception e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
