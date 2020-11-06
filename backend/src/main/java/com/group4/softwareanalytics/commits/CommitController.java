@@ -101,7 +101,6 @@ public class CommitController {
                    @PathVariable(value = "commitId") String commitID,
                    @RequestParam(value = "mode", defaultValue = "quick") String AnalysisMode) throws IOException {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner, repoName, commitID);
-        System.out.println(AnalysisMode);
         if (!commit.getHasMetrics() || (AnalysisMode != null && AnalysisMode.equals("deep"))) {
             ArrayList<String> parentCommitIDs = commit.getCommitParentsIDs();
             // TODO: add a boolean flag to check if we want to skip this step (quick vs deep analysis)
@@ -116,11 +115,9 @@ public class CommitController {
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
             Git git = new Git(repo);
 
-            System.out.println("...computing diffs metrics");
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitID, dest_url, parentCommitIDs);
             commit.setModifications(diffEntries);
             commitRepository.save(commit);
-            System.out.println("diffs metrics computed");
 
         }
         return commit;
