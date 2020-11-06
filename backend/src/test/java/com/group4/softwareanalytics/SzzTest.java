@@ -1,5 +1,6 @@
 package com.group4.softwareanalytics;
 
+import com.group4.softwareanalytics.commits.CommitGeneralInfo;
 import com.group4.softwareanalytics.issues.IssueRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class SzzTest {
 
         assertEquals(1,commits.get(18).getBugInducingCommits().size());
 
-        Commit bugCommit = (Commit) commits.get(18).getBugInducingCommits().toArray()[0];
+        CommitGeneralInfo bugCommit = (CommitGeneralInfo) commits.get(18).getBugInducingCommits().toArray()[0];
 
         List<String> nullFields = Arrays.asList("getEncodingName","getBugInducingCommits","getLinkedFixedIssues");
 
