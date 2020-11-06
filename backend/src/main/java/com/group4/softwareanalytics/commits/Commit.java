@@ -29,6 +29,7 @@ public class Commit {
     ArrayList<String> commitParentsIDs;
     private ArrayList<Integer> linkedFixedIssues;
     private HashSet<Commit> bugInducingCommits;
+    private boolean isBugInducing = false;
 
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
@@ -50,6 +51,14 @@ public class Commit {
         this.commitParentsIDs = commitParentsIDs;
         this.hasMetrics = hasMetrics;
         this.linkedFixedIssues = linkedFixedIssues;
+    }
+
+    public boolean isBugInducing() {
+        return isBugInducing;
+    }
+
+    public void setBugInducing(boolean bugInducing) {
+        isBugInducing = bugInducing;
     }
 
     public HashSet<Commit> getBugInducingCommits() {
