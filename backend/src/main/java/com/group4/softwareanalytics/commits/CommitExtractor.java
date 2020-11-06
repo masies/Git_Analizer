@@ -74,6 +74,7 @@ public class CommitExtractor {
                     if (entry.getChangeType().name().equals("MODIFY") && entry.getNewPath().endsWith(".java")) {
                         String repoNewPath = path + "/" + entry.getNewPath();
                         String repoOldPath = path + "/" + entry.getOldPath();
+                        git.checkout().setName(commitHashID).call();
 
                         MetricResults results = new MetricResults();
                         CK ck = new CK();

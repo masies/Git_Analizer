@@ -4,6 +4,7 @@ package com.group4.softwareanalytics.commits;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.metrics.ProjectMetricExtractor;
 import com.group4.softwareanalytics.repository.Repo;
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
@@ -118,8 +119,9 @@ public class CommitController {
             System.out.println("...computing diffs metrics");
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitID, dest_url, parentCommitIDs);
             commit.setModifications(diffEntries);
-
+            System.out.println(diffEntries.size());
             commitRepository.save(commit);
+            System.out.println("diffs metrics computed");
 
         }
         return commit;
