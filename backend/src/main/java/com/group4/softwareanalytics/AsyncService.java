@@ -74,7 +74,7 @@ public class AsyncService {
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
-            System.out.println("SZZ COMPLETED.");
+            System.out.println("------- SZZ COMPLETED. -------");
         } catch (Exception e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);

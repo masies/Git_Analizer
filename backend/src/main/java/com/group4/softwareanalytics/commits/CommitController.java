@@ -119,7 +119,6 @@ public class CommitController {
             System.out.println("...computing diffs metrics");
             List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitID, dest_url, parentCommitIDs);
             commit.setModifications(diffEntries);
-            System.out.println(diffEntries.size());
             commitRepository.save(commit);
             System.out.println("diffs metrics computed");
 
