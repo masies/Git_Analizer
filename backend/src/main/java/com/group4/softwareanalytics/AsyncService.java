@@ -187,10 +187,12 @@ public class AsyncService {
                 Commit bugInducingCommit = commitRepository.findByOwnerAndRepoAndCommitName(owner,repoName,bugInducingCommitId);
 
                 bugInducingCommit.setBugInducing(true);
+                bugInducingCommit.addBugFixingCommit(commit.getCommitName());
                 commitRepository.save(bugInducingCommit);
 
                 bugInducingCommitsSet.add(bugInducingCommit);
             }
+
 
             if (bugInducingCommitsSet.isEmpty()){
                 commit.setBugInducingCommits(null);
