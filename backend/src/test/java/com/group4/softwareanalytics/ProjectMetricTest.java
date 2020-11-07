@@ -59,20 +59,20 @@ public class ProjectMetricTest {
 
         ProjectMetric pm = new ProjectMetric(10, 10, 10, 10, 20, 20, 20, 20);
 
-        assertEquals(pm.getCBO(), 10);
-        assertEquals(pm.getWMC(), 10);
-        assertEquals(pm.getLCOM(), 10);
-        assertEquals(pm.getLOC(), 10);
+        assertEquals(10, pm.getCBO());
+        assertEquals(10, pm.getWMC());
+        assertEquals(10, pm.getLCOM());
+        assertEquals(10, pm.getLOC());
 
-        assertEquals(pm.getParentCBO(), 20);
-        assertEquals(pm.getParentWMC(), 20);
-        assertEquals(pm.getParentLCOM(), 20);
-        assertEquals(pm.getParentLOC(), 20);
+        assertEquals(20, pm.getParentCBO());
+        assertEquals(20, pm.getParentWMC());
+        assertEquals(20, pm.getParentLCOM());
+        assertEquals(20, pm.getParentLOC());
 
-        assertEquals(pm.getDeltaCBO(), 10);
-        assertEquals(pm.getDeltaWMC(), 10);
-        assertEquals(pm.getDeltaLCOM(), 10);
-        assertEquals(pm.getDeltaLOC(), 10);
+        assertEquals(10, pm.getDeltaCBO());
+        assertEquals(10, pm.getDeltaWMC());
+        assertEquals(10, pm.getDeltaLCOM());
+        assertEquals(10, pm.getDeltaLOC());
 
 
         pm.setCBO(11);
@@ -85,30 +85,30 @@ public class ProjectMetricTest {
         pm.setParentLCOM(77);
         pm.setParentLOC(88);
 
-        assertEquals(pm.getCBO(), 11);
-        assertEquals(pm.getWMC(), 22);
-        assertEquals(pm.getLCOM(), 33);
-        assertEquals(pm.getLOC(), 44);
+        assertEquals(11,pm.getCBO());
+        assertEquals(22,pm.getWMC());
+        assertEquals(33,pm.getLCOM());
+        assertEquals(44,pm.getLOC());
 
-        assertEquals(pm.getParentCBO(), 55);
-        assertEquals(pm.getParentWMC(), 66);
-        assertEquals(pm.getParentLCOM(), 77);
-        assertEquals(pm.getParentLOC(), 88);
+        assertEquals(55,pm.getParentCBO());
+        assertEquals(66,pm.getParentWMC());
+        assertEquals(77,pm.getParentLCOM());
+        assertEquals(88,pm.getParentLOC());
 
-        assertEquals(pm.getDeltaCBO(), 44);
-        assertEquals(pm.getDeltaWMC(), 44);
-        assertEquals(pm.getDeltaLCOM(), 44);
-        assertEquals(pm.getDeltaLOC(), 44);
+        assertEquals(44,pm.getDeltaCBO());
+        assertEquals(44,pm.getDeltaWMC());
+        assertEquals(44,pm.getDeltaLCOM());
+        assertEquals(44,pm.getDeltaLOC());
 
         pm.setDeltaCBO(2);
         pm.setDeltaWMC(2);
         pm.setDeltaLCOM(2);
         pm.setDeltaLOC(2);
 
-        assertEquals(pm.getDeltaCBO(), 2);
-        assertEquals(pm.getDeltaWMC(), 2);
-        assertEquals(pm.getDeltaLCOM(), 2);
-        assertEquals(pm.getDeltaLOC(), 2);
+        assertEquals(2, pm.getDeltaCBO() );
+        assertEquals(2, pm.getDeltaWMC() );
+        assertEquals(2, pm.getDeltaLCOM() );
+        assertEquals(2, pm.getDeltaLOC() );
 
     }
 }
