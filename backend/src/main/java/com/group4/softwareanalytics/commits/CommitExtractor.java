@@ -42,7 +42,8 @@ public class CommitExtractor {
                 commitList.add(commit);
             }
         } catch (GitAPIException | IOException e) {
-            e.printStackTrace();
+            Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
+            logger.error(e.getMessage(),e);
         }
         return commitList;
     }
