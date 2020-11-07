@@ -69,8 +69,6 @@ public class MetricsTest {
 
         Commit targetCommit = commits.get(0);
 
-        System.out.println(targetCommit.getCommitName());
-
         assertEquals(1, targetCommit.getCommitParentsIDs().size());
 
         assertNotNull(targetCommit);
@@ -79,16 +77,20 @@ public class MetricsTest {
 
         assertNotNull(metrics);
 
+        targetCommit.setProjectMetrics(metrics);
+
+        ProjectMetric targetCommitMetrics = targetCommit.getProjectMetrics();
 //        //Parent Metrics Check
-//        assertEquals(metrics.getParentCBO(),2);
-//        assertEquals(metrics.getParentWMC(),73);
-//        assertEquals(metrics.getParentLCOM(),3);
-//
-//
+        assertEquals(metrics.getParentLOC(),targetCommitMetrics.getParentLOC());
+        assertEquals(metrics.getParentCBO(),targetCommitMetrics.getParentCBO());
+        assertEquals(metrics.getParentWMC(),targetCommitMetrics.getParentWMC());
+        assertEquals(metrics.getParentLCOM(),targetCommitMetrics.getParentLCOM());
+
 //        //Self Metrics Check
-//        assertEquals(metrics.getCBO(),2);
-//        assertEquals(metrics.getWMC(),73);
-//        assertEquals(metrics.getLCOM(),3);
+        assertEquals(metrics.getLOC(),targetCommitMetrics.getParentLOC());
+        assertEquals(metrics.getCBO(),targetCommitMetrics.getCBO());
+        assertEquals(metrics.getWMC(),targetCommitMetrics.getWMC());
+        assertEquals(metrics.getLCOM(),targetCommitMetrics.getLCOM());
 
         for (Method m : metrics.getClass().getMethods()) {
             if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
