@@ -18,7 +18,7 @@ public interface IssueRepository extends MongoRepository<Issue,String> {
     Issue findByOwnerAndRepoAndId(String owner, String repo, int number);
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public List<Issue> findAndRemove (String owner, String repo);
+    List<Issue> findAndRemove (String owner, String repo);
 
 }
 

@@ -10,7 +10,7 @@ import java.util.List;
 public interface CommitRepository extends MongoRepository<Commit,String> {
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public List<Commit> findAndRemove (String owner, String repo);
+    List<Commit> findAndRemove(String owner, String repo);
 
 
     @Query("{'owner' : ?0 , 'repo' : ?1, 'commitName' : ?2}")

@@ -31,7 +31,7 @@ public class CommitController {
 
     @GetMapping("/commits")
     @ResponseBody
-    public List<Commit> getCommits() throws IOException {
+    public List<Commit> getCommits() {
         return commitRepository.findAll();
     }
 
@@ -77,7 +77,7 @@ public class CommitController {
         }
 
         if (!criteria.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[criteria.size()])));
+            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
         }
 
         List<Commit> list = mongoTemplate.find(query, Commit.class);

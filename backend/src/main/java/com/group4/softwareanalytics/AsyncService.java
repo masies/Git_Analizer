@@ -55,7 +55,7 @@ public class AsyncService {
     // list of fixingCommits, retrieved in fetchCommits and used by szz
     private ArrayList<Commit> fixingCommits = new ArrayList<>();
 
-    java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(AsyncService.class.getName());
+    java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AsyncService.class.getName());
 
     private static final String repoFolderPath = "./repo/";
 
@@ -78,7 +78,7 @@ public class AsyncService {
             computeSZZ(owner, name);
 
         } catch (Exception e){
-            LOGGER.warning(e.getMessage());
+            logger.warning(e.getMessage());
         }
     }
 
@@ -105,7 +105,7 @@ public class AsyncService {
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                 .collect(Collectors.toList());
 
-        LOGGER.info("------- Found " + issues.size() + " Issues, start fetching them... -------" );
+        logger.info("------- Found " + issues.size() + " Issues, start fetching them... -------" );
 
         for (Issue issue : issues) {
             com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
@@ -127,7 +127,7 @@ public class AsyncService {
 
         issueRepository.saveAll(issueList);
 
-        LOGGER.info("------- Issues fetched successfully! -------");
+        logger.info("------- Issues fetched successfully! -------");
         repo.hasIssuesDone();
         repoRepository.save(repo);
     }
@@ -188,12 +188,12 @@ public class AsyncService {
             }
             commitRepository.saveAll(commitList);
 
-            LOGGER.info("------- Commits stored successfully! -------");
+            logger.info("------- Commits stored successfully! -------");
 
             r.hasCommitsDone();
             repoRepository.save(r);
         } catch (Exception e){
-            LOGGER.warning(e.getMessage());
+            logger.warning(e.getMessage());
         }
     }
 
@@ -346,6 +346,6 @@ public class AsyncService {
             commitRepository.save(commit);
 
         }
-        LOGGER.info("------- SZZ completed. -------");
+        logger.info("------- SZZ completed. -------");
     }
 }

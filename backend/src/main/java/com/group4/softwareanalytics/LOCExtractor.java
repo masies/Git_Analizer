@@ -23,13 +23,13 @@ public class LOCExtractor {
 
     public static ArrayList<Integer> extractLines(String src)
     {
-        ArrayList<String> lineNb = new ArrayList<String>();
+        ArrayList<String> lineNb = new ArrayList<>();
         Document doc = getXml(src);
         assert doc != null;
         NodeList nodeList = doc.getFirstChild().getChildNodes();
 
         ArrayList<String> strings = new ArrayList<>(
-                new HashSet<String>(cleanXml(nodeList, lineNb)));
+                new HashSet<>(cleanXml(nodeList, lineNb)));
 
         ArrayList<Integer> numbers = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class LOCExtractor {
     public static List<String> cleanXml(NodeList nodeList, List<String> lineNb)
     {
 
-        List<String> intruders = new ArrayList<String>(
+        List<String> intruders = new ArrayList<>(
                 Arrays.asList("import","comment","{","}",";",""));
 
 
@@ -62,7 +62,7 @@ public class LOCExtractor {
                 {
                     try{
                         lineNb.add(node.getAttributes().getNamedItem("pos:start").getNodeValue().split(":")[0]);
-                    }catch (Exception e)
+                    }catch (Exception ignored)
                     { }
                 }
                 if(node.getChildNodes().getLength() > 0)
@@ -92,17 +92,13 @@ public class LOCExtractor {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
+                output.append(line).append("\n");
             }
 
             int exitVal = process.waitFor();
             if (exitVal == 0) {
-                Document doc = convertStringToXMLDocument(output.toString());
-                return doc;
-            } else {
-                //abnormal...
+                return convertStringToXMLDocument(output.toString());
             }
-
 
         } catch (Exception ignored) {
 
@@ -117,19 +113,12 @@ public class LOCExtractor {
         try {
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         } catch (ParserConfigurationException ignored) {
-
         }
 
-
-        DocumentBuilder builder = null;
-        try
-        {
-
+        DocumentBuilder builder;
+        try {
             builder = factory.newDocumentBuilder();
-
-
-            Document doc = (Document) builder.parse(new InputSource(new StringReader(xmlString)));
-            return doc;
+            return builder.parse(new InputSource(new StringReader(xmlString)));
         }
         catch (Exception e)
         {

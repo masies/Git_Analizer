@@ -63,7 +63,7 @@ public class IssueController {
             criteria.add(Criteria.where("issue.createdAt").gte(startDate).lte(endDate));
         }
         if (!criteria.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[criteria.size()])));
+            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
         }
 
         List<Issue> list = mongoTemplate.find(query, Issue.class);

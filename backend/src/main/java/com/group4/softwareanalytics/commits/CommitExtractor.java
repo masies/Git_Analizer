@@ -21,6 +21,8 @@ import java.util.*;
 
 public class CommitExtractor {
 
+    static Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
+
     public static void DownloadRepo(String repo_url, String destUrl) {
         try {
             Git.cloneRepository()
@@ -30,7 +32,6 @@ public class CommitExtractor {
             System.out.println("------- Repo cloned succesfully! -------");
 
         } catch (GitAPIException e){
-            Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
             logger.error(e.getMessage(),e);
         }
     }
@@ -42,7 +43,6 @@ public class CommitExtractor {
                 commitList.add(commit);
             }
         } catch (GitAPIException | IOException e) {
-            Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
             logger.error(e.getMessage(),e);
         }
         return commitList;
@@ -106,7 +106,7 @@ public class CommitExtractor {
                     stream.reset();
                 }
             } catch (Exception e){
-            Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
+
             logger.error(e.getMessage(),e);
         }
         }

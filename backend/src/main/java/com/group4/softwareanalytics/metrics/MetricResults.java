@@ -38,7 +38,7 @@ public class MetricResults implements CKNotifier {
             averageLCOM = averageLCOM / numberOfClasses;
             averageLOC = averageLOC / numberOfClasses;
         }
-        return new ArrayList<Float>(Arrays.asList(averageCBO, averageWMC, averageLOC, averageLCOM));
+        return new ArrayList<>(Arrays.asList(averageCBO, averageWMC, averageLOC, averageLCOM));
     }
 
     public Set<String> getJavaFiles() {

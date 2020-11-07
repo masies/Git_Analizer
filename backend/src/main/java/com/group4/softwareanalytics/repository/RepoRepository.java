@@ -15,7 +15,7 @@ public interface RepoRepository extends MongoRepository<Repo, String>  {
 
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public void findAndRemove (String owner, String repo);
+    void findAndRemove (String owner, String repo);
 
     @Query("{'owner' : ?0 , 'repo' : ?1}")
     Repo findByOwnerAndRepo(String owner, String repo);
