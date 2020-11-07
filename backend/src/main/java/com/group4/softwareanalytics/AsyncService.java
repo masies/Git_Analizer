@@ -11,8 +11,6 @@ import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -38,6 +36,7 @@ import java.util.stream.Stream;
 
 @Service
 public class AsyncService {
+    java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(AsyncService.class.getName());
 
     @Autowired
     private RepoRepository repoRepository;
@@ -76,8 +75,7 @@ public class AsyncService {
             computeSZZ(owner, name);
 
         } catch (Exception e){
-            Logger logger = LogManager.getLogger(AsyncService.class.getName());
-            logger.error(e.getMessage(),e);
+            LOGGER.warning(e.getMessage());
         }
     }
 
@@ -104,7 +102,7 @@ public class AsyncService {
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                 .collect(Collectors.toList());
 
-        System.out.println("------- Found " + issues.size() + " Issues, start fetching them... -------" );
+        LOGGER.info("------- Found " + issues.size() + " Issues, start fetching them... -------" );
 
         for (Issue issue : issues) {
             com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
@@ -125,8 +123,8 @@ public class AsyncService {
         }
 
         issueRepository.saveAll(issueList);
-        System.out.println("------- Issues fetched successfully! -------");
 
+        LOGGER.info("------- Issues fetched successfully! -------");
         repo.hasIssuesDone();
         repoRepository.save(repo);
     }
@@ -187,13 +185,12 @@ public class AsyncService {
             }
             commitRepository.saveAll(commitList);
 
-            System.out.println("------- Commits stored successfully! -------");
+            LOGGER.info("------- Commits stored successfully! -------");
 
             r.hasCommitsDone();
             repoRepository.save(r);
         } catch (Exception e){
-            Logger logger = LogManager.getLogger(AsyncService.class.getName());
-            logger.error(e.getMessage(),e);
+            LOGGER.warning(e.getMessage());
         }
     }
 
@@ -346,6 +343,6 @@ public class AsyncService {
             commitRepository.save(commit);
 
         }
-        System.out.println("------- SZZ completed. -------");
+        LOGGER.info("------- SZZ completed. -------");
     }
 }

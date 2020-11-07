@@ -1,7 +1,6 @@
 package com.group4.softwareanalytics.repository;
 
 
-import com.group4.softwareanalytics.repository.Repo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
