@@ -12,10 +12,6 @@ import java.util.ArrayList;
 public class ProjectMetricExtractor {
     static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProjectMetricExtractor.class.getName());
 
-    public ProjectMetricExtractor() {
-        // default
-    }
-
     public static void metricsPrinter(ArrayList<Float> metrics){
         logger.info("CBO: " + metrics.get(0).toString() + " , WMC:" + metrics.get(1).toString() + " , LCOM:" + metrics.get(2).toString() + " , LOC:" + metrics.get(3).toString() );
     }

@@ -64,7 +64,6 @@ public class RepoController {
         String name = body.getOrDefault("name", "guava").toString();
         Repo repo = repoRepository.findByOwnerAndRepo(owner,name);
         if (repo != null && (!repo.getStatus().getFetchedInfo() || !repo.getStatus().getFetchedCommits() || !repo.getStatus().getFetchedIssues())) {
-            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AsyncService.class.getName());
             logger.info("====== Repo is still on process");
             return null;
         }

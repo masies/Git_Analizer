@@ -21,10 +21,6 @@ public class LOCExtractor {
 
     static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LOCExtractor.class.getName());
 
-    public LOCExtractor() {
-        // default
-    }
-
     public static ArrayList<Integer> extractLines(String src)
     {
         ArrayList<String> lineNb = new ArrayList<>();

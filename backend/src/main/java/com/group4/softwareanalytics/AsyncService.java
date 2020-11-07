@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -105,7 +106,7 @@ public class AsyncService {
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                 .collect(Collectors.toList());
 
-        logger.info("------- Found " + issues.size() + " Issues, start fetching them... -------" );
+        logger.log(Level.ALL, "------- Found " + issues.size() + " Issues, start fetching them... -------" );
 
         for (Issue issue : issues) {
             com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
@@ -220,6 +221,7 @@ public class AsyncService {
                                             linkedIssues.add(issue.getIssue().getNumber());
                                         }
                                     } catch (Exception ignore) {
+                                        // abnormal
                                     }
                                 }
                             }
