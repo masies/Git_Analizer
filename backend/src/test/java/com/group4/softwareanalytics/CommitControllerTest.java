@@ -135,7 +135,7 @@ class CommitControllerTest {
 
         List<RevCommit> revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
 
-        assertEquals(revCommitList.size(),ids);
+        assertEquals(ids, revCommitList.size());
     }
 
 }

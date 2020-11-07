@@ -16,16 +16,16 @@ class CommitDiffTest {
         assertEquals(cf.getMetrics(), metrics);
 
         cf.setDiffs("New Diffs");
-        assertEquals(cf.getDiffs(), "New Diffs");
+        assertEquals("New Diffs", cf.getDiffs());
 
         cf.setChangeType("new change type");
-        assertEquals(cf.getChangeType(), "new change type");
+        assertEquals("new change type", cf.getChangeType());
 
         cf.setOldPath("new oldpath");
-        assertEquals(cf.getOldPath(), "new oldpath");
+        assertEquals("new oldpath", cf.getOldPath());
 
         cf.setNewPath("new newpath");
-        assertEquals(cf.getNewPath(), "new newpath");
+        assertEquals("new newpath", cf.getNewPath());
     }
 
 }

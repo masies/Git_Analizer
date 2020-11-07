@@ -68,7 +68,7 @@ public class RepoController {
             }
         }
         asyncService.fetchData(owner, name);
-        return null;
+        return repo;
     }
 }
 

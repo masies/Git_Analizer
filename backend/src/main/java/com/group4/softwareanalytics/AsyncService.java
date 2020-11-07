@@ -36,7 +36,6 @@ import java.util.stream.Stream;
 
 @Service
 public class AsyncService {
-    java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(AsyncService.class.getName());
 
     @Autowired
     private RepoRepository repoRepository;
@@ -55,6 +54,10 @@ public class AsyncService {
 
     // list of fixingCommits, retrieved in fetchCommits and used by szz
     private ArrayList<Commit> fixingCommits = new ArrayList<>();
+
+    java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(AsyncService.class.getName());
+
+    private static final String repoFolderPath = "./repo/";
 
     @Async
     public void fetchData(String owner, String name){
@@ -131,7 +134,7 @@ public class AsyncService {
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
         String repo_url = "https://github.com/" + owner + "/" + repoName;
-        String dest_url = "./repo/" + owner + "/" + repoName;
+        String dest_url = repoFolderPath + owner + "/" + repoName;
 
         List<Commit> commitList = new ArrayList<>();
         List<String> branches = new ArrayList<>();
@@ -233,7 +236,7 @@ public class AsyncService {
         for (Commit commit : fixingCommits) {
 
             // CHECKOUT this specific commit
-            String dest_url = "./repo/" + commit.getOwner() +"/"+ commit.getRepo();
+            String dest_url = repoFolderPath + commit.getOwner() +"/"+ commit.getRepo();
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
             HashSet<String> bugInducingCommitsHashSet;
@@ -306,7 +309,7 @@ public class AsyncService {
                     String file = entry.getKey();
                     ArrayList<Integer> deletedLines = entry.getValue();
 
-                    String relativePath = "./repo/" + owner + "/" + repoName + "/" + file;
+                    String relativePath = repoFolderPath + owner + "/" + repoName + "/" + file;
                     ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
 
                     BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();

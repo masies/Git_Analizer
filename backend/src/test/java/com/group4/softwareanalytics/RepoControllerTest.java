@@ -43,8 +43,8 @@ class RepoControllerTest {
         Repo repo = asyncService.fetchRepo(owner,name);
 
         assertNotNull(repo);
-        assertEquals(repo.getRepo(),"Calculator");
-        assertEquals(repo.getOwner(), "HouariZegai");
+        assertEquals("Calculator", repo.getRepo());
+        assertEquals("HouariZegai", repo.getOwner());
     }
 
     @Test
@@ -93,7 +93,7 @@ class RepoControllerTest {
 
             for (String key: statusObject.keySet())
             {
-                assertEquals(statusObject.get(key).toString(),"true");
+                assertEquals("true", statusObject.get(key).toString());
             }
         }
     }

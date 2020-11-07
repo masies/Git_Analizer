@@ -48,46 +48,35 @@ public class CommitTest {
                 "fullMessage","shortMessage","commitName",0,null,null,null,true,null);
 
         c.setModifications(cd);
-        assertEquals(c.getModifications(),cd);
 
         c.setId("id");
-        assertEquals(c.getId(),"id");
-
         c.setOwner("owner");
-        assertEquals(c.getOwner(),"owner");
-
         c.setRepo("repo");
-        assertEquals(c.getRepo(),"repo");
-
         c.setDeveloperName("name");
-        assertEquals(c.getDeveloperName(),"name");
-
         c.setDeveloperMail("mail");
-        assertEquals(c.getDeveloperMail(),"mail");
-
         c.setEncodingName("ename");
-        assertEquals(c.getEncodingName(),"ename");
-
         c.setFullMessage("fm");
-        assertEquals(c.getFullMessage(),"fm");
-
         c.setShortMessage("sm");
-        assertEquals(c.getShortMessage(),"sm");
-
         c.setCommitName("cn");
-        assertEquals(c.getCommitName(),"cn");
-
         c.setCommitType(1);
-        assertEquals(c.getCommitType(),1);
-
         c.setCommitDate(date);
-        assertEquals(c.getCommitDate(),date);
-
         c.setProjectMetrics(pm);
-        assertEquals(c.getProjectMetrics(),pm);
-
         c.setCommitParentsIDs(ids);
-        assertEquals(c.getCommitParentsIDs(),ids);
+
+        assertEquals(cd, c.getModifications());
+        assertEquals("id", c.getId());
+        assertEquals("owner", c.getOwner());
+        assertEquals("repo", c.getRepo());
+        assertEquals("name", c.getDeveloperName());
+        assertEquals("mail", c.getDeveloperMail());
+        assertEquals("ename", c.getEncodingName());
+        assertEquals("fm", c.getFullMessage());
+        assertEquals("sm", c.getShortMessage());
+        assertEquals("cn", c.getCommitName());
+        assertEquals(1, c.getCommitType());
+        assertEquals(date, c.getCommitDate());
+        assertEquals(pm, c.getProjectMetrics());
+        assertEquals(ids, c.getCommitParentsIDs());
 
         c.setHasMetrics(false);
         assertFalse(c.getHasMetrics());
