@@ -71,7 +71,7 @@ public class MetricsTest {
 
         System.out.println(targetCommit.getCommitName());
 
-        assertEquals(targetCommit.getCommitParentsIDs().size(),1);
+        assertEquals(1, targetCommit.getCommitParentsIDs().size());
 
         assertNotNull(targetCommit);
 
@@ -124,12 +124,12 @@ public class MetricsTest {
 
         List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, targetCommit.getCommitName(), dest_url, targetCommit.getCommitParentsIDs());
 
-        assertEquals(diffEntries.size(),1);
+        assertEquals(1, diffEntries.size());
 
-        assertEquals(diffEntries.get(0).getNewPath(), "src/com/houarizegai/calculator/Calculator.java");
-        assertEquals(diffEntries.get(0).getOldPath(), "src/com/houarizegai/calculator/Calculator.java");
+        assertEquals("src/com/houarizegai/calculator/Calculator.java", diffEntries.get(0).getNewPath());
+        assertEquals( "src/com/houarizegai/calculator/Calculator.java",diffEntries.get(0).getOldPath());
         assertNotNull(diffEntries.get(0).getDiffs());
-        assertEquals(diffEntries.get(0).getChangeType(),"MODIFY");
+        assertEquals("MODIFY", diffEntries.get(0).getChangeType());
 
         repoRepository.findAndRemove(owner,name);
         commitRepository.findAndRemove(owner,name);

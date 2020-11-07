@@ -11,8 +11,6 @@ import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -31,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -57,6 +56,10 @@ public class AsyncService {
     // list of fixingCommits, retrieved in fetchCommits and used by szz
     private ArrayList<Commit> fixingCommits = new ArrayList<>();
 
+    java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AsyncService.class.getName());
+
+    private static final String repoFolderPath = "./repo/";
+
     @Async
     public void fetchData(String owner, String name){
         try {
@@ -76,8 +79,7 @@ public class AsyncService {
             computeSZZ(owner, name);
 
         } catch (Exception e){
-            Logger logger = LogManager.getLogger(AsyncService.class.getName());
-            logger.error(e.getMessage(),e);
+            logger.warning(e.getMessage());
         }
     }
 
@@ -104,7 +106,7 @@ public class AsyncService {
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                 .collect(Collectors.toList());
 
-        System.out.println("------- Found " + issues.size() + " Issues, start fetching them... -------" );
+        logger.log(Level.ALL, "------- Found " + issues.size() + " Issues, start fetching them... -------" );
 
         for (Issue issue : issues) {
             com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
@@ -125,15 +127,15 @@ public class AsyncService {
         }
 
         issueRepository.saveAll(issueList);
-        System.out.println("------- Issues fetched successfully! -------");
 
+        logger.info("------- Issues fetched successfully! -------");
         repo.hasIssuesDone();
         repoRepository.save(repo);
     }
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
         String repo_url = "https://github.com/" + owner + "/" + repoName;
-        String dest_url = "./repo/" + owner + "/" + repoName;
+        String dest_url = repoFolderPath + owner + "/" + repoName;
 
         List<Commit> commitList = new ArrayList<>();
         List<String> branches = new ArrayList<>();
@@ -187,13 +189,12 @@ public class AsyncService {
             }
             commitRepository.saveAll(commitList);
 
-            System.out.println("------- Commits stored successfully! -------");
+            logger.info("------- Commits stored successfully! -------");
 
             r.hasCommitsDone();
             repoRepository.save(r);
         } catch (Exception e){
-            Logger logger = LogManager.getLogger(AsyncService.class.getName());
-            logger.error(e.getMessage(),e);
+            logger.warning(e.getMessage());
         }
     }
 
@@ -220,6 +221,7 @@ public class AsyncService {
                                             linkedIssues.add(issue.getIssue().getNumber());
                                         }
                                     } catch (Exception ignore) {
+                                        // abnormal
                                     }
                                 }
                             }
@@ -236,87 +238,90 @@ public class AsyncService {
         for (Commit commit : fixingCommits) {
 
             // CHECKOUT this specific commit
-            String dest_url = "./repo/" + commit.getOwner() +"/"+ commit.getRepo();
+            String dest_url = repoFolderPath + commit.getOwner() +"/"+ commit.getRepo();
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
-            Git git = new Git(repo);
-            git.checkout().setName(commit.getCommitName()).call();
 
-            // compute modified files
-            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commit.getCommitName(), dest_url, commit.getCommitParentsIDs());
-            commit.setModifications(diffEntries);
+            HashSet<String> bugInducingCommitsHashSet;
+            try (Git git = new Git(repo)) {
+                git.checkout().setName(commit.getCommitName()).call();
 
-            // java file --> list of modified lines
-            HashMap<String,ArrayList<Integer>> modifiedLinesPerJavaClass = new HashMap<>();
+                // compute modified files
+                List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commit.getCommitName(), dest_url, commit.getCommitParentsIDs());
+                commit.setModifications(diffEntries);
 
-            for (CommitDiff modification : commit.getModifications()) {
-                if (modification.getChangeType().equals("MODIFY") && modification.getNewPath().endsWith(".java")) {
-                    ArrayList<Integer> deletedLines = new ArrayList<>();
-                    String diffs = modification.getDiffs();
-                    String reg = "@@(\\s[-,+]\\d+[,]\\d+)+\\s@@";
-                    Pattern pattern = Pattern.compile(reg);
-                    ArrayList<String> chunksHeader = new ArrayList<>();
-                    Matcher matcher = pattern.matcher(diffs);
+                // java file --> list of modified lines
+                HashMap<String, ArrayList<Integer>> modifiedLinesPerJavaClass = new HashMap<>();
 
-                    while (matcher.find()) {
-                        chunksHeader.add(matcher.group());
-                    }
+                for (CommitDiff modification : commit.getModifications()) {
+                    if (modification.getChangeType().equals("MODIFY") && modification.getNewPath().endsWith(".java")) {
+                        ArrayList<Integer> deletedLines = new ArrayList<>();
+                        String diffs = modification.getDiffs();
+                        String reg = "@@(\\s[-,+]\\d+[,]\\d+)+\\s@@";
+                        Pattern pattern = Pattern.compile(reg);
+                        ArrayList<String> chunksHeader = new ArrayList<>();
+                        Matcher matcher = pattern.matcher(diffs);
 
-                    String[] diffsChunks = diffs.split(reg);
-                    for (int i = 1; i < diffsChunks.length; i++) {
-
-                        String header = chunksHeader.get(i - 1);
-                        ArrayList<Integer> startAndCont = new ArrayList<>();
-                        String reg2 = "\\d+";
-                        Pattern pattern2 = Pattern.compile(reg2);
-                        Matcher matcher2 = pattern2.matcher(header);
-
-                        while (matcher2.find()) {
-                            startAndCont.add(Integer.parseInt(matcher2.group()));
+                        while (matcher.find()) {
+                            chunksHeader.add(matcher.group());
                         }
-                        int start = startAndCont.get(0);
 
-                        // first chunk block
-                        String codeBlock = diffsChunks[i];
-                        String[] diffLines = codeBlock.split("\\r?\\n");
+                        String[] diffsChunks = diffs.split(reg);
+                        for (int i = 1; i < diffsChunks.length; i++) {
 
-                        int count = 0;
-                        for (String diffLine : diffLines) {
-                            if (diffLine.startsWith("-")) {
-                                deletedLines.add(start + count - 1);
-                            } else if (diffLine.startsWith("+")) {
-                                count = count - 1;
+                            String header = chunksHeader.get(i - 1);
+                            ArrayList<Integer> startAndCont = new ArrayList<>();
+                            String reg2 = "\\d+";
+                            Pattern pattern2 = Pattern.compile(reg2);
+                            Matcher matcher2 = pattern2.matcher(header);
+
+                            while (matcher2.find()) {
+                                startAndCont.add(Integer.parseInt(matcher2.group()));
                             }
-                            count = count + 1;
+                            int start = startAndCont.get(0);
+
+                            // first chunk block
+                            String codeBlock = diffsChunks[i];
+                            String[] diffLines = codeBlock.split("\\r?\\n");
+
+                            int count = 0;
+                            for (String diffLine : diffLines) {
+                                if (diffLine.startsWith("-")) {
+                                    deletedLines.add(start + count - 1);
+                                } else if (diffLine.startsWith("+")) {
+                                    count = count - 1;
+                                }
+                                count = count + 1;
+                            }
                         }
+                        modifiedLinesPerJavaClass.put(modification.getNewPath(), deletedLines);
                     }
-                    modifiedLinesPerJavaClass.put(modification.getNewPath(), deletedLines);
                 }
-            }
 
-            HashSet<String> bugInducingCommitsHashSet= new HashSet<>();
+                bugInducingCommitsHashSet = new HashSet<>();
 
-            // checkout parent
-            if (commit.getCommitParentsIDs().size() == 1) {
-                 git.checkout().setName(commit.getCommitParentsIDs().get(0)).call();
-            } else {
-                // in case we have multiple parents e.g., merge commits, we just skip
-                continue;
-            }
+                // checkout parent
+                if (commit.getCommitParentsIDs().size() == 1) {
+                    git.checkout().setName(commit.getCommitParentsIDs().get(0)).call();
+                } else {
+                    // in case we have multiple parents e.g., merge commits, we just skip
+                    continue;
+                }
 
-            for (Map.Entry<String,ArrayList<Integer>> entry : modifiedLinesPerJavaClass.entrySet()) {
-                String file = entry.getKey();
-                ArrayList<Integer> deletedLines = entry.getValue();
+                for (Map.Entry<String, ArrayList<Integer>> entry : modifiedLinesPerJavaClass.entrySet()) {
+                    String file = entry.getKey();
+                    ArrayList<Integer> deletedLines = entry.getValue();
 
-                String relativePath = "./repo/" + owner +"/"+ repoName + "/" + file;
-                ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
+                    String relativePath = repoFolderPath + owner + "/" + repoName + "/" + file;
+                    ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
 
-                BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
-                final RawText rawText = blameResult.getResultContents();
+                    BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
+                    final RawText rawText = blameResult.getResultContents();
 
-                for (int i = 0; i < rawText.size(); i++) {
-                    if (codeLines.contains(i) && deletedLines.contains(i)) {
-                        final String commitHash = blameResult.getSourceCommit(i).name();
-                        bugInducingCommitsHashSet.add(commitHash);
+                    for (int i = 0; i < rawText.size(); i++) {
+                        if (codeLines.contains(i) && deletedLines.contains(i)) {
+                            final String commitHash = blameResult.getSourceCommit(i).name();
+                            bugInducingCommitsHashSet.add(commitHash);
+                        }
                     }
                 }
             }
@@ -343,6 +348,6 @@ public class AsyncService {
             commitRepository.save(commit);
 
         }
-        System.out.println("------- SZZ completed. -------");
+        logger.info("------- SZZ completed. -------");
     }
 }

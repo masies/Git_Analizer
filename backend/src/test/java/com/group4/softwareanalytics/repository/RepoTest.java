@@ -11,17 +11,17 @@ class RepoTest {
         Repo r = new Repo(null, "owner", "repo");
 
         r.setId("my Id");
-        assertEquals(r.getId(), "my Id");
+        assertEquals("my Id", r.getId());
 
         r.setOwner("my Owner");
-        assertEquals(r.getOwner(), "my Owner");
+        assertEquals("my Owner", r.getOwner());
 
         r.setRepo("my Repo");
-        assertEquals(r.getRepo(), "my Repo");
+        assertEquals("my Repo", r.getRepo());
 
         RepoStatus rs = new RepoStatus();
         r.setStatus(rs);
-        assertEquals(r.getStatus(), rs);
+        assertEquals(rs, r.getStatus());
 
         r.hasCommitsDone();
         r.hasInfoDone();
@@ -34,6 +34,6 @@ class RepoTest {
 
         Repository re = new Repository();
         r.setRepository(re);
-        assertEquals(r.getRepository(), re);
+        assertEquals(re, r.getRepository());
     }
 }

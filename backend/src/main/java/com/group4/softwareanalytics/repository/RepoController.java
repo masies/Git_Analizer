@@ -7,13 +7,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RepoController {
+
+    static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(RepoController.class.getName());
+
+
     @Autowired
     private RepoRepository repoRepository;
 
@@ -29,7 +31,7 @@ public class RepoController {
     @GetMapping("/repo")
     @ResponseBody
     public Page<Repo> getRepos(@RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "20") int size) throws IOException {
+                               @RequestParam(defaultValue = "20") int size) {
         Pageable paging = PageRequest.of(page, size);
         return repoRepository.findAll(paging);
     }
@@ -38,7 +40,7 @@ public class RepoController {
     @ResponseBody
     public Page<Repo> getRepos(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "20") int size,
-                               @RequestParam(defaultValue = "") String q) throws IOException {
+                               @RequestParam(defaultValue = "") String q) {
         Pageable paging = PageRequest.of(page, size);
         return repoRepository.findByQuery(q, paging);
     }
@@ -57,18 +59,16 @@ public class RepoController {
 
     @PostMapping("/repo")
     @ResponseBody
-    public Repo fetchRepo(@RequestBody Map<String, Object> body) throws InterruptedException {
+    public Repo fetchRepo(@RequestBody Map<String, Object> body) {
         String owner = body.getOrDefault("owner", "google").toString();
         String name = body.getOrDefault("name", "guava").toString();
         Repo repo = repoRepository.findByOwnerAndRepo(owner,name);
-        if (repo != null){
-            if (!repo.getStatus().getFetchedInfo() || !repo.getStatus().getFetchedCommits() || !repo.getStatus().getFetchedIssues()){
-                System.out.println("====== Repo is still on process");
-                return null;
-            }
+        if (repo != null && (!repo.getStatus().getFetchedInfo() || !repo.getStatus().getFetchedCommits() || !repo.getStatus().getFetchedIssues())) {
+            logger.info("====== Repo is still on process");
+            return null;
         }
         asyncService.fetchData(owner, name);
-        return null;
+        return repo;
     }
 }
 

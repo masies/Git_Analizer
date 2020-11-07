@@ -16,15 +16,15 @@ class IssueCommentTest {
         assertEquals(ic.getComment(), c);
 
         ic.setOwner("my Owner");
-        assertEquals(ic.getOwner(), "my Owner");
+        assertEquals("my Owner", ic.getOwner());
 
         ic.setRepo("my Repo");
-        assertEquals(ic.getRepo(), "my Repo");
+        assertEquals("my Repo", ic.getRepo());
 
         ic.setId("my Id");
-        assertEquals(ic.getId(), "my Id");
+        assertEquals("my Id", ic.getId());
 
         ic.setIssueNumber(321);
-        assertEquals(ic.getIssueNumber(), 321);
+        assertEquals(321, ic.getIssueNumber());
     }
 }

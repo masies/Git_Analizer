@@ -10,17 +10,17 @@ class IssueTest {
         Issue i = new Issue(null, "owner", "repo", false);
 
         i.setId("myid");
-        assertEquals(i.getId(), "myid");
+        assertEquals("myid", i.getId());
 
         i.setOwner("my owner");
-        assertEquals(i.getOwner(), "my owner");
+        assertEquals("my owner", i.getOwner());
 
         i.setRepo("my repo");
-        assertEquals(i.getRepo(), "my repo");
+        assertEquals("my repo", i.getRepo());
 
         org.eclipse.egit.github.core.Issue issue = new org.eclipse.egit.github.core.Issue();
         i.setIssue(issue);
-        assertEquals(i.getIssue(), issue);
+        assertEquals(issue, i.getIssue());
     }
 
 }

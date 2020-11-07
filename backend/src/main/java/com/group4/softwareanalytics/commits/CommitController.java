@@ -3,10 +3,6 @@ package com.group4.softwareanalytics.commits;
 
 import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.metrics.ProjectMetricExtractor;
-import com.group4.softwareanalytics.repository.Repo;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +15,9 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Pageable;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -38,7 +31,7 @@ public class CommitController {
 
     @GetMapping("/commits")
     @ResponseBody
-    public List<Commit> getCommits() throws IOException {
+    public List<Commit> getCommits() {
         return commitRepository.findAll();
     }
 
@@ -84,7 +77,7 @@ public class CommitController {
         }
 
         if (!criteria.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[criteria.size()])));
+            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
         }
 
         List<Commit> list = mongoTemplate.find(query, Commit.class);

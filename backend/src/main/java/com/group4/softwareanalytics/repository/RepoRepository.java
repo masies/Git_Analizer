@@ -1,7 +1,6 @@
 package com.group4.softwareanalytics.repository;
 
 
-import com.group4.softwareanalytics.repository.Repo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -16,7 +15,7 @@ public interface RepoRepository extends MongoRepository<Repo, String>  {
 
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public void findAndRemove (String owner, String repo);
+    void findAndRemove (String owner, String repo);
 
     @Query("{'owner' : ?0 , 'repo' : ?1}")
     Repo findByOwnerAndRepo(String owner, String repo);

@@ -17,7 +17,7 @@ public class IssueCommentController {
 
     @GetMapping("/issue/comments")
     @ResponseBody
-    public List<IssueComment> getRepos() throws IOException {
+    public List<IssueComment> getRepos() {
         return issueCommentRepository.findAll();
     }
 

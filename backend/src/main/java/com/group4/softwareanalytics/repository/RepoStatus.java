@@ -6,7 +6,9 @@ public class RepoStatus {
     private Boolean fetchedIssues = false;
     private Boolean fetchedCommits = false;
 
-    public RepoStatus() {}
+    public RepoStatus() {
+        // empty constructor
+    }
 
     public Boolean getFetchedInfo() {
         return fetchedInfo;

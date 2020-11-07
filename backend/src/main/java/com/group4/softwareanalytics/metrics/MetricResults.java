@@ -19,16 +19,11 @@ public class MetricResults implements CKNotifier {
 
     @Override
     public void notify(CKClassResult ckClassResult) {
-//        System.out.println(ckClassResult.getFile());
-        // TODO: add control if file list is empty
-//        if (javaFiles.contains(ckClassResult.getFile())){
-//            System.out.println("file counted");
             this.numberOfClasses = this.numberOfClasses + 1;
             this.averageCBO += ckClassResult.getCbo();
             this.averageLCOM += ckClassResult.getLcom();
             this.averageWMC += ckClassResult.getWmc();
             this.averageLOC += ckClassResult.getLoc();
-//        }
     }
 
     public ArrayList<Float> getResults(){
@@ -38,7 +33,7 @@ public class MetricResults implements CKNotifier {
             averageLCOM = averageLCOM / numberOfClasses;
             averageLOC = averageLOC / numberOfClasses;
         }
-        return new ArrayList<Float>(Arrays.asList(averageCBO, averageWMC, averageLOC, averageLCOM));
+        return new ArrayList<>(Arrays.asList(averageCBO, averageWMC, averageLOC, averageLCOM));
     }
 
     public Set<String> getJavaFiles() {
