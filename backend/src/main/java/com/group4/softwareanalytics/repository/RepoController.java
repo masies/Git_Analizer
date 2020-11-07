@@ -12,6 +12,10 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/api/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RepoController {
+
+    static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(RepoController.class.getName());
+
+
     @Autowired
     private RepoRepository repoRepository;
 
@@ -59,11 +63,10 @@ public class RepoController {
         String owner = body.getOrDefault("owner", "google").toString();
         String name = body.getOrDefault("name", "guava").toString();
         Repo repo = repoRepository.findByOwnerAndRepo(owner,name);
-        if (repo != null){
-            if (!repo.getStatus().getFetchedInfo() || !repo.getStatus().getFetchedCommits() || !repo.getStatus().getFetchedIssues()){
-                System.out.println("====== Repo is still on process");
-                return null;
-            }
+        if (repo != null && (!repo.getStatus().getFetchedInfo() || !repo.getStatus().getFetchedCommits() || !repo.getStatus().getFetchedIssues())) {
+            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AsyncService.class.getName());
+            logger.info("====== Repo is still on process");
+            return null;
         }
         asyncService.fetchData(owner, name);
         return repo;

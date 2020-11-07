@@ -3,8 +3,6 @@ package com.group4.softwareanalytics.commits;
 import com.github.mauricioaniche.ck.CK;
 import com.group4.softwareanalytics.metrics.MetricResults;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -21,7 +19,11 @@ import java.util.*;
 
 public class CommitExtractor {
 
-    static Logger logger = LogManager.getLogger(CommitExtractor.class.getName());
+    static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CommitExtractor.class.getName());
+
+    public CommitExtractor() {
+        // default
+    }
 
     public static void DownloadRepo(String repo_url, String destUrl) {
         try {
@@ -29,10 +31,10 @@ public class CommitExtractor {
                     .setURI(repo_url)
                     .setDirectory(Paths.get(destUrl).toFile())
                     .call();
-            System.out.println("------- Repo cloned succesfully! -------");
+            logger.info("------- Repo cloned succesfully! -------");
 
         } catch (GitAPIException e){
-            logger.error(e.getMessage(),e);
+            logger.info(e.getMessage());
         }
     }
 
@@ -43,7 +45,7 @@ public class CommitExtractor {
                 commitList.add(commit);
             }
         } catch (GitAPIException | IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.info(e.getMessage());
         }
         return commitList;
     }
@@ -107,7 +109,7 @@ public class CommitExtractor {
                 }
             } catch (Exception e){
 
-            logger.error(e.getMessage(),e);
+            logger.info(e.getMessage());
         }
         }
         catch (Exception ignore) {

@@ -1,7 +1,5 @@
 package com.group4.softwareanalytics;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -20,6 +18,12 @@ import java.util.HashSet;
 import java.util.List;
 
 public class LOCExtractor {
+
+    static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LOCExtractor.class.getName());
+
+    public LOCExtractor() {
+        // default
+    }
 
     public static ArrayList<Integer> extractLines(String src)
     {
@@ -53,7 +57,6 @@ public class LOCExtractor {
 
             if(intruders.contains(node.getNodeName()))
             {
-                //System.out.println(node);
                 node.getParentNode().removeChild(node);
             }
             else
@@ -63,7 +66,9 @@ public class LOCExtractor {
                     try{
                         lineNb.add(node.getAttributes().getNamedItem("pos:start").getNodeValue().split(":")[0]);
                     }catch (Exception ignored)
-                    { }
+                    {
+                        // abnormal
+                    }
                 }
                 if(node.getChildNodes().getLength() > 0)
                 {
@@ -101,7 +106,7 @@ public class LOCExtractor {
             }
 
         } catch (Exception ignored) {
-
+            // abnormal
         }
         return null;
     }
@@ -113,6 +118,7 @@ public class LOCExtractor {
         try {
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         } catch (ParserConfigurationException ignored) {
+            // abnormal
         }
 
         DocumentBuilder builder;
@@ -122,8 +128,7 @@ public class LOCExtractor {
         }
         catch (Exception e)
         {
-            Logger logger = LogManager.getLogger(LOCExtractor.class.getName());
-            logger.error(e.getMessage(),e);
+            logger.info(e.getMessage());
         }
         return null;
     }
