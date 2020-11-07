@@ -7,7 +7,7 @@
 			<div class="col">
 				<p class="mb-0">Commits on {{ getFormattedDate(day) }}</p>
 				<div class="row rounded list-group m-0">
-					<div class="col-12 list-group-item" v-for="item in items"  :class="{'bg-light-green': item.bugInducingCommits}">
+					<div class="col-12 list-group-item" v-for="item in items"  :class="commitStatus(item)">
 						<commits-list-item :data="item"/>
 					</div>
 				</div>
@@ -81,6 +81,13 @@
 			},
 			getFormattedDate(date){
 				return this.$moment(date).format('MMM D, YYYY')
+			},
+			commitStatus: function(commit){
+				return {
+					'bg-light-yellow': commit.bugInducing && commit.bugInducingCommits,
+					'bg-light-green': !commit.bugInducing && commit.bugInducingCommits,
+					'bg-light-red': commit.bugInducing && !commit.bugInducingCommits,
+				}
 			}
 		},
 		computed: {
@@ -142,6 +149,22 @@
 
 .bg-light-green:hover{
 	background-color: #cdffd8;
+}
+
+.bg-light-red{
+	background-color: #ffedf0;
+}
+
+.bg-light-red:hover{
+	background-color: #ffdadf;
+}
+
+.bg-light-yellow{
+	background-color: #fffbdd;
+}
+
+.bg-light-yellow:hover{
+	background-color: #fff5b1;
 }
 
 </style>

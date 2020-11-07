@@ -74,7 +74,7 @@ public class AsyncService {
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
-            System.out.println("------- SZZ COMPLETED. -------");
+
         } catch (Exception e){
             Logger logger = LogManager.getLogger(AsyncService.class.getName());
             logger.error(e.getMessage(),e);
@@ -164,7 +164,9 @@ public class AsyncService {
                 String shortMessage = revCommit.getShortMessage();
                 String commitName = revCommit.getName();
                 int commitType = revCommit.getType();
-                Date date = new Date(revCommit.getCommitTime() * 1000);
+
+                long millis = revCommit.getCommitTime();
+                Date date = new Date(millis * 1000);
                 List<CommitDiff> diffEntries = new ArrayList<>();
                 ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -339,6 +341,8 @@ public class AsyncService {
             }
 
             commitRepository.save(commit);
+
         }
+        System.out.println("------- SZZ completed. -------");
     }
 }

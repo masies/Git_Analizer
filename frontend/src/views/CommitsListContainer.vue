@@ -35,6 +35,14 @@
 					<button class="btn btn-primary btn-sm" type="submit">Search</button>
 					<hr>	
 				</div>
+				<div class="col-12 mt-2">
+					<div>
+						<div class="square d-inline-block bg-light-green"></div> Bug Fixing
+						<div class="square d-inline-block bg-light-red"></div> Bug Inducing
+						<div class="square d-inline-block bg-light-yellow"></div> Bug Inducing & Fixing
+					</div>
+					<hr>	
+				</div>
 
 			</div>
 		</form>
@@ -96,4 +104,36 @@
 </script>
 <style>
 @import '~bootstrap-daterangepicker/daterangepicker.css';
+</style>
+<style scoped>
+.bg-light-green{
+	background-color: #e0ffeb;
+}
+
+.bg-light-green:hover{
+	background-color: #cdffd8;
+}
+
+.bg-light-red{
+	background-color: #ffedf0;
+}
+
+.bg-light-red:hover{
+	background-color: #ffdadf;
+}
+
+.bg-light-yellow{
+	background-color: #fffbdd;
+}
+
+.bg-light-yellow:hover{
+	background-color: #fff5b1;
+}
+
+.square{
+	height: 20px;
+	width: 20px;
+	vertical-align: middle;
+}
+
 </style>

@@ -7,7 +7,7 @@
 				</div>
 			</div>
 			<div class="col-12 text-center">
-				<h3>Calculating metrics...</h3>
+				<h3>Computing metrics...</h3>
 			</div>
 		</div>
 		<div class="card" v-if="!isLoading && commit">
@@ -43,7 +43,24 @@
 					
 				</div>
 			</div>
-			<div class="card-header" v-if="commit.hasMetrics">
+			<div class="card-header" v-if="commit.bugInducing">
+				<div class="row">
+					<div class="col-12">
+						This commit induces bugs fixed by: 
+						<ul>
+							<li v-for="commitBug in commit.bugFixingCommits">
+								<router-link class="text-decoration-none" :to="{name: 'commit', params: {owner: commit.owner, name: commit.repo, id: commitBug.commitName}}">
+									{{ commitBug.commitName }}
+								</router-link>
+								developed by <a :href="'https://github.com/'+commitBug.developerName" target="_blank">{{ commitBug.developerName }}</a> on {{ formatDate(commitBug.commitDate) }}
+							</li>
+						</ul>
+						
+					</div>
+					
+				</div>
+			</div>
+			<div class="card-header" v-if="hasDeepMetrics">
 				<div class="row text-center">
 					<div class="col">
 						{{ metrics.loc.toFixed(2) }} 
@@ -87,6 +104,14 @@
 					</div>
 				</div>
 			</div>
+			<div class="card-header" v-else>
+				<div class="row text-center">
+					<div class="col">
+						<button class="btn btn-primary btn-sm" @click="loadDataDeep" v-if="!isLoadingDeepMetrics">Compute project metrics</button>
+						<button class="btn btn-primary btn-sm loading" v-else="isLoadingDeepMetrics" disabled>Computing project metrics</button>
+					</div>
+				</div>
+			</div>
 			<div class="card-body">
 				<p  class="mb-0" v-html="parsedMessage" v-if="commit.fullMessage != ''"></p>
 			</div>
@@ -111,6 +136,7 @@
 			return {
 				commit: null,
 				isLoading: true,
+				isLoadingDeepMetrics: false,
 			}
 		},
 		mounted(){
@@ -124,12 +150,26 @@
 					return response.json()
 				})
 				.then(data => {
-
 					this.commit = data
 					this.isLoading = false;
 					this.$nextTick(function () {
 						$('[data-toggle="tooltip"]').tooltip()
 					})
+
+				});
+			},
+			loadDataDeep: function() {
+				this.isLoadingDeepMetrics = true;
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/commits/${this.$route.params.id}?mode=deep`)
+				.then(response => {
+					return response.json()
+				})
+				.then(data => {
+					this.commit = data
+					this.$nextTick(function () {
+						$('[data-toggle="tooltip"]').tooltip()
+					})
+					this.isLoadingDeepMetrics = false;
 
 				});
 			},
@@ -166,6 +206,9 @@
 			changeCBO: function(){
 				return this.calculateChange(this.metrics.cbo, this.metrics.parentCBO);
 			},
+			hasDeepMetrics: function(){
+				return !(this.metrics.loc == 0 && this.metrics.lcom == 0 && this.metrics.wmc == 0 && this.metrics.cbo == 0);
+			}
 		},
 		watch: {
 			'$route' (to, from) {
@@ -174,3 +217,24 @@
 		}
 	};
 </script>
+<style scoped>
+.loading:after {
+	animation: dotty steps(1,end) 1s infinite;
+	content: '';
+}
+
+@keyframes dotty {
+	0% {
+		content: '\00a0\00a0\00a0';
+	}
+	30% {
+		content: '.\00a0\00a0';
+	}
+	60% {
+		content: '..\00a0';
+	}
+	90% {
+		content: '...';
+	}
+}
+</style>
