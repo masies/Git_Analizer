@@ -18,5 +18,5 @@ public interface DeveloperExpertiseRepository extends MongoRepository<DeveloperE
     @Query("{'owner' : ?0 , 'repo' : ?1, 'developerMail': {$regex: ?2 }}")
     Page<DeveloperExpertise> findByQuery(String owner, String repo, String query, Pageable p);
 
-    DeveloperExpertise findByOwnerAndRepoAndDeveloperMail(String owner, String repo, String mail);
+    DeveloperExpertise findByOwnerAndRepoAndEmail(String owner, String repo, String mail);
 }

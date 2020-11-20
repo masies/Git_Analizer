@@ -26,6 +26,7 @@ public class RepoController {
     public @ResponseBody
     void removeRepo(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         repoRepository.findAndRemove(owner,repo);
+        // TODO: Remove all the othed data from all the other repository
     }
 
     @GetMapping("/repo")

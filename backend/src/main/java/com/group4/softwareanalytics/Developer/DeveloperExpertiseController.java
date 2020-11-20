@@ -50,7 +50,7 @@ public class DeveloperExpertiseController {
             @PathVariable(value="owner") String owner,
             @PathVariable(value="repo") String repo,
             @PathVariable(value="mail") String mail) {
-        return developerExpertiseRepository.findByOwnerAndRepoAndDeveloperMail(owner,repo,mail);
+        return developerExpertiseRepository.findByOwnerAndRepoAndEmail(owner,repo,mail);
     }
 
     @GetMapping("/repo/{owner}/{repo}/developerExpertise/search")

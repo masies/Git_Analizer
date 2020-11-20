@@ -2,8 +2,14 @@ package com.group4.softwareanalytics;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.group4.softwareanalytics.Developer.DeveloperExpertise;
 import com.group4.softwareanalytics.Developer.DeveloperExpertiseRepository;
+import com.group4.softwareanalytics.Developer.DeveloperPR;
+import com.group4.softwareanalytics.Developer.DeveloperPRRepository;
 import com.group4.softwareanalytics.commits.*;
 import com.group4.softwareanalytics.commits.Commit;
 import com.group4.softwareanalytics.issues.comments.IssueComment;
@@ -12,6 +18,7 @@ import com.group4.softwareanalytics.issues.IssueRepository;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
+import net.minidev.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -44,6 +51,9 @@ public class AsyncService {
     private DeveloperExpertiseRepository developerExpertiseRepository;
 
     @Autowired
+    private DeveloperPRRepository developerPRRepository;
+
+    @Autowired
     private RepoRepository repoRepository;
 
     @Autowired
@@ -56,7 +66,10 @@ public class AsyncService {
     private CommitRepository commitRepository;
 
     // list of developer expertise
-    private ArrayList<DeveloperExpertise> developerListExpertise = new ArrayList<>();
+    private ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
+
+    // list of developer expertise
+    private ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
 
     // list of issues, retrieved in fetchIssues and used by szz
     private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
@@ -74,12 +87,15 @@ public class AsyncService {
             // clear the two lists for each new repo to mine
             fixingCommits.clear();
             issueList.clear();
+            developerPRRatesList.clear();
+            developerExpertiseList.clear();
             // clean existing data
             repoRepository.findAndRemove(owner,name);
             issueRepository.findAndRemove(owner,name);
             issueCommentRepository.findAndRemove(owner,name);
             commitRepository.findAndRemove(owner,name);
             developerExpertiseRepository.findAndRemove(owner,name);
+            developerPRRepository.findAndRemove(owner,name);
 
 
             // mining repo
@@ -88,7 +104,8 @@ public class AsyncService {
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
 
-            developerExpertiseRepository.saveAll(developerListExpertise);
+            developerExpertiseRepository.saveAll(developerExpertiseList);
+            developerPRRepository.saveAll(developerPRRatesList);
 
         } catch (Exception e){
             logger.warning(e.getMessage());
@@ -105,14 +122,14 @@ public class AsyncService {
         return repo;
     }
 
-    public void fetchIssues(String owner, String name, Repo repo) throws IOException {
+    public void fetchIssues(String owner, String repoName, Repo repo) throws IOException {
         IssueService service = new IssueService();
 
         service.getClient().setOAuth2Token("ab6bd4f53af3a9a35077c9d06dfb48047240fe8e");
-        List<Issue> issuesOpen = service.getIssues(owner, name,
+        List<Issue> issuesOpen = service.getIssues(owner, repoName,
                 Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
 
-        List<Issue> issuesClosed = service.getIssues(owner, name,
+        List<Issue> issuesClosed = service.getIssues(owner, repoName,
                 Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_CLOSED));
 
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
@@ -121,18 +138,23 @@ public class AsyncService {
         logger.log(Level.ALL, "------- Found " + issues.size() + " Issues, start fetching them... -------" );
 
         for (Issue issue : issues) {
-            com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
+            com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, repoName, false);
 
             if(issue.getHtmlUrl().contains("pull")) {
+
                 i.setPR(true);
+                if(issue.getState().equals("closed")) {
+                    System.out.println(issue.getNumber());
+                    linkIssueDev(owner, repoName ,issue.getUser().getLogin(), issue.getNumber());
+                }
             }
 
             issueList.add(i);
             // gather all the issue comments
-            List<Comment> comments = service.getComments(owner, name, issue.getNumber());
+            List<Comment> comments = service.getComments(owner, repoName, issue.getNumber());
             List<IssueComment> commentList = new ArrayList<>();
             for (Comment comment : comments) {
-                IssueComment c = new IssueComment(comment, owner, name, issue.getNumber());
+                IssueComment c = new IssueComment(comment, owner, repoName, issue.getNumber());
                 commentList.add(c);
             }
             issueCommentRepository.saveAll(commentList);
@@ -143,6 +165,52 @@ public class AsyncService {
         logger.info("------- Issues fetched successfully! -------");
         repo.hasIssuesDone();
         repoRepository.save(repo);
+    }
+
+     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber){
+        String command = "curl -X GET https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber + " -H 'Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac' ";
+        ProcessBuilder pb = new ProcessBuilder(
+                "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
+                "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
+        try {
+            Process process = pb.start();
+            process.waitFor();
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String s = stdInput.lines().collect(Collectors.joining());
+            System.out.println(s);
+
+            JsonObject jsonObject = JsonParser.parseString(s).getAsJsonObject();
+
+            String merged = jsonObject.get("merged").toString();
+            System.out.println("username "+ userName);
+
+            if (merged.equals("true")){
+                String mergedBy = jsonObject.getAsJsonObject("merged_by").get("login").toString().replaceAll("\"","");
+
+                System.out.println("merged by "+ mergedBy);
+//                TODO: closed & accepted
+            } else {
+//                TODO: closed & rejected
+            }
+
+
+
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        for (DeveloperPR dev : developerPRRatesList) {
+            if (dev.getUsername().equals(userName)) {
+                dev.setOpened(dev.getOpened()+1);
+                return;
+            }
+        }
+
+        DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+        newDev.setOpened(newDev.getOpened()+1);
+        developerPRRatesList.add(newDev);
     }
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
@@ -213,15 +281,15 @@ public class AsyncService {
     }
 
     private void linkCommitDev(String owner, String repo, String  devEmail) {
-        for (DeveloperExpertise dev : developerListExpertise) {   // CHECK IF DEV EXISTS
-            if (dev.getDeveloperMail().equals(devEmail)) {
+        for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
+            if (dev.getEmail().equals(devEmail)) {
                 dev.setExpertise(dev.getExpertise() + 1);
                 return;
             }
         }
 
         DeveloperExpertise newDev = new DeveloperExpertise(owner, repo,1, devEmail);
-        developerListExpertise.add(newDev);
+        developerExpertiseList.add(newDev);
     }
 
     private ArrayList<Integer> fixedIssuesRelated(RevCommit commit) {

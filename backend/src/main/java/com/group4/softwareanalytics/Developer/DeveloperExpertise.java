@@ -11,15 +11,15 @@ public class DeveloperExpertise {
     private String owner;
     private String repo;
 
-    private String developerMail;
+    private String email;
     private int expertise;
 
 
-    public DeveloperExpertise(String owner, String repo, int expertise, String developerMail) {
+    public DeveloperExpertise(String owner, String repo, int expertise, String email) {
         this.owner = owner;
         this.repo = repo;
         this.expertise = expertise;
-        this.developerMail = developerMail;
+        this.email = email;
     }
 
     public String getOwner() {
@@ -46,11 +46,11 @@ public class DeveloperExpertise {
         this.expertise = expertise;
     }
 
-    public String getDeveloperMail() {
-        return developerMail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDeveloperMail(String developerMail) {
-        this.developerMail = developerMail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
