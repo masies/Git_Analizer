@@ -2,6 +2,8 @@ package com.group4.softwareanalytics;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.group4.softwareanalytics.Developer.DeveloperExpertise;
+import com.group4.softwareanalytics.Developer.DeveloperExpertiseRepository;
 import com.group4.softwareanalytics.commits.*;
 import com.group4.softwareanalytics.commits.Commit;
 import com.group4.softwareanalytics.issues.comments.IssueComment;
@@ -39,6 +41,9 @@ import java.util.stream.Stream;
 public class AsyncService {
 
     @Autowired
+    private DeveloperExpertiseRepository developerExpertiseRepository;
+
+    @Autowired
     private RepoRepository repoRepository;
 
     @Autowired
@@ -49,6 +54,9 @@ public class AsyncService {
 
     @Autowired
     private CommitRepository commitRepository;
+
+    // list of developer expertise
+    private ArrayList<DeveloperExpertise> developerListExpertise = new ArrayList<>();
 
     // list of issues, retrieved in fetchIssues and used by szz
     private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
@@ -71,12 +79,16 @@ public class AsyncService {
             issueRepository.findAndRemove(owner,name);
             issueCommentRepository.findAndRemove(owner,name);
             commitRepository.findAndRemove(owner,name);
+            developerExpertiseRepository.findAndRemove(owner,name);
+
 
             // mining repo
             Repo repo = fetchRepo(owner,name);
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
+
+            developerExpertiseRepository.saveAll(developerListExpertise);
 
         } catch (Exception e){
             logger.warning(e.getMessage());
@@ -179,6 +191,8 @@ public class AsyncService {
 
                 ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
 
+                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress());
+
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
 
@@ -196,6 +210,18 @@ public class AsyncService {
         } catch (Exception e){
             logger.warning(e.getMessage());
         }
+    }
+
+    private void linkCommitDev(String owner, String repo, String  devEmail) {
+        for (DeveloperExpertise dev : developerListExpertise) {   // CHECK IF DEV EXISTS
+            if (dev.getDeveloperMail().equals(devEmail)) {
+                dev.setExpertise(dev.getExpertise() + 1);
+                return;
+            }
+        }
+
+        DeveloperExpertise newDev = new DeveloperExpertise(owner, repo,1, devEmail);
+        developerListExpertise.add(newDev);
     }
 
     private ArrayList<Integer> fixedIssuesRelated(RevCommit commit) {
