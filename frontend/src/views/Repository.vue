@@ -37,6 +37,9 @@
 			</div>
 		</div>
 		<div class="row mt-3">
+			<directory-structure />
+		</div>
+		<div class="row mt-3">
 			<div class="col-12 col-lg-6">
 				<h5 class="mb-0">Issues</h5>
 				<hr>

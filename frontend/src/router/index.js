@@ -7,6 +7,8 @@ import Issue from '../views/Issue.vue';
 import CommitsListContainer from '../views/CommitsListContainer.vue';
 import IssuesListContainer from '../views/IssuesListContainer.vue';
 import RepositoryList from '../views/RepositoryList.vue';
+import ExpertiseListContainer from '../views/ExpertiseListContainer.vue';
+import DirectoryStructureContainer from '../views/DirectoryStructureContainer.vue';
 
 
 Vue.use(VueRouter);
@@ -46,6 +48,16 @@ const routes = [
   path: '/repository/:owner/:name/commit/:id',
   name: 'commit',
   component: Commit,
+},
+{
+  path: '/repository/:owner/:name/tree*',
+  name: 'tree',
+  component: DirectoryStructureContainer,
+},
+{
+  path: '/repository/:owner/:name/expertise',
+  name: 'expertiseListContainer',
+  component: ExpertiseListContainer,
 }
 ];
 
