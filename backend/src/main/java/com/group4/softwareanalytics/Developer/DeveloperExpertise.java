@@ -3,6 +3,9 @@ package com.group4.softwareanalytics.Developer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class DeveloperExpertise {
     @Field("DeveloperExpertise")
     @Id
@@ -12,6 +15,8 @@ public class DeveloperExpertise {
     private String repo;
 
     private String email;
+
+    HashSet<String> commitHashSet = new HashSet<>();
     private int expertise;
 
 
@@ -20,6 +25,18 @@ public class DeveloperExpertise {
         this.repo = repo;
         this.expertise = expertise;
         this.email = email;
+    }
+
+    public HashSet<String> getCommitHashSet() {
+        return commitHashSet;
+    }
+
+    public void setCommitHashSet(HashSet<String> commitHashSet) {
+        this.commitHashSet = commitHashSet;
+    }
+
+    public void addCommitHash(String commitHash){
+        this.commitHashSet.add(commitHash);
     }
 
     public String getOwner() {
