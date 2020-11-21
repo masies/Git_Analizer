@@ -2,16 +2,23 @@ package com.group4.softwareanalytics;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.group4.softwareanalytics.developer.DeveloperExpertise;
+import com.group4.softwareanalytics.developer.DeveloperExpertiseRepository;
+import com.group4.softwareanalytics.developer.DeveloperPR;
+import com.group4.softwareanalytics.developer.DeveloperPRRepository;
 import com.group4.softwareanalytics.commits.*;
-import com.group4.softwareanalytics.commits.Commit;
+import com.group4.softwareanalytics.issues.IssueRepository;
 import com.group4.softwareanalytics.issues.comments.IssueComment;
 import com.group4.softwareanalytics.issues.comments.IssueCommentRepository;
-import com.group4.softwareanalytics.issues.IssueRepository;
 import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
@@ -27,7 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -37,6 +47,12 @@ import java.util.stream.Stream;
 
 @Service
 public class AsyncService {
+
+    @Autowired
+    private DeveloperExpertiseRepository developerExpertiseRepository;
+
+    @Autowired
+    private DeveloperPRRepository developerPRRepository;
 
     @Autowired
     private RepoRepository repoRepository;
@@ -49,6 +65,12 @@ public class AsyncService {
 
     @Autowired
     private CommitRepository commitRepository;
+
+    // list of developer expertise
+    private ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
+
+    // list of developer expertise
+    private ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
 
     // list of issues, retrieved in fetchIssues and used by szz
     private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
@@ -66,17 +88,25 @@ public class AsyncService {
             // clear the two lists for each new repo to mine
             fixingCommits.clear();
             issueList.clear();
+            developerPRRatesList.clear();
+            developerExpertiseList.clear();
             // clean existing data
             repoRepository.findAndRemove(owner,name);
             issueRepository.findAndRemove(owner,name);
             issueCommentRepository.findAndRemove(owner,name);
             commitRepository.findAndRemove(owner,name);
+            developerExpertiseRepository.findAndRemove(owner,name);
+            developerPRRepository.findAndRemove(owner,name);
+
 
             // mining repo
             Repo repo = fetchRepo(owner,name);
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
+
+            developerExpertiseRepository.saveAll(developerExpertiseList);
+            developerPRRepository.saveAll(developerPRRatesList);
 
         } catch (Exception e){
             logger.warning(e.getMessage());
@@ -93,14 +123,14 @@ public class AsyncService {
         return repo;
     }
 
-    public void fetchIssues(String owner, String name, Repo repo) throws IOException {
+    public void fetchIssues(String owner, String repoName, Repo repo) throws IOException {
         IssueService service = new IssueService();
 
         service.getClient().setOAuth2Token("ab6bd4f53af3a9a35077c9d06dfb48047240fe8e");
-        List<Issue> issuesOpen = service.getIssues(owner, name,
+        List<Issue> issuesOpen = service.getIssues(owner, repoName,
                 Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_OPEN));
 
-        List<Issue> issuesClosed = service.getIssues(owner, name,
+        List<Issue> issuesClosed = service.getIssues(owner, repoName,
                 Collections.singletonMap(IssueService.FILTER_STATE, IssueService.STATE_CLOSED));
 
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
@@ -109,18 +139,21 @@ public class AsyncService {
         logger.log(Level.ALL, "------- Found " + issues.size() + " Issues, start fetching them... -------" );
 
         for (Issue issue : issues) {
-            com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, name, false);
+            com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, repoName, false);
 
             if(issue.getHtmlUrl().contains("pull")) {
                 i.setPR(true);
+                if(issue.getState().equals("closed")) {
+                    linkIssueDev(owner, repoName ,issue.getUser().getLogin(), issue.getNumber());
+                }
             }
 
             issueList.add(i);
             // gather all the issue comments
-            List<Comment> comments = service.getComments(owner, name, issue.getNumber());
+            List<Comment> comments = service.getComments(owner, repoName, issue.getNumber());
             List<IssueComment> commentList = new ArrayList<>();
             for (Comment comment : comments) {
-                IssueComment c = new IssueComment(comment, owner, name, issue.getNumber());
+                IssueComment c = new IssueComment(comment, owner, repoName, issue.getNumber());
                 commentList.add(c);
             }
             issueCommentRepository.saveAll(commentList);
@@ -131,6 +164,172 @@ public class AsyncService {
         logger.info("------- Issues fetched successfully! -------");
         repo.hasIssuesDone();
         repoRepository.save(repo);
+    }
+
+     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber){
+        ProcessBuilder curlPRProcess = new ProcessBuilder(
+                "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
+                "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
+
+        JsonObject jsonPR = curlRequest(curlPRProcess);
+
+        if (jsonPR == null){
+            return;
+        }
+
+        String merged = jsonPR.get("merged").toString();
+
+        if (merged.equals("true")){
+            // in this case the PR is accepted, we will increment the accepted count of the owner
+            // then we need to add all the reviewers, increment all it's reviewed count and accepted reviewed count
+
+            String mergedBy = jsonPR.getAsJsonObject("merged_by").get("login").toString().replaceAll("\"","");
+
+            // TODO: ask if we have to consider this
+    //      HashSet<String> reviewers;
+    //      JsonArray jsonReviewers = jsonPR.getAsJsonArray("requested_reviewers");
+    //      System.out.println(jsonReviewers.toString());
+    //      for (int i = 0; i < jsonReviewers.size(); i++) {
+    //          String reviewer = jsonReviewers.get(i).getAsJsonObject().get("login").toString().replaceAll("\"","");
+    //          System.out.println(reviewer);
+    //      }
+
+            boolean userFound = false;
+            boolean reviewerFound = false;
+
+            for (DeveloperPR dev : developerPRRatesList) {
+                // the developer which opened the PR gets it's PR total and accepeted total increased by 1
+                if (dev.getUsername().equals(userName)) {
+                    dev.setOpened(dev.getOpened()+1);
+                    dev.setAccepted_opened(dev.getAccepted_opened() + 1);
+                    dev.addPROpened(PRnumber);
+                    userFound = true;
+                }
+                // the developer which approved the PR gets it's PR reviewed total increased by 1
+                // and the accepted reviewed total increased by 1
+                if (dev.getUsername().equals(mergedBy)) {
+                    dev.setReviewed(dev.getReviewed()+1);
+                    dev.setAccepted_reviewed(dev.getAccepted_reviewed() + 1);
+                    dev.addPRreviewed(PRnumber);
+                    reviewerFound = true;
+                }
+                if(userFound && reviewerFound){
+                    return;
+                }
+            }
+
+            if (!userFound && !reviewerFound){
+                if (mergedBy.equals(userName)){
+                    DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                    newDev.setOpened(1);
+                    newDev.setAccepted_opened(1);
+                    newDev.setReviewed(1);
+                    newDev.setAccepted_reviewed(1);
+                    newDev.addPROpened(PRnumber);
+                    newDev.addPRreviewed(PRnumber);
+                    developerPRRatesList.add(newDev);
+                    return;
+                }
+            }
+
+            if (!userFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                newDev.setOpened(1);
+                newDev.setAccepted_opened(1);
+                newDev.addPROpened(PRnumber);
+                developerPRRatesList.add(newDev);
+            }
+
+            if (!reviewerFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,mergedBy);
+                newDev.setReviewed(1);
+                newDev.setAccepted_reviewed(1);
+                newDev.addPRreviewed(PRnumber);
+                developerPRRatesList.add(newDev);
+            }
+
+
+        } else {
+            // we do not have the closed_by info in the pull request fetched as pull
+            // hence we need to fetch it as issue
+            ProcessBuilder curlIssueProcess = new ProcessBuilder(
+                    "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName + "/issues/" + PRnumber,
+                    "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
+
+            JsonObject jsonIssue = curlRequest(curlIssueProcess);
+
+            if (jsonIssue == null){
+                return;
+            }
+
+            String closedBy = jsonIssue.getAsJsonObject("closed_by").get("login").toString().replaceAll("\"", "");
+
+            boolean userFound = false;
+            boolean reviewerFound = false;
+
+            for (DeveloperPR dev : developerPRRatesList) {
+                // the developer which opened the PR gets it's PR total increased by 1, but not the accepted total
+                if (dev.getUsername().equals(userName)) {
+                    dev.setOpened(dev.getOpened()+1);
+                    dev.addPROpened(PRnumber);
+                    userFound = true;
+                }
+                // the developer which closed the PR gets it's PR reviewed total increased by 1
+                if (dev.getUsername().equals(closedBy)) {
+                    dev.setReviewed(dev.getReviewed()+1);
+                    dev.addPRreviewed(PRnumber);
+                    reviewerFound = true;
+                }
+                if(userFound && reviewerFound){
+                    return;
+                }
+            }
+
+            if (!userFound && !reviewerFound){
+                if (closedBy.equals(userName)){
+                    DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                    newDev.setOpened(1);
+                    newDev.setReviewed(1);
+                    newDev.addPROpened(PRnumber);
+                    newDev.addPRreviewed(PRnumber);
+                    developerPRRatesList.add(newDev);
+                    return;
+                }
+            }
+
+            if (!userFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                newDev.setOpened(1);
+                newDev.addPROpened(PRnumber);
+                developerPRRatesList.add(newDev);
+            }
+
+            if (!reviewerFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,closedBy);
+                newDev.setReviewed(1);
+                newDev.addPRreviewed(PRnumber);
+                developerPRRatesList.add(newDev);
+            }
+        }
+
+    }
+
+    private JsonObject curlRequest(ProcessBuilder pb){
+        Process process = null;
+        try {
+            process = pb.start();
+            process.waitFor();
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String s = stdInput.lines().collect(Collectors.joining());
+            return JsonParser.parseString(s).getAsJsonObject();
+        } catch (IOException | InterruptedException e) {
+            assert process != null;
+            process.destroy();
+            logger.warning(e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+
+        return null;
     }
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
@@ -179,6 +378,8 @@ public class AsyncService {
 
                 ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
 
+                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName);
+
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
 
@@ -196,6 +397,20 @@ public class AsyncService {
         } catch (Exception e){
             logger.warning(e.getMessage());
         }
+    }
+
+    private void linkCommitDev(String owner, String repo, String devEmail, String commitHash) {
+        for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
+            if (dev.getEmail().equals(devEmail)) {
+                dev.setExpertise(dev.getExpertise() + 1);
+                dev.addCommitHash(commitHash);
+                return;
+            }
+        }
+
+        DeveloperExpertise newDev = new DeveloperExpertise(owner, repo,1, devEmail);
+        newDev.addCommitHash(commitHash);
+        developerExpertiseList.add(newDev);
     }
 
     private ArrayList<Integer> fixedIssuesRelated(RevCommit commit) {
