@@ -317,7 +317,7 @@ public class AsyncService {
     }
 
     private JsonObject curlRequest(ProcessBuilder pb){
-        Process process;
+        Process process = null;
         try {
             process = pb.start();
             process.waitFor();
@@ -325,7 +325,8 @@ public class AsyncService {
             String s = stdInput.lines().collect(Collectors.joining());
             return JsonParser.parseString(s).getAsJsonObject();
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            process.destroy();
+            logger.warning(e.getMessage());
         }
 
         return null;
