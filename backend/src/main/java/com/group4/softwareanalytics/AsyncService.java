@@ -325,8 +325,10 @@ public class AsyncService {
             String s = stdInput.lines().collect(Collectors.joining());
             return JsonParser.parseString(s).getAsJsonObject();
         } catch (IOException | InterruptedException e) {
+            assert process != null;
             process.destroy();
             logger.warning(e.getMessage());
+            Thread.currentThread().interrupt();
         }
 
         return null;
