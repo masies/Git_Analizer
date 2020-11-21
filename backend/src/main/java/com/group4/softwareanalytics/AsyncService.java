@@ -66,12 +66,6 @@ public class AsyncService {
     @Autowired
     private CommitRepository commitRepository;
 
-    // list of developer expertise
-    private ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
-
-    // list of developer expertise
-    private ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
-
     // list of issues, retrieved in fetchIssues and used by szz
     private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
 
@@ -88,8 +82,6 @@ public class AsyncService {
             // clear the two lists for each new repo to mine
             fixingCommits.clear();
             issueList.clear();
-            developerPRRatesList.clear();
-            developerExpertiseList.clear();
             // clean existing data
             repoRepository.findAndRemove(owner,name);
             issueRepository.findAndRemove(owner,name);
@@ -104,9 +96,6 @@ public class AsyncService {
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
-
-            developerExpertiseRepository.saveAll(developerExpertiseList);
-            developerPRRepository.saveAll(developerPRRatesList);
 
         } catch (Exception e){
             logger.warning(e.getMessage());
@@ -138,13 +127,16 @@ public class AsyncService {
 
         logger.log(Level.ALL, "------- Found " + issues.size() + " Issues, start fetching them... -------" );
 
+        // list of developer expertise
+        ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
+
         for (Issue issue : issues) {
             com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, repoName, false);
 
             if(issue.getHtmlUrl().contains("pull")) {
                 i.setPR(true);
                 if(issue.getState().equals("closed")) {
-                    linkIssueDev(owner, repoName ,issue.getUser().getLogin(), issue.getNumber());
+                    linkIssueDev(owner, repoName ,issue.getUser().getLogin(), issue.getNumber(), developerPRRatesList);
                 }
             }
 
@@ -160,13 +152,14 @@ public class AsyncService {
         }
 
         issueRepository.saveAll(issueList);
+        developerPRRepository.saveAll(developerPRRatesList);
 
         logger.info("------- Issues fetched successfully! -------");
         repo.hasIssuesDone();
         repoRepository.save(repo);
     }
 
-     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber){
+     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
         ProcessBuilder curlPRProcess = new ProcessBuilder(
                 "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
@@ -348,6 +341,9 @@ public class AsyncService {
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
+        // list of developer expertise
+        ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
+
         List<RevCommit> revCommitList;
         try (Git git = new Git(repo)) {
             List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
@@ -378,7 +374,7 @@ public class AsyncService {
 
                 ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
 
-                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName);
+                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName, developerExpertiseList);
 
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
@@ -389,6 +385,7 @@ public class AsyncService {
                 }
             }
             commitRepository.saveAll(commitList);
+            developerExpertiseRepository.saveAll(developerExpertiseList);
 
             logger.info("------- Commits stored successfully! -------");
 
@@ -399,7 +396,7 @@ public class AsyncService {
         }
     }
 
-    private void linkCommitDev(String owner, String repo, String devEmail, String commitHash) {
+    private void linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList) {
         for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
             if (dev.getEmail().equals(devEmail)) {
                 dev.setExpertise(dev.getExpertise() + 1);

@@ -9,6 +9,7 @@ public class DirNav {
     public static HashMap<String,String> repoContents(String repoPath){
         File repoDirectory = new File(repoPath);
         File[] contents = repoDirectory.listFiles();
+        assert contents != null;
         for(File item: contents) {
             if (item.isFile()) {
                 repoContents.put(item.getPath(),"F");
