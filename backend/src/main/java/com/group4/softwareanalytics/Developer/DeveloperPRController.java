@@ -43,27 +43,27 @@ public class DeveloperPRController {
                 )
         );
     }
-//
-//    @RequestMapping(value = "/repo/{owner}/{repo}/developerPR/{username}", method = {RequestMethod.GET})
-//    public @ResponseBody
-//    DeveloperPR getAttr(
-//            @PathVariable(value="owner") String owner,
-//            @PathVariable(value="repo") String repo,
-//            @PathVariable(value="username") String username) {
-//        return developerPRRepository.findByOwnerAndRepoAndDeveloperUserName(owner,repo,username);
-//    }
-//
-//    @GetMapping("/repo/{owner}/{repo}/developerExpertise/search")
-//    @ResponseBody
-//    public Page<DeveloperPR> getRepos(
-//            @PathVariable(value="owner") String owner,
-//            @PathVariable(value="repo") String repo,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "20") int size,
-//            @RequestParam(value = "username", defaultValue = "") String q) {
-//        Pageable paging = PageRequest.of(page, size);
-//        return developerPRRepository.findByQuery(owner, repo, q, paging);
-//    }
+
+    @RequestMapping(value = "/repo/{owner}/{repo}/developerPR/{username}", method = {RequestMethod.GET})
+    public @ResponseBody
+    DeveloperPR getAttr(
+            @PathVariable(value="owner") String owner,
+            @PathVariable(value="repo") String repo,
+            @PathVariable(value="username") String username) {
+        return developerPRRepository.findByOwnerAndRepoAndUsername(owner,repo,username);
+    }
+
+    @GetMapping("/repo/{owner}/{repo}/developerPR/search")
+    @ResponseBody
+    public Page<DeveloperPR> getRepos(
+            @PathVariable(value="owner") String owner,
+            @PathVariable(value="repo") String repo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(value = "username", defaultValue = "") String q) {
+        Pageable paging = PageRequest.of(page, size);
+        return developerPRRepository.findByQuery(owner, repo, q, paging);
+    }
 
 
 }

@@ -14,7 +14,7 @@ public interface DeveloperPRRepository extends MongoRepository<DeveloperPR,Strin
      @Query("{'owner' : ?0 , 'repo' : ?1}")
      Page<DeveloperPR> findByOwnerAndRepo(String owner, String repo, Pageable pageable);
 
-     @Query("{'owner' : ?0 , 'repo' : ?1, 'developerMail': {$regex: ?2 }}")
+     @Query("{'owner' : ?0 , 'repo' : ?1, 'username': {$regex: ?2 }}")
     Page<DeveloperPR> findByQuery(String owner, String repo, String query, Pageable p);
 
     DeveloperPR findByOwnerAndRepoAndUsername(String owner, String repo, String username);

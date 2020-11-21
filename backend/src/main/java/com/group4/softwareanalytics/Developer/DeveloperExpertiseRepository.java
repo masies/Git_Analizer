@@ -15,7 +15,7 @@ public interface DeveloperExpertiseRepository extends MongoRepository<DeveloperE
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
     public void findAndRemove (String owner, String repo);
 
-    @Query("{'owner' : ?0 , 'repo' : ?1, 'developerMail': {$regex: ?2 }}")
+    @Query("{'owner' : ?0 , 'repo' : ?1, 'email': {$regex: ?2 }}")
     Page<DeveloperExpertise> findByQuery(String owner, String repo, String query, Pageable p);
 
     DeveloperExpertise findByOwnerAndRepoAndEmail(String owner, String repo, String mail);
