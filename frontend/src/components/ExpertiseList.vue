@@ -77,18 +77,7 @@
 		},
 		methods: {
 			loadData: function() {
-				this.data = {}
-				this.data.content = [
-				{
-					email: "myUser@domain.com",
-					expertise: 24,
-				},
-				{
-					email: "mySecondUser@example.com",
-					expertise: 33,
-				}]
-				return
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/developerExpertise${this.queryString}&page=${this.currentPage-1}&size=${this.size}&sort=${sort}&order=${order}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/developerExpertise/search${this.queryString}&page=${this.currentPage-1}&size=${this.size}&sort=${this.sort}&order=${this.order}`)
 				.then(response => {
 					return response.json()
 				})

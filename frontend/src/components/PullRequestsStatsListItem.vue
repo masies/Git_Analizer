@@ -1,13 +1,19 @@
 <template>
 	<div class="row">
-		<div class="col-6">
+		<div class="col-4">
 			{{ data.username }}
 		</div>
-		<div class="col-3 text-center">
+		<div class="col-2 text-center">
 			{{ formatPercentage(data.accepted_opened_percentage) }}%
 		</div>
-		<div class="col-3 text-center">
+		<div class="col-2 text-center">
 			{{ formatPercentage(data.accepted_reviewed_percentage) }}%
+		</div>
+		<div class="col-2 text-center">
+			{{ data.opened }}
+		</div>
+		<div class="col-2 text-center">
+			{{ data.reviewed }}
 		</div>
 	</div>
 </template>

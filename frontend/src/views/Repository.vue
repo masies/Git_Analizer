@@ -3,11 +3,16 @@
 		<div class="row">
 			<div class="col card w-100 mt-2">
 				<div class="card-body">
-					<h5 class="card-title">
-						<router-link :to="{name: 'repository', params: { owner: repository.owner.login, name: repository.name }}">	
-							{{ repository.owner.login }}/{{ repository.name }}
-						</router-link>
-					</h5>
+					<div class="card-title">
+						<h5 class="d-inline-block">
+							<router-link :to="{name: 'repository', params: { owner: repository.owner.login, name: repository.name }}">	
+								{{ repository.owner.login }}/{{ repository.name }}
+							</router-link>
+						</h5>
+						<button class="btn btn-primary btn-sm float-right" @click="updateRepository" :disabled="showStatusBar">
+							<i class="material-icons align-middle md-18">cached</i>
+						</button>
+					</div>
 					<h6 class="card-subtitle mb-2 text-muted" v-if="repository.language">
 						<span class="repo-language-color" :style="{'background-color': languageColor.color}"></span>
 						{{ repository.language }}
@@ -31,7 +36,20 @@
 					<p class="card-text">
 						{{ repository.description }}
 					</p>
-					<button class="btn btn-primary btn-sm" @click="updateRepository" :disabled="showStatusBar">Update</button>
+
+					<div class="row">
+						<div class="col">
+							<router-link class="btn btn-primary btn-sm w-100" role="button" :to="{name: 'expertiseListContainer', params: { owner: repository.owner.login, name: repository.name }}">	
+								Developers expertise
+							</router-link>
+						</div>	
+						<div class="col">
+							<router-link class="btn btn-primary btn-sm w-100" role="button" :to="{name: 'pullRequestStatsListContainer', params: { owner: repository.owner.login, name: repository.name }}">	
+								Developers PR rates 
+							</router-link>
+						</div>	
+					</div>
+					
 					<status-bar :owner="repository.owner.login" :name="repository.name" v-if="showStatusBar" class="mt-2" @fetchIsComplete="reloadData"/>
 				</div>
 			</div>
@@ -114,5 +132,8 @@
 	width: 12px;
 	height: 12px;
 	border-radius: 50%;
+}
+.material-icons.md-18 { 
+	font-size: 18px; 
 }
 </style>

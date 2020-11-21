@@ -3,22 +3,34 @@
 		<div class="row list-group">
 			<div class="col-12 list-group-item list-group-item-header">
 				<div class="row font-weight-bold">
-					<div class="col-6">
+					<div class="col-4">
 						<span @click="sortBy('username')" role="button">Developer
 							<i class="material-icons align-middle" v-if="sort == 'username' && order == 'asc'">arrow_drop_up</i>
 							<i class="material-icons align-middle" v-if="sort == 'username' && order == 'desc'">arrow_drop_down</i>
 						</span>
 					</div>
-					<div class="col-3 text-center">
-						<span @click="sortBy('accepted_opened_percentage')" role="button">PR accepted/opened
+					<div class="col-2 text-center">
+						<span @click="sortBy('accepted_opened_percentage')" role="button" title="Percentage of merged pull requests among the reviewed ones" data-toggle="tooltip" data-placement="bottom">Marged rate
 							<i class="material-icons align-middle" v-if="sort == 'accepted_opened_percentage' && order == 'asc'">arrow_drop_up</i>
 							<i class="material-icons align-middle" v-if="sort == 'accepted_opened_percentage' && order == 'desc'">arrow_drop_down</i>
 						</span>
 					</div>
-					<div class="col-3 text-center">
-						<span @click="sortBy('accepted_reviewed_percentage')" role="button">PR accepted/reviewed
+					<div class="col-2 text-center">
+						<span @click="sortBy('accepted_reviewed_percentage')" role="button" title="Percentage of accepted Pull Request among the opened ones" data-toggle="tooltip" data-placement="bottom">Approved rate
 							<i class="material-icons align-middle" v-if="sort == 'accepted_reviewed_percentage' && order == 'asc'">arrow_drop_up</i>
 							<i class="material-icons align-middle" v-if="sort == 'accepted_reviewed_percentage' && order == 'desc'">arrow_drop_down</i>
+						</span>
+					</div>
+					<div class="col-2 text-center">
+						<span @click="sortBy('opened')" role="button">Opened
+							<i class="material-icons align-middle" v-if="sort == 'opened' && order == 'asc'">arrow_drop_up</i>
+							<i class="material-icons align-middle" v-if="sort == 'opened' && order == 'desc'">arrow_drop_down</i>
+						</span>
+					</div>
+					<div class="col-2 text-center">
+						<span @click="sortBy('reviewed')" role="button">Reviewed
+							<i class="material-icons align-middle" v-if="sort == 'reviewed' && order == 'asc'">arrow_drop_up</i>
+							<i class="material-icons align-middle" v-if="sort == 'reviewed' && order == 'desc'">arrow_drop_down</i>
 						</span>
 					</div>
 				</div>
@@ -80,27 +92,20 @@
 		},
 		mounted(){
 			this.loadData();
+
 		},
 		methods: {
 			loadData: function() {
-				this.data = {}
-				this.data.content = [
-				{
-					username: "myUser",
-					accepted_opened_percentage: 0.56,
-					accepted_reviewed_percentage: 0.27,
-				},
-				{
-					username: "mySecondUser",
-					accepted_opened_percentage: 0.3,
-					accepted_reviewed_percentage: 0.71,
-				}]
-				return
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/developerPR${this.queryString}&page=${this.currentPage-1}&size=${this.size}&sort=${sort}&order=${order}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/developerPR/search${this.queryString}&page=${this.currentPage-1}&size=${this.size}&sort=${this.sort}&order=${this.order}`)
 				.then(response => {
 					return response.json()
 				})
-				.then(data => this.data = data);
+				.then(data => {
+					this.data = data
+					this.$nextTick(function () {
+						$('[data-toggle="tooltip"]').tooltip()
+					})
+				});
 			},
 			changePage: function(){
 				this.$router.push({ query: {...this.$route.query, page: this.currentPage }}) 

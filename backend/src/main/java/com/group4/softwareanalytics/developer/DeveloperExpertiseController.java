@@ -53,7 +53,7 @@ public class DeveloperExpertiseController {
             @PathVariable(value="repo") String repo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(value = "mail", defaultValue = "") String q,
+            @RequestParam(value = "email", defaultValue = "") String q,
             @RequestParam(value = "order", defaultValue = "desc") String order,
             @RequestParam(value = "sort", defaultValue = "percentage_accepted_opened") String sort) {
 
