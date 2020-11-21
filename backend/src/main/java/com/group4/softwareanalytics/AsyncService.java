@@ -310,8 +310,6 @@ public class AsyncService {
                 newDev.addPRreviewed(PRnumber);
                 developerPRRatesList.add(newDev);
             }
-
-
         }
 
     }
