@@ -168,49 +168,160 @@ public class AsyncService {
     }
 
      private void linkIssueDev(String owner, String repoName, String userName, int PRnumber){
-        String command = "curl -X GET https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber + " -H 'Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac' ";
-        ProcessBuilder pb = new ProcessBuilder(
+        ProcessBuilder curlPRProcess = new ProcessBuilder(
                 "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
-        try {
-            Process process = pb.start();
-            process.waitFor();
-            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String s = stdInput.lines().collect(Collectors.joining());
-            System.out.println(s);
 
-            JsonObject jsonObject = JsonParser.parseString(s).getAsJsonObject();
+        JsonObject jsonPR = curlRequest(curlPRProcess);
 
-            String merged = jsonObject.get("merged").toString();
-            System.out.println("username "+ userName);
+        if (jsonPR == null){
+            return;
+        }
 
-            if (merged.equals("true")){
-                String mergedBy = jsonObject.getAsJsonObject("merged_by").get("login").toString().replaceAll("\"","");
+        String merged = jsonPR.get("merged").toString();
 
-                System.out.println("merged by "+ mergedBy);
-//                TODO: closed & accepted
-            } else {
-//                TODO: closed & rejected
+        if (merged.equals("true")){
+            // in this case the PR is accepted, we will increment the accepted count of the owner
+            // then we need to add all the reviewers, increment all it's reviewed count and accepted reviewed count
+
+            String mergedBy = jsonPR.getAsJsonObject("merged_by").get("login").toString().replaceAll("\"","");
+
+            // TODO: ask if we have to consider this
+    //      HashSet<String> reviewers;
+    //      JsonArray jsonReviewers = jsonPR.getAsJsonArray("requested_reviewers");
+    //      System.out.println(jsonReviewers.toString());
+    //      for (int i = 0; i < jsonReviewers.size(); i++) {
+    //          String reviewer = jsonReviewers.get(i).getAsJsonObject().get("login").toString().replaceAll("\"","");
+    //          System.out.println(reviewer);
+    //      }
+
+            System.out.println("merged by "+ mergedBy);
+
+            Boolean userFound = false;
+            Boolean reviewerFound = false;
+
+            for (DeveloperPR dev : developerPRRatesList) {
+                // the developer which opened the PR gets it's PR total and accepeted total increased by 1
+                if (dev.getUsername().equals(userName)) {
+                    dev.setOpened(dev.getOpened()+1);
+                    dev.setAccepted_opened(dev.getAccepted_opened() + 1);
+                    userFound = true;
+                }
+                // the developer which approved the PR gets it's PR reviewed total increased by 1
+                // and the accepted reviewed total increased by 1
+                if (dev.getUsername().equals(mergedBy)) {
+                    dev.setReviewed(dev.getReviewed()+1);
+                    dev.setAccepted_reviewed(dev.getAccepted_reviewed() + 1);
+                    reviewerFound = true;
+                }
+                if(userFound && reviewerFound){
+                    return;
+                }
+            }
+
+            if (!userFound && !reviewerFound){
+                if (mergedBy.equals(userName)){
+                    DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                    newDev.setOpened(1);
+                    newDev.setAccepted_opened(1);
+                    newDev.setReviewed(1);
+                    newDev.setAccepted_reviewed(1);
+                    developerPRRatesList.add(newDev);
+                    return;
+                }
+            }
+
+            if (!userFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                newDev.setOpened(1);
+                newDev.setAccepted_opened(1);
+                developerPRRatesList.add(newDev);
+            }
+
+            if (!reviewerFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,mergedBy);
+                newDev.setReviewed(1);
+                newDev.setAccepted_reviewed(1);
+                developerPRRatesList.add(newDev);
             }
 
 
+        } else {
+            // we do not have the closed_by info in the pull request fetched as pull
+            // hence we need to fetch it as issue
+            ProcessBuilder curlIssueProcess = new ProcessBuilder(
+                    "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName + "/issues/" + PRnumber,
+                    "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
+
+            JsonObject jsonIssue = curlRequest(curlIssueProcess);
+
+            if (jsonIssue == null){
+                return;
+            }
+
+            String closedBy = jsonIssue.getAsJsonObject("closed_by").get("login").toString().replaceAll("\"", "");
+            System.out.println("closed by " + closedBy);
+
+            Boolean userFound = false;
+            Boolean reviewerFound = false;
+
+            for (DeveloperPR dev : developerPRRatesList) {
+                // the developer which opened the PR gets it's PR total increased by 1, but not the accepted total
+                if (dev.getUsername().equals(userName)) {
+                    dev.setOpened(dev.getOpened()+1);
+                    userFound = true;
+                }
+                // the developer which closed the PR gets it's PR reviewed total increased by 1
+                if (dev.getUsername().equals(closedBy)) {
+                    dev.setReviewed(dev.getReviewed()+1);
+                    reviewerFound = true;
+                }
+                if(userFound && reviewerFound){
+                    return;
+                }
+            }
+
+            if (!userFound && !reviewerFound){
+                if (closedBy.equals(userName)){
+                    DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                    newDev.setOpened(1);
+                    newDev.setReviewed(1);
+                    developerPRRatesList.add(newDev);
+                    return;
+                }
+            }
+
+            if (!userFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
+                newDev.setOpened(1);
+                developerPRRatesList.add(newDev);
+            }
+
+            if (!reviewerFound){
+                DeveloperPR newDev = new DeveloperPR(owner,repoName,closedBy);
+                newDev.setReviewed(1);
+                developerPRRatesList.add(newDev);
+            }
 
 
+        }
+
+    }
+
+    private JsonObject curlRequest(ProcessBuilder pb){
+        Process process = null;
+        try {
+            process = pb.start();
+            process.waitFor();
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String s = stdInput.lines().collect(Collectors.joining());
+            JsonObject jsonObject = JsonParser.parseString(s).getAsJsonObject();
+            return jsonObject;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
-
-        for (DeveloperPR dev : developerPRRatesList) {
-            if (dev.getUsername().equals(userName)) {
-                dev.setOpened(dev.getOpened()+1);
-                return;
-            }
-        }
-
-        DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
-        newDev.setOpened(newDev.getOpened()+1);
-        developerPRRatesList.add(newDev);
+        return null;
     }
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {

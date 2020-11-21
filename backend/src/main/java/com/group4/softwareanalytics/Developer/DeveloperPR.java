@@ -84,7 +84,7 @@ public class DeveloperPR {
     public void setReviewed(int reviewed) {
         this.reviewed = reviewed;
         if (this.reviewed > 0 ){
-            this.accepted_reviewed_percentage = (double) this.reviewed / this.accepted_reviewed;
+            this.accepted_reviewed_percentage = (double) this.accepted_reviewed / this.reviewed  ;
         } else{
             this.accepted_reviewed_percentage = 0;
         }
@@ -102,7 +102,7 @@ public class DeveloperPR {
     public void setAccepted_reviewed(int accepted_reviewed) {
         this.accepted_reviewed = accepted_reviewed;
         if (this.reviewed > 0 ){
-            this.accepted_reviewed_percentage = (double) this.reviewed / this.accepted_reviewed;
+            this.accepted_reviewed_percentage = (double) this.accepted_reviewed / this.reviewed;
         } else{
             this.accepted_reviewed_percentage = 0;
         }
