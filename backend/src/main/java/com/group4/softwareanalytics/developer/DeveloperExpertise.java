@@ -1,9 +1,8 @@
-package com.group4.softwareanalytics.Developer;
+package com.group4.softwareanalytics.developer;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class DeveloperExpertise {

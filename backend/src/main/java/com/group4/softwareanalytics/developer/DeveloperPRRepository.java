@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics.Developer;
+package com.group4.softwareanalytics.developer;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
