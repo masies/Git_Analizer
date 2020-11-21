@@ -14,7 +14,7 @@
 				</div>
 			</div>
 		</form>
-		<expertise-list/>
+		<pull-requests-stats-list/>
 	</div>
 </template>
 
@@ -32,7 +32,7 @@
 		methods: {
 			loadData: function(){
 				var q = {
-					email: this.developer,
+					username: this.developer,
 				}
 
 				Object.keys(q).forEach((key) => (q[key] == null) && delete q[key]);

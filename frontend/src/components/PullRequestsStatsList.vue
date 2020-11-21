@@ -3,22 +3,28 @@
 		<div class="row list-group">
 			<div class="col-12 list-group-item list-group-item-header">
 				<div class="row font-weight-bold">
-					<div class="col-9">
-						<span @click="sortBy('email')" role="button">Developer
-							<i class="material-icons align-middle" v-if="sort == 'email' && order == 'asc'">arrow_drop_up</i>
-							<i class="material-icons align-middle" v-if="sort == 'email' && order == 'desc'">arrow_drop_down</i>
+					<div class="col-6">
+						<span @click="sortBy('username')" role="button">Developer
+							<i class="material-icons align-middle" v-if="sort == 'username' && order == 'asc'">arrow_drop_up</i>
+							<i class="material-icons align-middle" v-if="sort == 'username' && order == 'desc'">arrow_drop_down</i>
 						</span>
 					</div>
 					<div class="col-3 text-center">
-						<span @click="sortBy('expertise')" role="button">Expertise
-							<i class="material-icons align-middle" v-if="sort == 'expertise' && order == 'asc'">arrow_drop_up</i>
-							<i class="material-icons align-middle" v-if="sort == 'expertise' && order == 'desc'">arrow_drop_down</i>
+						<span @click="sortBy('accepted_opened_percentage')" role="button">PR accepted/opened
+							<i class="material-icons align-middle" v-if="sort == 'accepted_opened_percentage' && order == 'asc'">arrow_drop_up</i>
+							<i class="material-icons align-middle" v-if="sort == 'accepted_opened_percentage' && order == 'desc'">arrow_drop_down</i>
+						</span>
+					</div>
+					<div class="col-3 text-center">
+						<span @click="sortBy('accepted_reviewed_percentage')" role="button">PR accepted/reviewed
+							<i class="material-icons align-middle" v-if="sort == 'accepted_reviewed_percentage' && order == 'asc'">arrow_drop_up</i>
+							<i class="material-icons align-middle" v-if="sort == 'accepted_reviewed_percentage' && order == 'desc'">arrow_drop_down</i>
 						</span>
 					</div>
 				</div>
 			</div>
 			<div class="col-12 list-group-item" v-for="item in data.content">
-				<expertise-list-item :data="item"/>
+				<pull-requests-stats-list-item :data="item"/>
 			</div>
 			<div class="col-12 list-group-item" v-if="!data.content.length">
 				<div class="alert alert-secondary" role="alert">
@@ -69,7 +75,7 @@
 				data: null,
 				currentPage: this.$route.query.page ? parseInt(this.$route.query.page) : 1,
 				order: 'desc',
-				sort: 'expertise',
+				sort: 'username',
 			}
 		},
 		mounted(){
@@ -80,15 +86,17 @@
 				this.data = {}
 				this.data.content = [
 				{
-					email: "myUser@domain.com",
-					expertise: 24,
+					username: "myUser",
+					accepted_opened_percentage: 0.56,
+					accepted_reviewed_percentage: 0.27,
 				},
 				{
-					email: "mySecondUser@example.com",
-					expertise: 33,
+					username: "mySecondUser",
+					accepted_opened_percentage: 0.3,
+					accepted_reviewed_percentage: 0.71,
 				}]
 				return
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/developerExpertise${this.queryString}&page=${this.currentPage-1}&size=${this.size}&sort=${sort}&order=${order}`)
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/developerPR${this.queryString}&page=${this.currentPage-1}&size=${this.size}&sort=${sort}&order=${order}`)
 				.then(response => {
 					return response.json()
 				})

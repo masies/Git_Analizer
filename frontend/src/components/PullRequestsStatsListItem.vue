@@ -1,10 +1,13 @@
 <template>
 	<div class="row">
-		<div class="col-9">
-			{{ data.email }}
+		<div class="col-6">
+			{{ data.username }}
 		</div>
 		<div class="col-3 text-center">
-			{{ data.expertise }}
+			{{ formatPercentage(data.accepted_opened_percentage) }}%
+		</div>
+		<div class="col-3 text-center">
+			{{ formatPercentage(data.accepted_reviewed_percentage) }}%
 		</div>
 	</div>
 </template>
@@ -23,6 +26,11 @@
 		},
 		mounted(){
 		},
+		methods: {
+			formatPercentage: function(value){
+				return (value * 100).toFixed(2)
+			}
+		}
 	};
 </script>
 
