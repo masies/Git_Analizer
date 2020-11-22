@@ -4,7 +4,7 @@
 			<div class="col-12 list-group-item list-group-item-header">
 				<div class="row font-weight-bold">
 					<div class="col-8">Name</div>
-					<div class="col-4">Developer</div>
+					<div class="col-4">Top Contributor</div>
 				</div>
 			</div>
 			<div class="col-12 list-group-item py-2" v-if="!isRoot">
