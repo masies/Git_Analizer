@@ -73,7 +73,7 @@
 		},
 		computed: {
 			isRoot: function(){
-				return this.$route.name != "tree" || this.$route.params.pathMatch == "" || this.$route.params.pathMatch == "//" ;
+				return this.$route.name != "tree" || this.$route.params.pathMatch == "" || this.$route.params.pathMatch == "/" || this.$route.params.pathMatch == undefined ;
 			},
 			sortedItem: function(){
 				return this.data.sort((a, b) => { 

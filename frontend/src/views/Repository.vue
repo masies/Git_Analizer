@@ -47,15 +47,17 @@
 							<router-link class="btn btn-primary btn-sm w-100" role="button" :to="{name: 'pullRequestStatsListContainer', params: { owner: repository.owner.login, name: repository.name }}">	
 								Developers PR rates 
 							</router-link>
+						</div>
+						<div class="col">
+							<router-link class="btn btn-primary btn-sm w-100" role="button" :to="{name: 'tree', params: { owner: repository.owner.login, name: repository.name, '0': '' }}">	
+								Contributors Tree
+							</router-link>
 						</div>	
 					</div>
 					
 					<status-bar :owner="repository.owner.login" :name="repository.name" v-if="showStatusBar" class="mt-2" @fetchIsComplete="reloadData"/>
 				</div>
 			</div>
-		</div>
-		<div class="row mt-3">
-			<directory-structure />
 		</div>
 		<div class="row mt-3">
 			<div class="col-12 col-lg-6">
