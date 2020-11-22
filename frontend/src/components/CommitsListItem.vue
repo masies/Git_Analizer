@@ -4,7 +4,7 @@
 			<router-link class="text-dark text-decoration-none" :to="{name: 'commit', params: {owner: data.owner,name: data.repo, id: data.commitName}}">
 				<p class="mb-0">{{ data.shortMessage }}</p>			
 			</router-link> 
-			<p class="text-muted mb-0"><a :href="'https://github.com/'+data.developerName" target="_blank">{{ data.developerName }}</a> commited on {{ formattedDate }}</p>	
+			<p class="text-muted mb-0">{{ data.developerName }} commited on {{ formattedDate }}</p>	
 		</div>
 	</div>
 </template>
