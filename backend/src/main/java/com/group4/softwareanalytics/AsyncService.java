@@ -134,9 +134,7 @@ public class AsyncService {
 
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                 .collect(Collectors.toList());
-
-        logger.log(Level.ALL, "------- Found " + issues.size() + " Issues, start fetching them... -------" );
-
+        
         // list of developer expertise
         ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
 
