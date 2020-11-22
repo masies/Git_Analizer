@@ -20,7 +20,7 @@ public class IssueCommentController {
         return issueCommentRepository.findAll();
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/issues/{issuesNumber}/comments", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/issues/{issuesNumber}/comments")
     public @ResponseBody Page<IssueComment> getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo, @PathVariable(value="issuesNumber") String number, @RequestParam(value = "page",defaultValue = "0") String page, @RequestParam(value = "size",defaultValue = "20") String size) {
         return issueCommentRepository.findByOwnerAndRepoAndIssueNumber(owner,repo,Integer.parseInt(number), PageRequest.of(Integer.parseInt(page),Integer.parseInt(size)));
     }

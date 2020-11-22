@@ -22,7 +22,7 @@ public class RepoController {
     @Autowired
     private AsyncService asyncService;
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/delete", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/delete")
     public @ResponseBody
     void removeRepo(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         repoRepository.findAndRemove(owner,repo);
@@ -46,14 +46,14 @@ public class RepoController {
         return repoRepository.findByQuery(q, paging);
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/status", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/status")
     public @ResponseBody
     RepoStatus getAttr(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         Repo r = repoRepository.findByOwnerAndRepo(owner,repo);
         return r != null ?  r.getStatus() : new RepoStatus();
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repo}", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}")
     public @ResponseBody Repo getRepo(@PathVariable(value="owner") String owner, @PathVariable(value="repo") String repo) {
         return repoRepository.findByOwnerAndRepo(owner,repo);
     }

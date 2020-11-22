@@ -15,7 +15,7 @@ public class FileContributionController {
     @Autowired
     private  FileContributionRepository fileContributionRepository;
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/FileContributions", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/FileContributions")
     public @ResponseBody
     ArrayList<FileContribution> getAttr(
             @PathVariable(value="owner") String owner,
@@ -23,7 +23,7 @@ public class FileContributionController {
         return fileContributionRepository.findByOwnerAndRepo(owner, repo);
     }
 
-    @RequestMapping(value ="/repo/{owner}/{repo}/tree/**", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/tree/**")
     public ArrayList<FileContribution> getAttr(@PathVariable(value="owner") String owner,
                     @PathVariable(value="repo") String repo,
                     HttpServletRequest request){
