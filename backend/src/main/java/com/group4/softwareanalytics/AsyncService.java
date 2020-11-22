@@ -398,7 +398,7 @@ public class AsyncService {
                             // if is the last commit we add
                             if (file.getPath().equals(path)) {
                                 // if it contains a dot i will mess up With MongoDB
-                                file.addDeveloperContribute(developerName.replaceAll(".",""));
+                                file.addDeveloperContribute(developerName.replace(".",""));
                             }
                         }
                     }
