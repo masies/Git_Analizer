@@ -387,7 +387,7 @@ public class AsyncService {
                 if (!iterator.hasNext()){
                     // last commit, everything which does not have a contribution is created in here
                     for (FileContribution file : fileContributions) {
-                        if (file.getContributionsMap().isEmpty()) {
+                        if (file.getContributionsMap().isEmpty() && file.isFile()) {
                             file.addDeveloperContribute(revCommit.getAuthorIdent().getName());
                         }
                     }
