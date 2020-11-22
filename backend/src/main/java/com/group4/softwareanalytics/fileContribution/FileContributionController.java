@@ -17,7 +17,7 @@ public class FileContributionController {
     @Autowired
     private  FileContributionRepository fileContributionRepository;
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/fileContributions", method = {RequestMethod.GET})
+    @RequestMapping(value = "/repo/{owner}/{repo}/tree", method = {RequestMethod.GET})
     public @ResponseBody
     ArrayList<FileContribution> getAttr(
             @PathVariable(value="owner") String owner,
@@ -25,12 +25,12 @@ public class FileContributionController {
         return fileContributionRepository.findByOwnerAndRepo(owner, repo);
     }
 
-    @RequestMapping("/repo/{owner}/{repo}/fileContributions/**")
+    @RequestMapping("/repo/{owner}/{repo}/tree/**")
     public ArrayList<FileContribution> foo(@PathVariable(value="owner") String owner,
                     @PathVariable(value="repo") String repo,
                     HttpServletRequest request) {
         String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/fileContributions/","") + "/";
+        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree/","") + "/";
         ArrayList<FileContribution> fileContributions = fileContributionRepository.findByOwnerAndRepo(owner,repo);
 
         ArrayList<FileContribution> requestedLevelContributions = new ArrayList<>();
