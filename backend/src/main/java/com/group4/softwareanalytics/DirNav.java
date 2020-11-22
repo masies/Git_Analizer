@@ -6,8 +6,6 @@ import java.util.HashMap;
 public class DirNav {
     static HashMap<String,Boolean>  repoContents = new HashMap<>();
 
-
-
     public static HashMap<String,Boolean> repoContents(String repoPath){
         Boolean directory = false;
         Boolean file = true;
@@ -16,11 +14,13 @@ public class DirNav {
         File[] contents = repoDirectory.listFiles();
         assert contents != null;
         for(File item: contents) {
-            if (item.isFile()) {
-                repoContents.put(item.getPath(),file);
-            } else if (item.isDirectory()) {
-                repoContents.put( item.getPath(),directory);
-                repoContents(item.getPath());
+            if (!item.getPath().contains("/.git") || item.getPath().contains("/.gitignore")) {
+                if (item.isFile()) {
+                    repoContents.put(item.getPath(), file);
+                } else if (item.isDirectory()) {
+                    repoContents.put(item.getPath(), directory);
+                    repoContents(item.getPath());
+                }
             }
         }
         return repoContents;
