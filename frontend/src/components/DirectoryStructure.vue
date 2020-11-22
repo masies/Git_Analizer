@@ -7,14 +7,14 @@
 					<div class="col-4">Developer</div>
 				</div>
 			</div>
-			<div class="col-12 list-group-item" v-if="!isRoot">
+			<div class="col-12 list-group-item py-2" v-if="!isRoot">
 				<div class="row clickable" @click="goBackFolder"> 
 					<div class="col-12 name">
 						<span>..</span>
 					</div>
 				</div>
 			</div>
-			<div class="col-12 list-group-item" v-for="item in sortedItem">
+			<div class="col-12 list-group-item py-2" v-for="item in sortedItem">
 				<div class="row" @click="goToFolder(item)" :class="{clickable: !item.file}">
 					<div class="col-8 name">
 						<i class="material-icons mr-1">{{ getTypeIcon(item.file) }}</i>
