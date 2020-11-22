@@ -67,7 +67,9 @@ public class FileContribution {
             }
         }
 
-        topContributor = maxEntry.getKey();
+        if (maxEntry != null) {
+            topContributor = maxEntry.getKey();
+        }
 
     }
 
