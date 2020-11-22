@@ -11,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +27,11 @@ public class IssueController {
 
     @GetMapping("/issues")
     @ResponseBody
-    public List<Issue> getRepos() throws IOException {
+    public List<Issue> getRepos() {
         return issueRepository.findAll();
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/issues", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/issues")
     public @ResponseBody
     Page<Issue> getAttr(
             @PathVariable(value = "owner") String owner,
@@ -73,7 +72,7 @@ public class IssueController {
                 () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), Issue.class));
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/issues/{number}", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/issues/{number}")
     public @ResponseBody
     Issue getAttr(@PathVariable(value = "owner") String owner, @PathVariable(value = "repo") String repo, @PathVariable(value = "number") String number) {
         return issueRepository.findByOwnerAndRepoAndId(owner, repo, Integer.parseInt(number));

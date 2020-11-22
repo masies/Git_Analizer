@@ -9,6 +9,8 @@ import com.group4.softwareanalytics.developer.DeveloperExpertiseRepository;
 import com.group4.softwareanalytics.developer.DeveloperPR;
 import com.group4.softwareanalytics.developer.DeveloperPRRepository;
 import com.group4.softwareanalytics.commits.*;
+import com.group4.softwareanalytics.fileContribution.FileContribution;
+import com.group4.softwareanalytics.fileContribution.FileContributionRepository;
 import com.group4.softwareanalytics.issues.IssueRepository;
 import com.group4.softwareanalytics.issues.comments.IssueComment;
 import com.group4.softwareanalytics.issues.comments.IssueCommentRepository;
@@ -25,19 +27,21 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.blame.BlameResult;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawText;
 import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -45,8 +49,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.group4.softwareanalytics.DirNav.repoContents;
+
+
 @Service
 public class AsyncService {
+
+    @Autowired
+    private FileContributionRepository fileContributionRepository;
 
     @Autowired
     private DeveloperExpertiseRepository developerExpertiseRepository;
@@ -66,12 +76,6 @@ public class AsyncService {
     @Autowired
     private CommitRepository commitRepository;
 
-    // list of developer expertise
-    private ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
-
-    // list of developer expertise
-    private ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
-
     // list of issues, retrieved in fetchIssues and used by szz
     private List<com.group4.softwareanalytics.issues.Issue> issueList = new ArrayList<>();
 
@@ -88,8 +92,6 @@ public class AsyncService {
             // clear the two lists for each new repo to mine
             fixingCommits.clear();
             issueList.clear();
-            developerPRRatesList.clear();
-            developerExpertiseList.clear();
             // clean existing data
             repoRepository.findAndRemove(owner,name);
             issueRepository.findAndRemove(owner,name);
@@ -97,16 +99,13 @@ public class AsyncService {
             commitRepository.findAndRemove(owner,name);
             developerExpertiseRepository.findAndRemove(owner,name);
             developerPRRepository.findAndRemove(owner,name);
-
-
+            fileContributionRepository.findAndRemove(owner,name);
+            
             // mining repo
             Repo repo = fetchRepo(owner,name);
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
-
-            developerExpertiseRepository.saveAll(developerExpertiseList);
-            developerPRRepository.saveAll(developerPRRatesList);
 
         } catch (Exception e){
             logger.warning(e.getMessage());
@@ -135,8 +134,9 @@ public class AsyncService {
 
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                 .collect(Collectors.toList());
-
-        logger.log(Level.ALL, "------- Found " + issues.size() + " Issues, start fetching them... -------" );
+        
+        // list of developer expertise
+        ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
 
         for (Issue issue : issues) {
             com.group4.softwareanalytics.issues.Issue i = new com.group4.softwareanalytics.issues.Issue(issue, owner, repoName, false);
@@ -144,7 +144,7 @@ public class AsyncService {
             if(issue.getHtmlUrl().contains("pull")) {
                 i.setPR(true);
                 if(issue.getState().equals("closed")) {
-                    linkIssueDev(owner, repoName ,issue.getUser().getLogin(), issue.getNumber());
+                    linkIssueDev(owner, repoName ,issue.getUser().getLogin(), issue.getNumber(), developerPRRatesList);
                 }
             }
 
@@ -160,13 +160,14 @@ public class AsyncService {
         }
 
         issueRepository.saveAll(issueList);
+        developerPRRepository.saveAll(developerPRRatesList);
 
         logger.info("------- Issues fetched successfully! -------");
         repo.hasIssuesDone();
         repoRepository.save(repo);
     }
 
-     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber){
+     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
         ProcessBuilder curlPRProcess = new ProcessBuilder(
                 "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
@@ -345,8 +346,13 @@ public class AsyncService {
         }
 
         CommitExtractor.DownloadRepo(repo_url, dest_url);
+        
+        ArrayList<FileContribution> fileContributions = computeFileContributions(owner, repoName, dest_url);
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+
+        // list of developer expertise
+        ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
 
         List<RevCommit> revCommitList;
         try (Git git = new Git(repo)) {
@@ -357,7 +363,8 @@ public class AsyncService {
             // focus on master branch
             revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
 
-            for (RevCommit revCommit : revCommitList) {
+            for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
+                RevCommit revCommit = iterator.next();
                 String developerName = revCommit.getAuthorIdent().getName();
                 String developerMail = revCommit.getAuthorIdent().getEmailAddress();
                 String encodingName = revCommit.getEncodingName();
@@ -371,6 +378,33 @@ public class AsyncService {
                 List<CommitDiff> diffEntries = new ArrayList<>();
                 ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
 
+
+
+
+                // actually first commit may be retrieved with bash command
+                // git rev-list --max-parents=0 HEAD
+                if (!iterator.hasNext()){
+                    // last commit, everything which does not have a contribution is created in here
+                    for (FileContribution file : fileContributions) {
+                        if (file.getContributionsMap().isEmpty() && file.isFile()) {
+                            file.addDeveloperContribute(revCommit.getAuthorIdent().getName());
+                        }
+                    }
+                } else {
+                    ArrayList<String> relatedFilePaths = computeRelatedFilePaths(git, revCommit.name());
+                    for (String path : relatedFilePaths) {
+                        for (FileContribution file : fileContributions) {
+                            // if is the last commit we add
+                            if (file.getPath().equals(path)) {
+                                // if it contains a dot i will mess up With MongoDB
+                                file.addDeveloperContribute(developerName.replace(".",""));
+                            }
+                        }
+                    }
+                }
+
+
+
                 ArrayList<String> commitParentsIDs = new ArrayList<>();
                 for (RevCommit parent : revCommit.getParents()) {
                     commitParentsIDs.add(parent.name());
@@ -378,7 +412,7 @@ public class AsyncService {
 
                 ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
 
-                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName);
+                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName, developerExpertiseList);
 
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
@@ -389,17 +423,66 @@ public class AsyncService {
                 }
             }
             commitRepository.saveAll(commitList);
+            developerExpertiseRepository.saveAll(developerExpertiseList);
+            fileContributionRepository.saveAll(fileContributions);
 
             logger.info("------- Commits stored successfully! -------");
 
             r.hasCommitsDone();
             repoRepository.save(r);
+
+
         } catch (Exception e){
             logger.warning(e.getMessage());
         }
     }
 
-    private void linkCommitDev(String owner, String repo, String devEmail, String commitHash) {
+
+    ArrayList<String>  computeRelatedFilePaths(Git git, String commitHashID){
+        ArrayList<String> relatedFilePaths = new ArrayList<>();
+
+        CanonicalTreeParser oldTreeIter;
+        CanonicalTreeParser newTreeIter;
+
+        try (ObjectReader reader = git.getRepository().newObjectReader()) {
+
+                oldTreeIter = new CanonicalTreeParser();
+                ObjectId oldTree = git.getRepository().resolve(commitHashID + "~1^{tree}");
+                oldTreeIter.reset(reader, oldTree);
+                newTreeIter = new CanonicalTreeParser();
+                ObjectId newTree = git.getRepository().resolve(commitHashID + "^{tree}");
+                newTreeIter.reset(reader, newTree);
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                DiffFormatter diffFormatter = new DiffFormatter(stream);
+
+                diffFormatter.setRepository(git.getRepository());
+                for (DiffEntry entry : diffFormatter.scan(oldTreeIter, newTreeIter)) {
+                    diffFormatter.format(entry);
+                    relatedFilePaths.add("/"+entry.getNewPath());
+                }
+        } catch (Exception e){
+            logger.info(e.getMessage());
+        }
+
+        return relatedFilePaths;
+    }
+    
+    ArrayList<FileContribution> computeFileContributions(String owner, String repoName, String path){
+        ArrayList<FileContribution> fileContributions = new ArrayList<>();
+
+        HashMap<String,Boolean> filesAndRepos = repoContents(path);
+        for (Map.Entry<String, Boolean> entry : filesAndRepos.entrySet()) {
+            String filePath = entry.getKey().replace("./repo/" + owner + "/"+ repoName , "");
+            Boolean fileType = entry.getValue();
+            FileContribution fileContribution = new FileContribution(owner, repoName, filePath, fileType);
+            fileContributions.add(fileContribution);
+        }
+        
+        return fileContributions;
+    }
+
+    private void linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList) {
         for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
             if (dev.getEmail().equals(devEmail)) {
                 dev.setExpertise(dev.getExpertise() + 1);

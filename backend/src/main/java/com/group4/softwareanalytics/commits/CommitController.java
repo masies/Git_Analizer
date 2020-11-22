@@ -35,7 +35,7 @@ public class CommitController {
         return commitRepository.findAll();
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/commits", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/commits")
     public @ResponseBody
     Page<Commit> getAttr(
             @PathVariable(value = "owner") String owner,
@@ -87,7 +87,7 @@ public class CommitController {
                 () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), Commit.class));
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repoName}/commits/{commitId}", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repoName}/commits/{commitId}")
     public @ResponseBody
     Commit getAttr(@PathVariable(value = "owner") String owner,
                    @PathVariable(value = "repoName") String repoName,
