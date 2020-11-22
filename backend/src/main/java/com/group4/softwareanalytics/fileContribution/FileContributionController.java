@@ -25,6 +25,15 @@ public class FileContributionController {
 //        return fileContributionRepository.findByOwnerAndRepo(owner, repo);
 //    }
 
+    @RequestMapping("/repo/{owner}/{repo}/treex/**")
+    public ArrayList<FileContribution> getAttr(@PathVariable(value="owner") String owner,
+                    @PathVariable(value="repo") String repo,
+                    HttpServletRequest request){
+        String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree/","") + "/";
+        return fileContributionRepository.findByOwnerAndRepoAndDir(owner,repo,path);
+    }
+
     @RequestMapping("/repo/{owner}/{repo}/tree/**")
     public ArrayList<FileContribution> foo(@PathVariable(value="owner") String owner,
                     @PathVariable(value="repo") String repo,
@@ -52,8 +61,6 @@ public class FileContributionController {
         }
 
         return requestedLevelContributions;
-
-
 
     }
 }

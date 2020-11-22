@@ -17,6 +17,8 @@ public class FileContribution {
     private String path;
     private Boolean file;
 
+    private String dir;
+
     // map developer (String username) to number of commits he performed on this file
     HashMap<String,Integer> contributionsMap = new HashMap<>();
 
@@ -26,6 +28,7 @@ public class FileContribution {
         this.owner = owner;
         this.repo = repo;
         this.path = path;
+        this.dir = this.path.replaceAll("/(?:.(?!/))+$", "");
         // true if file
         // false if directory
         this.file = file;
@@ -44,6 +47,14 @@ public class FileContribution {
 
         topContributor = maxEntry.getKey();
 
+    }
+
+    public String getDir() {
+        return dir;
+    }
+
+    public void setDir(String dir) {
+        this.dir = dir;
     }
 
     public String getOwner() {
