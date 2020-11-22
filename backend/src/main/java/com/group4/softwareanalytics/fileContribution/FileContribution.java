@@ -5,8 +5,16 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
 
 public class FileContribution {
+
+
+
+
     @Field("FileContribution")
     @Id
     private String id;
@@ -16,6 +24,7 @@ public class FileContribution {
 
     private String path;
     private Boolean file;
+    private String filename = "";
 
     private String dir;
 
@@ -31,6 +40,16 @@ public class FileContribution {
         this.dir = this.path.replaceAll("/(?:.(?!/))+$", "");
         if (this.dir.isEmpty()){
             this.dir = "/";
+        }
+
+        Pattern fineNamePattern = Pattern.compile("/(?:.(?!/))+$");
+        Matcher m = fineNamePattern.matcher(path);
+        while (m.find()){
+            this.filename = m.group(0).replace("/","");
+        }
+
+        if (this.filename.isEmpty()){
+            this.filename = "/";
         }
         // true if file
         // false if directory
@@ -50,6 +69,14 @@ public class FileContribution {
 
         topContributor = maxEntry.getKey();
 
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public String getDir() {

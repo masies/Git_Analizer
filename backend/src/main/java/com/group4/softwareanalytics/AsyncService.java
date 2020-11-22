@@ -404,6 +404,8 @@ public class AsyncService {
                     }
                 }
 
+
+
                 ArrayList<String> commitParentsIDs = new ArrayList<>();
                 for (RevCommit parent : revCommit.getParents()) {
                     commitParentsIDs.add(parent.name());
@@ -458,7 +460,7 @@ public class AsyncService {
                 diffFormatter.setRepository(git.getRepository());
                 for (DiffEntry entry : diffFormatter.scan(oldTreeIter, newTreeIter)) {
                     diffFormatter.format(entry);
-                    relatedFilePaths.add(entry.getNewPath());
+                    relatedFilePaths.add("/"+entry.getNewPath());
                 }
         } catch (Exception e){
             logger.info(e.getMessage());

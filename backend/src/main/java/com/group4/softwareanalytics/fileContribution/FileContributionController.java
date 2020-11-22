@@ -17,13 +17,13 @@ public class FileContributionController {
     @Autowired
     private  FileContributionRepository fileContributionRepository;
 
-//    @RequestMapping(value = "/repo/{owner}/{repo}/tree", method = {RequestMethod.GET})
-//    public @ResponseBody
-//    ArrayList<FileContribution> getAttr(
-//            @PathVariable(value="owner") String owner,
-//            @PathVariable(value="repo") String repo) {
-//        return fileContributionRepository.findByOwnerAndRepo(owner, repo);
-//    }
+    @RequestMapping(value = "/repo/{owner}/{repo}/FileContributions", method = {RequestMethod.GET})
+    public @ResponseBody
+    ArrayList<FileContribution> getAttr(
+            @PathVariable(value="owner") String owner,
+            @PathVariable(value="repo") String repo) {
+        return fileContributionRepository.findByOwnerAndRepo(owner, repo);
+    }
 
     @RequestMapping("/repo/{owner}/{repo}/tree/**")
     public ArrayList<FileContribution> getAttr(@PathVariable(value="owner") String owner,
