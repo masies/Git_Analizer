@@ -16,7 +16,7 @@ public class DeveloperExpertiseController {
     @Autowired
     private DeveloperExpertiseRepository developerExpertiseRepository;
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/developerExpertise", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/developerExpertise")
     public @ResponseBody
     Page<DeveloperExpertise> getAttr(
             @PathVariable(value="owner") String owner,
@@ -37,7 +37,7 @@ public class DeveloperExpertiseController {
         );
     }
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/developerExpertise/{mail}", method = {RequestMethod.GET})
+    @GetMapping("/repo/{owner}/{repo}/developerExpertise/{mail}")
     public @ResponseBody
     DeveloperExpertise getAttr(
             @PathVariable(value="owner") String owner,
