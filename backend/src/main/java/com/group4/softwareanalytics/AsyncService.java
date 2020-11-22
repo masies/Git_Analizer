@@ -475,7 +475,7 @@ public class AsyncService {
         
         HashMap<String,Boolean> filesAndRepos = repoContents(path);
         for (Map.Entry<String, Boolean> entry : filesAndRepos.entrySet()) {
-            String filePath = entry.getKey().replace("./repo/" + owner + "/"+ repoName +"/", "");
+            String filePath = entry.getKey().replace("./repo/" + owner + "/"+ repoName , "");
             Boolean fileType = entry.getValue();
             FileContribution fileContribution = new FileContribution(owner, repoName, filePath, fileType);
             fileContributions.add(fileContribution);

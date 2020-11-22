@@ -25,42 +25,44 @@ public class FileContributionController {
 //        return fileContributionRepository.findByOwnerAndRepo(owner, repo);
 //    }
 
-    @RequestMapping("/repo/{owner}/{repo}/treex/**")
+    @RequestMapping("/repo/{owner}/{repo}/tree/**")
     public ArrayList<FileContribution> getAttr(@PathVariable(value="owner") String owner,
                     @PathVariable(value="repo") String repo,
                     HttpServletRequest request){
         String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree/","") + "/";
+        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree","");
+        System.out.println(path);
         return fileContributionRepository.findByOwnerAndRepoAndDir(owner,repo,path);
-    }
-
-    @RequestMapping("/repo/{owner}/{repo}/tree/**")
-    public ArrayList<FileContribution> foo(@PathVariable(value="owner") String owner,
-                    @PathVariable(value="repo") String repo,
-                    HttpServletRequest request) {
-        String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree/","") + "/";
-        ArrayList<FileContribution> fileContributions = fileContributionRepository.findByOwnerAndRepo(owner,repo);
-
-        ArrayList<FileContribution> requestedLevelContributions = new ArrayList<>();
-        if (path.equals("/")){
-            for (FileContribution fileContribution: fileContributions) {
-                if (!fileContribution.getPath().contains("/")){
-                    requestedLevelContributions.add(fileContribution);
-                }
-            }
-            return requestedLevelContributions;
-        }
-
-        for (FileContribution fileContribution: fileContributions) {
-            if (fileContribution.getPath().contains(path)){
-                if (!fileContribution.getPath().replace(path,"").contains("/")){
-                    requestedLevelContributions.add(fileContribution);
-                }
-            }
-        }
-
-        return requestedLevelContributions;
 
     }
+//
+//    @RequestMapping("/repo/{owner}/{repo}/tree/**")
+//    public ArrayList<FileContribution> foo(@PathVariable(value="owner") String owner,
+//                    @PathVariable(value="repo") String repo,
+//                    HttpServletRequest request) {
+//        String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+//        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree/","") + "/";
+//        ArrayList<FileContribution> fileContributions = fileContributionRepository.findByOwnerAndRepo(owner,repo);
+//
+//        ArrayList<FileContribution> requestedLevelContributions = new ArrayList<>();
+//        if (path.equals("/")){
+//            for (FileContribution fileContribution: fileContributions) {
+//                if (!fileContribution.getPath().contains("/")){
+//                    requestedLevelContributions.add(fileContribution);
+//                }
+//            }
+//            return requestedLevelContributions;
+//        }
+//
+//        for (FileContribution fileContribution: fileContributions) {
+//            if (fileContribution.getPath().contains(path)){
+//                if (!fileContribution.getPath().replace(path,"").contains("/")){
+//                    requestedLevelContributions.add(fileContribution);
+//                }
+//            }
+//        }
+//
+//        return requestedLevelContributions;
+//
+//    }
 }

@@ -29,6 +29,9 @@ public class FileContribution {
         this.repo = repo;
         this.path = path;
         this.dir = this.path.replaceAll("/(?:.(?!/))+$", "");
+        if (this.dir.isEmpty()){
+            this.dir = "/";
+        }
         // true if file
         // false if directory
         this.file = file;
