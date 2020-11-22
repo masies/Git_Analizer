@@ -15,13 +15,13 @@
 				</div>
 			</div>
 			<div class="col-12 list-group-item" v-for="item in sortedItem">
-				<div class="row" @click="goToFolder(item)" :class="{clickable: item.type == 'folder'}">
+				<div class="row" @click="goToFolder(item)" :class="{clickable: !item.file}">
 					<div class="col-8 name">
-						<i class="material-icons mr-1">{{ getTypeIcon(item.type) }}</i>
-						<span>{{item.name}}</span>
+						<i class="material-icons mr-1">{{ getTypeIcon(item.file) }}</i>
+						<span>{{item.filename}}</span>
 					</div>
-					<div class="col-4" v-if="item.type == 'file'">
-						{{ item.top }}
+					<div class="col-4" v-if="item.file">
+						{{ item.topContributor }}
 					</div>
 				</div>
 			</div>
@@ -41,30 +41,11 @@
 		},
 		methods: {
 			loadData: function() {
-				this.data = [
-				{
-					name: "bFile.py",
-					type: "file",
-					top: "MyUser"
-				},
-				{
-					name: "bFolder",
-					type: "folder",
-					top: "MyUser"
-				},	
-				{
-					name: "aFile.py",
-					type: "file",
-					top: "MyUser"
-				},				
-				{
-					name: "aFolder",
-					type: "folder",
-					top: "MyUser"
-				}
-				]
-				return;
-				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/tree/`)
+				
+				console.log(this.$route.path);
+				var path = this.$route.params.pathMatch ;
+				path = path == "" ? "/" : path;
+				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/tree${path}`)
 				.then(response => {
 					return response.json()
 				})
@@ -76,7 +57,7 @@
 				return this.$moment(date).format("MMM DD, YYYY")
 			},
 			getTypeIcon: function(type){
-				return type == "file" ? "description" : "folder"
+				return type ? "description" : "folder" 
 			},
 			goBackFolder: function(){
 				var path = this.$route.path
@@ -84,9 +65,9 @@
 				this.$router.push({ path: path })
 			},
 			goToFolder: function(item){
-				if(item.type == "folder"){
+				if(!item.file){
 					var t = this.$route.name != "tree" ? "/tree" : ""
-					var path = this.$route.path + t + "/" + item.name
+					var path = this.$route.path + t + "/" + item.filename
 					this.$router.push({ path: path })
 				}
 			}
@@ -97,10 +78,10 @@
 			},
 			sortedItem: function(){
 				return this.data.sort((a, b) => { 
-					if(a.type == b.type){
-						return a.name.localeCompare(b.name) 
+					if(a.file == b.file){
+						return a.filename.localeCompare(b.filename) 
 					}
-					return a.type == "file" ? 1 : -1
+					return a.file ? 1 : -1
 				});
 			}
 		},
