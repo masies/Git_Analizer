@@ -42,9 +42,8 @@
 		methods: {
 			loadData: function() {
 				
-				console.log(this.$route.path);
-				var path = this.$route.params.pathMatch ;
-				path = path == "" ? "/" : path;
+				var path = this.$route.params.pathMatch;
+				path = path == "" || path == undefined ? "/" : path;
 				fetch(`/api/repo/${this.$route.params.owner}/${this.$route.params.name}/tree${path}`)
 				.then(response => {
 					return response.json()
