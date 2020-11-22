@@ -17,13 +17,13 @@ public class FileContributionController {
     @Autowired
     private  FileContributionRepository fileContributionRepository;
 
-    @RequestMapping(value = "/repo/{owner}/{repo}/tree", method = {RequestMethod.GET})
-    public @ResponseBody
-    ArrayList<FileContribution> getAttr(
-            @PathVariable(value="owner") String owner,
-            @PathVariable(value="repo") String repo) {
-        return fileContributionRepository.findByOwnerAndRepo(owner, repo);
-    }
+//    @RequestMapping(value = "/repo/{owner}/{repo}/tree", method = {RequestMethod.GET})
+//    public @ResponseBody
+//    ArrayList<FileContribution> getAttr(
+//            @PathVariable(value="owner") String owner,
+//            @PathVariable(value="repo") String repo) {
+//        return fileContributionRepository.findByOwnerAndRepo(owner, repo);
+//    }
 
     @RequestMapping("/repo/{owner}/{repo}/tree/**")
     public ArrayList<FileContribution> foo(@PathVariable(value="owner") String owner,
@@ -34,11 +34,18 @@ public class FileContributionController {
         ArrayList<FileContribution> fileContributions = fileContributionRepository.findByOwnerAndRepo(owner,repo);
 
         ArrayList<FileContribution> requestedLevelContributions = new ArrayList<>();
+        if (path.equals("/")){
+            for (FileContribution fileContribution: fileContributions) {
+                if (!fileContribution.getPath().contains("/")){
+                    requestedLevelContributions.add(fileContribution);
+                }
+            }
+            return requestedLevelContributions;
+        }
 
         for (FileContribution fileContribution: fileContributions) {
             if (fileContribution.getPath().contains(path)){
                 if (!fileContribution.getPath().replace(path,"").contains("/")){
-                    System.out.println(fileContribution.getPath().replace(path,""));
                     requestedLevelContributions.add(fileContribution);
                 }
             }
