@@ -167,7 +167,7 @@ public class AsyncService {
         repoRepository.save(repo);
     }
 
-     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
+    private void linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
         ProcessBuilder curlPRProcess = new ProcessBuilder(
                 "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
@@ -387,7 +387,7 @@ public class AsyncService {
                     // last commit, everything which does not have a contribution is created in here
                     for (FileContribution file : fileContributions) {
                         if (file.getContributionsMap().isEmpty() && file.isFile()) {
-                            file.addDeveloperContribute(revCommit.getAuthorIdent().getName());
+                            file.addDeveloperContribute(developerName.replace(".",""));
                         }
                     }
                 } else {
@@ -437,8 +437,7 @@ public class AsyncService {
         }
     }
 
-
-    ArrayList<String>  computeRelatedFilePaths(Git git, String commitHashID){
+    public ArrayList<String> computeRelatedFilePaths(Git git, String commitHashID){
         ArrayList<String> relatedFilePaths = new ArrayList<>();
 
         CanonicalTreeParser oldTreeIter;
@@ -468,7 +467,7 @@ public class AsyncService {
         return relatedFilePaths;
     }
     
-    ArrayList<FileContribution> computeFileContributions(String owner, String repoName, String path){
+    public ArrayList<FileContribution> computeFileContributions(String owner, String repoName, String path){
         ArrayList<FileContribution> fileContributions = new ArrayList<>();
 
         HashMap<String,Boolean> filesAndRepos = repoContents(path);
