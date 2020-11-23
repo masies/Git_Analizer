@@ -63,9 +63,9 @@ public class FileContrTest {
         Path file = Paths.get("./repo/" + owner +"/" + name  +"/test-file.txt");
         Files.write(file, lines, StandardCharsets.UTF_8);
 
-        fileContributions = asyncService.computeFileContributions(owner,name,dest_url);
+        ArrayList<FileContribution> newFileContributions = asyncService.computeFileContributions(owner,name,dest_url);
 
-        assertEquals(fileContributions.size(), 19);
+        assertTrue(newFileContributions.size() > fileContributions.size());
 
         deleteDir();
     }
