@@ -13,7 +13,7 @@ import java.util.List;
 public interface FileContributionRepository extends MongoRepository<FileContribution,String> {
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public List<FileContribution> findAndRemove(String owner, String repo);
+    public void findAndRemove(String owner, String repo);
 
     @Query("{'owner' : ?0 , 'repo' : ?1}")
     ArrayList<FileContribution> findByOwnerAndRepo(String owner, String repo);

@@ -79,7 +79,7 @@ public class FileContrTest {
 
         asyncService.fetchCommits("HouariZegai","Calculator",r);
 
-        List<FileContribution> files = fileContributionRepository.findAndRemove(owner,name);
+        List<FileContribution> files = fileContributionRepository.findByOwnerAndRepo(owner,name);
 
         FileContribution tarFile = null;
 
