@@ -10,32 +10,18 @@ import com.group4.softwareanalytics.metrics.ProjectMetricExtractor;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import javax.json.*;
 import java.io.IOException;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,8 +55,6 @@ public class MetricsTest {
 
         Commit targetCommit = commits.get(0);
 
-        System.out.println(targetCommit.getCommitName());
-
         assertEquals(1, targetCommit.getCommitParentsIDs().size());
 
         assertNotNull(targetCommit);
@@ -79,16 +63,20 @@ public class MetricsTest {
 
         assertNotNull(metrics);
 
+        targetCommit.setProjectMetrics(metrics);
+
+        ProjectMetric targetCommitMetrics = targetCommit.getProjectMetrics();
 //        //Parent Metrics Check
-//        assertEquals(metrics.getParentCBO(),2);
-//        assertEquals(metrics.getParentWMC(),73);
-//        assertEquals(metrics.getParentLCOM(),3);
-//
-//
+        assertEquals(metrics.getParentLOC(),targetCommitMetrics.getParentLOC());
+        assertEquals(metrics.getParentCBO(),targetCommitMetrics.getParentCBO());
+        assertEquals(metrics.getParentWMC(),targetCommitMetrics.getParentWMC());
+        assertEquals(metrics.getParentLCOM(),targetCommitMetrics.getParentLCOM());
+
 //        //Self Metrics Check
-//        assertEquals(metrics.getCBO(),2);
-//        assertEquals(metrics.getWMC(),73);
-//        assertEquals(metrics.getLCOM(),3);
+        assertEquals(metrics.getLOC(),targetCommitMetrics.getParentLOC());
+        assertEquals(metrics.getCBO(),targetCommitMetrics.getCBO());
+        assertEquals(metrics.getWMC(),targetCommitMetrics.getWMC());
+        assertEquals(metrics.getLCOM(),targetCommitMetrics.getLCOM());
 
         for (Method m : metrics.getClass().getMethods()) {
             if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {

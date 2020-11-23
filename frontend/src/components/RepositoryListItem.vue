@@ -11,7 +11,7 @@
 				{{ repository.language }}
 			</h6>
 			<div class="row">
-				<div class="col-2 text-center">
+				<div class="col text-center">
 					<a :href="repository.htmlUrl" target="_blank">
 						<img src="/images/GitHub-Mark-32px.png" style="width: 16px;">
 					</a>
@@ -25,12 +25,19 @@
 					{{ repository.forks }}
 				</div>
 			</div>
-				<hr>
+			<hr>
 
 			<p class="card-text">
 				{{ repository.description }}
 			</p>
-			<button class="btn btn-primary btn-sm" @click="updateRepository" :disabled="showStatusBar">Update</button>
+			<div class="row">
+				<div class="col-12 text-center">
+					<button class="btn btn-primary btn-sm" @click="updateRepository" :disabled="showStatusBar">
+						<i class="material-icons align-middle md-18">cached</i>
+					</button>
+				</div>
+			</div>
+			
 			<status-bar :owner="repository.owner.login" :name="repository.name" v-if="showStatusBar" class="mt-2"/>
 		</div>
 	</div>
