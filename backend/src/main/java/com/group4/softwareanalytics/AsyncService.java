@@ -387,6 +387,7 @@ public class AsyncService {
                     // last commit, everything which does not have a contribution is created in here
                     for (FileContribution file : fileContributions) {
                         if (file.getContributionsMap().isEmpty() && file.isFile()) {
+                            // if it contains a dot it will mess up With MongoDB, so we remove it
                             file.addDeveloperContribute(developerName.replace(".",""));
                         }
                     }
@@ -394,9 +395,9 @@ public class AsyncService {
                     ArrayList<String> relatedFilePaths = computeRelatedFilePaths(git, revCommit.name());
                     for (String path : relatedFilePaths) {
                         for (FileContribution file : fileContributions) {
-                            // if is the last commit we add
+                            // if is the last commit we add all the files that have no contribution (initial commit)
                             if (file.getPath().equals(path)) {
-                                // if it contains a dot i will mess up With MongoDB
+                                // if it contains a dot it will mess up With MongoDB, so we remove it
                                 file.addDeveloperContribute(developerName.replace(".",""));
                             }
                         }
