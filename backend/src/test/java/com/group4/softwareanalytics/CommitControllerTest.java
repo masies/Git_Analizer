@@ -4,8 +4,11 @@ import com.group4.softwareanalytics.commits.Commit;
 import com.group4.softwareanalytics.commits.CommitController;
 import com.group4.softwareanalytics.commits.CommitExtractor;
 import com.group4.softwareanalytics.commits.CommitRepository;
+import com.group4.softwareanalytics.developer.DeveloperExpertise;
+import com.group4.softwareanalytics.developer.DeveloperExpertiseRepository;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -22,6 +25,7 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.json.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -47,14 +51,17 @@ class CommitControllerTest {
     @Autowired
     private CommitRepository commitRepository;
     @Autowired
+    private DeveloperExpertiseRepository developerExpertiseRepository;
+    @Autowired
     private RepoRepository repoRepository;
     @Autowired
     private CommitController commitController;
 
 
+
+
     @Test
     void testFetchCommits() throws IOException, GitAPIException, InterruptedException, InvocationTargetException, IllegalAccessException {
-
         String owner = "HouariZegai";
         String name = "Calculator";
 
@@ -64,10 +71,20 @@ class CommitControllerTest {
 
         List<Commit> commits = commitRepository.findAndRemove(owner,name);
 
+        List<DeveloperExpertise> devExps = developerExpertiseRepository.findByOwnerAndRepoArr(owner,name);
+
         repoRepository.findAndRemove(owner,name);
         commitRepository.findAndRemove(owner,name);
+        developerExpertiseRepository.findAndRemove(owner,name);
+
+
+        File dir = new File("./repo/" +  owner);
+        if (dir.exists()) {
+            FileUtils.deleteDirectory(dir);
+        }
 
         assertNotNull(commits);
+        assertNotNull(devExps);
 
         List<String> nullFields = Arrays.asList("getEncodingName","getBugInducingCommits","getLinkedFixedIssues");
 
@@ -83,6 +100,15 @@ class CommitControllerTest {
                 }
             }
         }
+
+        for(DeveloperExpertise dev: devExps)
+        {
+            assertNotNull(dev.getEmail());
+            assertNotNull(dev.getExpertise());
+            assertNotNull(dev.getOwner());
+            assertNotNull(dev.getRepo());
+        }
+
     }
     @Test
     void testDuplicateCommits() throws Exception {
