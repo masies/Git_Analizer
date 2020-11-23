@@ -3,6 +3,7 @@ package com.group4.softwareanalytics;
 
 import com.group4.softwareanalytics.commits.Commit;
 import com.group4.softwareanalytics.commits.CommitController;
+import com.group4.softwareanalytics.commits.CommitExtractor;
 import com.group4.softwareanalytics.commits.CommitRepository;
 import com.group4.softwareanalytics.fileContribution.FileContribution;
 import com.group4.softwareanalytics.fileContribution.FileContributionRepository;
@@ -15,7 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest
@@ -30,10 +40,38 @@ public class FileContrTest {
     @Autowired
     private FileContributionRepository fileContributionRepository;
 
+    @Test
+    void repoFilesContentTest() throws IOException {
+        String owner = "HouariZegai";
+        String name = "Calculator";
 
+        String repo_url = "https://github.com/" + owner + "/" + name;
+        String dest_url = "./repo/" + owner + "/" + name;
+
+
+        deleteDir();
+
+        CommitExtractor.DownloadRepo(repo_url, dest_url);
+
+        ArrayList<FileContribution> fileContributions = asyncService.computeFileContributions(owner,name,dest_url);
+
+        assertNotNull(fileContributions);
+
+        assertEquals(fileContributions.size(), 18);
+
+        List<String> lines = Arrays.asList("This is just a test");
+        Path file = Paths.get("./repo/" + owner +"/" + name  +"/test-file.txt");
+        Files.write(file, lines, StandardCharsets.UTF_8);
+
+        fileContributions = asyncService.computeFileContributions(owner,name,dest_url);
+
+        assertEquals(fileContributions.size(), 19);
+
+        deleteDir();
+    }
 
     @Test
-    void FileRepoTest() throws IOException {
+    void FileRepoTest() throws IOException, InvocationTargetException, IllegalAccessException {
         String owner = "HouariZegai";
         String name = "Calculator";
 
@@ -41,8 +79,15 @@ public class FileContrTest {
 
         asyncService.fetchCommits("HouariZegai","Calculator",r);
 
-        List<Commit> commits = commitRepository.findAndRemove(owner,name);
         List<FileContribution> files = fileContributionRepository.findAndRemove(owner,name);
+
+        FileContribution tarFile = null;
+
+        for(FileContribution file: files)
+        {
+            if(file.getPath().equals("/src/com/houarizegai/calculator/Calculator.java"))
+                tarFile = file;
+        }
 
         assertTrue(files.size() > 1);
 
@@ -52,9 +97,22 @@ public class FileContrTest {
         }
         repoRepository.findAndRemove(owner,name);
         commitRepository.findAndRemove(owner,name);
+
+        for (Method m : tarFile.getClass().getMethods()) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
+                final Object met = m.invoke(tarFile);
+                System.out.println(met);
+                assertNotNull(met);
+            }
+        }
     }
 
-
+    public void deleteDir() throws IOException {
+        File dir = new File("./repo/" +  "HouariZegai");
+        if (dir.exists()) {
+            FileUtils.deleteDirectory(dir);
+        }
+    }
 
 
 
