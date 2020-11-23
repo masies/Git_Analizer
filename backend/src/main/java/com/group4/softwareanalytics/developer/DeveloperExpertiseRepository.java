@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.util.List;
+
 @RepositoryRestResource(collectionResourceRel = "developerExpertise", path = "developerExpertise")
 public interface DeveloperExpertiseRepository extends MongoRepository<DeveloperExpertise,String> {
 
@@ -13,7 +15,7 @@ public interface DeveloperExpertiseRepository extends MongoRepository<DeveloperE
     Page<DeveloperExpertise> findByOwnerAndRepo(String owner, String repo, Pageable pageable);
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public void findAndRemove (String owner, String repo);
+    public List<DeveloperExpertise> findAndRemove (String owner, String repo);
 
     @Query("{'owner' : ?0 , 'repo' : ?1, 'email': {$regex: ?2 }}")
     Page<DeveloperExpertise> findByQuery(String owner, String repo, String query, Pageable p);

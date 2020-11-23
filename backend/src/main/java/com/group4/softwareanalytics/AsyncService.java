@@ -167,7 +167,7 @@ public class AsyncService {
         repoRepository.save(repo);
     }
 
-     private void linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
+     public DeveloperPR linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
         ProcessBuilder curlPRProcess = new ProcessBuilder(
                 "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
@@ -175,7 +175,7 @@ public class AsyncService {
         JsonObject jsonPR = curlRequest(curlPRProcess);
 
         if (jsonPR == null){
-            return;
+            return null;
         }
 
         String merged = jsonPR.get("merged").toString();
@@ -215,7 +215,7 @@ public class AsyncService {
                     reviewerFound = true;
                 }
                 if(userFound && reviewerFound){
-                    return;
+                    return dev;
                 }
             }
 
@@ -229,7 +229,7 @@ public class AsyncService {
                     newDev.addPROpened(PRnumber);
                     newDev.addPRreviewed(PRnumber);
                     developerPRRatesList.add(newDev);
-                    return;
+                    return newDev;
                 }
             }
 
@@ -260,7 +260,7 @@ public class AsyncService {
             JsonObject jsonIssue = curlRequest(curlIssueProcess);
 
             if (jsonIssue == null){
-                return;
+                return null;
             }
 
             String closedBy = jsonIssue.getAsJsonObject("closed_by").get("login").toString().replaceAll("\"", "");
@@ -282,7 +282,7 @@ public class AsyncService {
                     reviewerFound = true;
                 }
                 if(userFound && reviewerFound){
-                    return;
+                    return dev;
                 }
             }
 
@@ -294,7 +294,7 @@ public class AsyncService {
                     newDev.addPROpened(PRnumber);
                     newDev.addPRreviewed(PRnumber);
                     developerPRRatesList.add(newDev);
-                    return;
+                    return newDev;
                 }
             }
 
@@ -312,7 +312,7 @@ public class AsyncService {
                 developerPRRatesList.add(newDev);
             }
         }
-
+        return null;
     }
 
     private JsonObject curlRequest(ProcessBuilder pb){
@@ -482,18 +482,19 @@ public class AsyncService {
         return fileContributions;
     }
 
-    private void linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList) {
+    public DeveloperExpertise linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList) {
         for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
             if (dev.getEmail().equals(devEmail)) {
                 dev.setExpertise(dev.getExpertise() + 1);
                 dev.addCommitHash(commitHash);
-                return;
+                return dev;
             }
         }
 
         DeveloperExpertise newDev = new DeveloperExpertise(owner, repo,1, devEmail);
         newDev.addCommitHash(commitHash);
         developerExpertiseList.add(newDev);
+        return newDev;
     }
 
     private ArrayList<Integer> fixedIssuesRelated(RevCommit commit) {

@@ -7,12 +7,13 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RepositoryRestResource(collectionResourceRel = "FileContribution", path = "FileContribution")
 public interface FileContributionRepository extends MongoRepository<FileContribution,String> {
 
     @Query(value="{'owner' : ?0 , 'repo' : ?1}", delete = true)
-    public void findAndRemove(String owner, String repo);
+    public List<FileContribution> findAndRemove(String owner, String repo);
 
     @Query("{'owner' : ?0 , 'repo' : ?1}")
     ArrayList<FileContribution> findByOwnerAndRepo(String owner, String repo);
