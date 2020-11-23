@@ -71,7 +71,7 @@ class CommitControllerTest {
 
         List<Commit> commits = commitRepository.findAndRemove(owner,name);
 
-        List<DeveloperExpertise> devExps = developerExpertiseRepository.findAndRemove(owner,name);
+        List<DeveloperExpertise> devExps = developerExpertiseRepository.findByOwnerAndRepoArr(owner,name);
 
         repoRepository.findAndRemove(owner,name);
         commitRepository.findAndRemove(owner,name);
