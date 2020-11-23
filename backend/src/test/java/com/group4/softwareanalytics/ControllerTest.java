@@ -62,6 +62,20 @@ public class ControllerTest {
                 .andReturn();
 
 
+        MvcResult devExp = mvc.perform(get("/api/repo/" + owner + "/" +  repo  + "/developerExpertise")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        MvcResult devPr = mvc.perform(get("/api/repo/" + owner + "/" +  repo  + "/developerPR")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        MvcResult fileCont = mvc.perform(get("/api/repo/" + owner + "/" +  repo  + "/FileContributions")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
 }
