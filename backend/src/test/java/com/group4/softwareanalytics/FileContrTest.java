@@ -57,7 +57,7 @@ public class FileContrTest {
 
         assertNotNull(fileContributions);
 
-        assertEquals(fileContributions.size(), 18);
+        assertTrue(fileContributions.size()>=18);
 
         List<String> lines = Arrays.asList("This is just a test");
         Path file = Paths.get("./repo/" + owner +"/" + name  +"/test-file.txt");
@@ -113,7 +113,5 @@ public class FileContrTest {
             FileUtils.deleteDirectory(dir);
         }
     }
-
-
 
 }
