@@ -108,8 +108,6 @@ public class CommitController {
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
             Git git = new Git(repo);
 
-            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitID, dest_url, parentCommitIDs);
-            commit.setModifications(diffEntries);
             commitRepository.save(commit);
 
         }
