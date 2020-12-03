@@ -1,11 +1,16 @@
 package com.group4.softwareanalytics;
 
+import java.util.HashSet;
+
 public class CommitEntry {
     private int addedFileCount = 0;
     private int modifiedFileCount = 0;
     private int deleteFileCount = 0;
     private int addedLinesCount = 0;
     private int deletedLinesCount = 0;
+    private String commitHash;
+    private String developerMail;
+    private boolean isBuggy = false;
 
 //    The absolute experience of the developer authoring the commit computed at the commit’s date (1 pre- dictor variable);
     private int developerAbsoluteExperience = 0;
@@ -17,7 +22,7 @@ public class CommitEntry {
 
 //     The ratio of buggy commits authored by the developer in the past,
 //     e.g.,if she committed 4 times, and 1 of these commits was buggy, this variable is equal 0.25 (1 predictor variable).
-    private int developerBuggyCommitsRatio = 0;
+    private float developerBuggyCommitsRatio = 0;
 
 //    The number of commits performed in the previous month by the developer authoring the commit (1 predictor variable).
     private int developerTotalCommitsLastMont = 0;
@@ -32,6 +37,30 @@ public class CommitEntry {
         this.developerAverageExperience = developerAverageExperience;
         this.developerBuggyCommitsRatio = developerBuggyCommitsRatio;
         this.developerTotalCommitsLastMont = developerTotalCommitsLastMont;
+    }
+
+    public boolean isBuggy() {
+        return isBuggy;
+    }
+
+    public void setBuggy(boolean buggy) {
+        isBuggy = buggy;
+    }
+
+    public String getCommitHash() {
+        return commitHash;
+    }
+
+    public void setCommitHash(String commitHash) {
+        this.commitHash = commitHash;
+    }
+
+    public String getDeveloperMail() {
+        return developerMail;
+    }
+
+    public void setDeveloperMail(String developerMail) {
+        this.developerMail = developerMail;
     }
 
     public int getAddedFileCount() {
@@ -90,11 +119,11 @@ public class CommitEntry {
         this.developerAverageExperience = developerAverageExperience;
     }
 
-    public int getDeveloperBuggyCommitsRatio() {
+    public float getDeveloperBuggyCommitsRatio() {
         return developerBuggyCommitsRatio;
     }
 
-    public void setDeveloperBuggyCommitsRatio(int developerBuggyCommitsRatio) {
+    public void setDeveloperBuggyCommitsRatio(float developerBuggyCommitsRatio) {
         this.developerBuggyCommitsRatio = developerBuggyCommitsRatio;
     }
 
@@ -105,4 +134,5 @@ public class CommitEntry {
     public void setDeveloperTotalCommitsLastMont(int developerTotalCommitsLastMont) {
         this.developerTotalCommitsLastMont = developerTotalCommitsLastMont;
     }
+
 }

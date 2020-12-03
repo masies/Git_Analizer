@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -61,7 +62,7 @@ public class DevLinkTest {
 
         ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
 
-        DeveloperExpertise actualDexExpr = asyncService.linkCommitDev(owner,name,email,commitHash, developerExpertiseList, new CommitEntry(0,0,0,0,0,0,0,0,0));
+        DeveloperExpertise actualDexExpr = asyncService.linkCommitDev(owner,name,email,commitHash, developerExpertiseList, new CommitEntry(0,0,0,0,0,0,0,0,0), new Date());
 
         DeveloperExpertise expectedDevExpr = new DeveloperExpertise(owner,name,1,email);
 
@@ -77,7 +78,7 @@ public class DevLinkTest {
 
         String newCommitHash = "123";
 
-        DeveloperExpertise oldDexExpr = asyncService.linkCommitDev(owner,name,email,newCommitHash, developerExpertiseList, new CommitEntry(0,0,0,0,0,0,0,0,0));
+        DeveloperExpertise oldDexExpr = asyncService.linkCommitDev(owner,name,email,newCommitHash, developerExpertiseList, new CommitEntry(0,0,0,0,0,0,0,0,0), new Date());
 
 
         assertTrue(oldDexExpr.getExpertise() == 2);

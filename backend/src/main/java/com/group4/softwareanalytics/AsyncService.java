@@ -108,6 +108,9 @@ public class AsyncService {
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
 
+            traingSetBuilder.computeFinalMetrics();
+            traingSetBuilder.resume();
+
         } catch (Exception e){
             logger.warning(e.getMessage());
         }
@@ -385,9 +388,11 @@ public class AsyncService {
                 String shortMessage = revCommit.getShortMessage();
                 String commitName = revCommit.getName();
                 int commitType = revCommit.getType();
-
                 long millis = revCommit.getCommitTime();
                 Date date = new Date(millis * 1000);
+
+                commitEntry.setCommitHash(commitName);
+                commitEntry.setDeveloperMail(developerMail);
 
                 ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -417,7 +422,7 @@ public class AsyncService {
 
                 ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
 
-                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName, developerExpertiseList, commitEntry);
+                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName, developerExpertiseList, commitEntry, date);
 
 
                 // routine to retrieve the number of inserted and deleted lines; building the training set
@@ -471,8 +476,6 @@ public class AsyncService {
             commitRepository.saveAll(commitList);
             developerExpertiseRepository.saveAll(developerExpertiseList);
             fileContributionRepository.saveAll(fileContributions);
-
-            traingSetBuilder.resume();
 
 
             logger.info("------- Commits stored successfully! -------");
@@ -544,12 +547,15 @@ public class AsyncService {
         return fileContributions;
     }
 
-    public DeveloperExpertise linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList, CommitEntry commitEntry) {
+    public DeveloperExpertise linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList, CommitEntry commitEntry, Date commitDate) {
         for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
             if (dev.getEmail().equals(devEmail)) {
                 dev.setExpertise(dev.getExpertise() + 1);
                 dev.addCommitHash(commitHash);
+                dev.addCommitDate(commitDate);
+
                 commitEntry.setDeveloperAbsoluteExperience(dev.getExpertise());
+                commitEntry.setDeveloperTotalCommitsLastMont(dev.computeMonthExpertise(commitDate));
                 return dev;
             }
         }
@@ -685,12 +691,18 @@ public class AsyncService {
                 }
             }
 
+
+
             HashSet<CommitGeneralInfo> bugInducingCommitsSet= new HashSet<>();
+
 
             for (String bugInducingCommitId: bugInducingCommitsHashSet) {
                 Commit bugInducingCommit = commitRepository.findByOwnerAndRepoAndCommitName(owner,repoName,bugInducingCommitId);
 
                 bugInducingCommit.setBugInducing(true);
+
+                traingSetBuilder.setBuggyCommit(bugInducingCommit.getCommitName());
+
                 CommitGeneralInfo info = new CommitGeneralInfo(commit.getCommitName(), commit.getDeveloperName(), commit.getCommitDate());
                 bugInducingCommit.addBugFixingCommit(info);
                 commitRepository.save(bugInducingCommit);
@@ -707,6 +719,7 @@ public class AsyncService {
             commitRepository.save(commit);
 
         }
+
         logger.info("------- SZZ completed. -------");
     }
 }
