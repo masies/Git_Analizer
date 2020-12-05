@@ -20,6 +20,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.evaluation.output.prediction.PlainText;
+import weka.classifiers.meta.ThresholdSelector;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -81,62 +82,123 @@ public class Predictor {
 //    }
 
 
-    public static void EvaluateAndTrain(String trainingFilePath, String predictFilePath) {
+    public static void Evaluate(Instances dataset) throws Exception {
+
         ArrayList<String> categories = new ArrayList<String>();
         categories.add("true");
         categories.add("false");
         String toPredictName = "buggy";
 
-        int seed = 444;
+        Instances balancedTrainingFilePath = balanceTrainingSetWithSMOTE(dataset, toPredictName, categories);
+        if(balancedTrainingFilePath == null)
+            balancedTrainingFilePath = dataset;
 
-        try {
-            String balancedTrainingFilePath = balanceTrainingSetWithSMOTE(trainingFilePath, toPredictName, categories);
-            if(balancedTrainingFilePath == null)
-                balancedTrainingFilePath = trainingFilePath;
+        Instances data =  balancedTrainingFilePath;
+        AbstractClassifier classifier = buildRandomForestClassifier(data, toPredictName);
+        int seed = 1;
+        int folds = 10;
 
-            RandomForest evalclassifier = new RandomForest();
-            String options = ("-I 100");
-            String[] optionsArray = options.split(" ");
-            evalclassifier.setOptions(optionsArray);
+        int runs = 10;
+        for (int i = 0; i < runs; i++) {
+            seed = i + 1;
+            Random rand = new Random(seed);
+            Instances randData = new Instances(data);
+            randData.randomize(rand);
 
-            FileReader frTrain = new FileReader(balancedTrainingFilePath);
+            for (int n = 0; n < folds; n++) {
+                Instances train = randData.trainCV(folds, n, rand);
+                Instances test = randData.testCV(folds, n);
 
-            Instances originalTrain = new Instances(frTrain);
+                ThresholdSelector ts = new ThresholdSelector();
+                ts.setClassifier(classifier);
+                ts.buildClassifier(train);
+                ts.setManualThresholdValue(0.7);
 
-            originalTrain.setClass(originalTrain.attribute(toPredictName));
-
-            Evaluation eval = new Evaluation(originalTrain);
-
-            List<Double> preEval = new ArrayList<>();
-
-            System.out.println("Evaluating the Classifier.");
-            int runs = 10;
-            for (int i = 0; i < runs; i++) {
-                seed = i + 1;
-                eval.crossValidateModel(evalclassifier, originalTrain, 10, new Random(seed));
-                preEval.add(eval.pctCorrect());
-                System.out.println("Estimated Accuracy of iteration nb " + i +": "+Double.toString(eval.pctCorrect()));
+                Evaluation results = runOnTestSet(classifier, test, toPredictName);
             }
-
-            Double total = .0;
-            for(Double ev: preEval)
-            {
-                total +=ev;
-            }
-
-            System.out.println("Overall Evaluation:" +  total/10);
-
-            AbstractClassifier classifier = buildRandomForestClassifier(evalclassifier, balancedTrainingFilePath, toPredictName);
-
-            Evaluation results = runOnTestSet(classifier, predictFilePath, toPredictName);
-
-            printResults(results);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
+
+    public static void Predict(Instances dataset, Instances predictionSet) throws Exception {
+
+        ArrayList<String> categories = new ArrayList<String>();
+        categories.add("true");
+        categories.add("false");
+        String toPredictName = "buggy";
+
+        Instances balancedTrainingFilePath = balanceTrainingSetWithSMOTE(dataset, toPredictName, categories);
+        if(balancedTrainingFilePath == null)
+            balancedTrainingFilePath = dataset;
+
+        Instances data =  balancedTrainingFilePath;
+        AbstractClassifier classifier = buildRandomForestClassifier(data, toPredictName);
+
+        ThresholdSelector ts = new ThresholdSelector();
+        ts.setClassifier(classifier);
+        ts.buildClassifier(data);
+        ts.setManualThresholdValue(0.7);
+
+        Evaluation results = runOnTestSet(classifier, predictionSet, toPredictName);
+
+        printResults(results);
+    }
+
+//    public static void EvaluateAndTrain(String trainingFilePath, String predictFilePath) {
+//        ArrayList<String> categories = new ArrayList<String>();
+//        categories.add("true");
+//        categories.add("false");
+//        String toPredictName = "buggy";
+//
+//        int seed = 444;
+//
+//        try {
+//            String balancedTrainingFilePath = balanceTrainingSetWithSMOTE(trainingFilePath, toPredictName, categories);
+//            if(balancedTrainingFilePath == null)
+//                balancedTrainingFilePath = trainingFilePath;
+//
+//            RandomForest evalclassifier = new RandomForest();
+//            String options = ("-I 100");
+//            String[] optionsArray = options.split(" ");
+//            evalclassifier.setOptions(optionsArray);
+//
+//            FileReader frTrain = new FileReader(balancedTrainingFilePath);
+//
+//            Instances originalTrain = new Instances(frTrain);
+//
+//            originalTrain.setClass(originalTrain.attribute(toPredictName));
+//
+//            Evaluation eval = new Evaluation(originalTrain);
+//
+//            List<Double> preEval = new ArrayList<>();
+//
+//            System.out.println("Evaluating the Classifier.");
+//            int runs = 10;
+//            for (int i = 0; i < runs; i++) {
+//                seed = i + 1;
+//                eval.crossValidateModel(evalclassifier, originalTrain, 10, new Random(seed));
+//                preEval.add(eval.pctCorrect());
+//                System.out.println("Estimated Accuracy of iteration nb " + i +": "+Double.toString(eval.pctCorrect()));
+//            }
+//
+//            Double total = .0;
+//            for(Double ev: preEval)
+//            {
+//                total +=ev;
+//            }
+//
+//            System.out.println("Overall Evaluation:" +  total/10);
+//
+//            AbstractClassifier classifier = buildRandomForestClassifier(balancedTrainingFilePath, toPredictName);
+//
+//            Evaluation results = runOnTestSet(classifier, predictFilePath, toPredictName);
+//
+//            printResults(results);
+//
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     private static void printResults(Evaluation results)
@@ -169,24 +231,24 @@ public class Predictor {
         System.out.println("Clean: " + predictedAsClean);
 
     }
-    private static RandomForest buildRandomForestClassifier(RandomForest classifier, String trainingFilePath, String toPredictName) throws Exception{
+    private static RandomForest buildRandomForestClassifier(Instances instances, String toPredictName) throws Exception{
 
-        FileReader frTraining = new FileReader(trainingFilePath);
-        Instances ts = new Instances(frTraining);
+
+        RandomForest classifier = new RandomForest();
 
         String options = ("-I 100");
         String[] optionsArray = options.split(" ");
         classifier.setOptions(optionsArray);
-        ts.setClass(ts.attribute(toPredictName));
-        classifier.buildClassifier(ts);
+        instances.setClass(instances.attribute(toPredictName));
+        classifier.buildClassifier(instances);
         return classifier;
     }
 
 
-    public static String balanceTrainingSetWithSMOTE(String trainingFilePath, String toPredictName, ArrayList<String> categories) throws Exception{
+    public static Instances balanceTrainingSetWithSMOTE(Instances instances, String toPredictName, ArrayList<String> categories) throws Exception{
 
-        FileReader frTraining = new FileReader(trainingFilePath);
-        Instances instances = new Instances(frTraining);
+//        FileReader frTraining = new FileReader(trainingFilePath);
+//        Instances instances = new Instances(frTraining);
         instances.setClass(instances.attribute(toPredictName));
 
         ArrayList<Integer> percentages = getPercentageOfArtificialInstancesNeeded(instances, categories);
@@ -206,13 +268,13 @@ public class Predictor {
 
         }
 
-        ArffSaver saver = new ArffSaver();
-        saver.setInstances(instances);
-        File outputFile = new File(trainingFilePath.replace(".arff", "_balanced.arff"));
-        saver.setFile(outputFile);
-        saver.writeBatch();
+//        ArffSaver saver = new ArffSaver();
+//        saver.setInstances(instances);
+//        File outputFile = new File(trainingFilePath.replace(".arff", "_balanced.arff"));
+//        saver.setFile(outputFile);
+//        saver.writeBatch();
 
-        return outputFile.getAbsolutePath();
+        return instances;
 
     }
 
@@ -254,18 +316,16 @@ public class Predictor {
         return result;
     }
 
-    private static Evaluation runOnTestSet(Classifier classifier, String testFilePath, String toPredict) throws Exception{
+    private static Evaluation runOnTestSet(Classifier classifier, Instances testInstances, String toPredict) throws Exception{
 
-        FileReader frTest = new FileReader(testFilePath);
-        Instances test = new Instances(frTest);
-        test.setClass(test.attribute(toPredict));
+        testInstances.setClass(testInstances.attribute(toPredict));
 
         StringBuffer predsBuffer = new StringBuffer();
         PlainText pt = new PlainText();
         pt.setBuffer(predsBuffer);
-        pt.setHeader(test);
-        Evaluation eval = new Evaluation(test);
-        eval.evaluateModel(classifier, test, pt);
+        pt.setHeader(testInstances);
+        Evaluation eval = new Evaluation(testInstances);
+        eval.evaluateModel(classifier, testInstances, pt);
 
         return eval;
     }
