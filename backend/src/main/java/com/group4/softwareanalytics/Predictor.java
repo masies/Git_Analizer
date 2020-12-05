@@ -13,12 +13,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import com.group4.softwareanalytics.commits.Commit;
+import org.checkerframework.common.value.qual.ArrayLen;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.trees.RandomForest;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
@@ -26,6 +30,55 @@ import weka.filters.Filter;
 import weka.filters.supervised.instance.SMOTE;
 
 public class Predictor {
+
+
+
+//    Class CommitEntry needs to be for this to work
+
+//    public static Instances createArfFile(List<CommitEntry> ces) {
+//
+//        Instances data;
+//        ArrayList<Attribute> atts = new ArrayList<>();
+//        ArrayList<String> attVals = new ArrayList<>();
+//        double[] vals;
+//
+//        attVals.add("True");
+//        attVals.add("False");
+//
+//        atts.add(new Attribute("addedFileCount"));
+//        atts.add(new Attribute("modifiedFileCount"));
+//        atts.add(new Attribute("deleteFileCount"));
+//        atts.add(new Attribute("addedLinesCount"));
+//        atts.add(new Attribute("deletedLinesCount"));
+//        atts.add(new Attribute("developerAbsoluteExperience"));
+//        atts.add(new Attribute("developerAverageExperience"));
+//        atts.add(new Attribute("developerBuggyCommitsRatio"));
+//        atts.add(new Attribute("developerTotalCommitsLastMont"));
+//        atts.add(new Attribute("isBuggy", attVals));
+//
+//        data = new Instances("CommitsSet", atts, 0);
+//
+//        for (CommitEntry ce: ces) {
+//            vals = new double[data.numAttributes()];
+//
+//            vals[0] = (double) ce.getAddedFileCount();
+//            vals[1] = (double) ce.getModifiedFileCount();
+//            vals[2] = (double) ce.getDeleteFileCount();
+//            vals[3] = (double) ce.getAddedFileCount();
+//            vals[4] = (double) ce.getDeleteFileCount();
+//            vals[5] = (double) ce.getDeveloperAbsoluteExperience();
+//            vals[6] = (double) ce.getDeveloperAverageExperience();
+//            vals[7] = (double) ce.getDeveloperBuggyCommitsRatio();
+//            vals[8] = (double) ce.getDeveloperTotalCommitsLastMont();
+//            if (ce.isBuggy()) {
+//                vals[9] = attVals.indexOf("True");
+//            } else {
+//                vals[9] = attVals.indexOf("False");
+//            }
+//            data.add(new DenseInstance(1.0, vals));
+//        }
+//        return data;
+//    }
 
 
     public static void EvaluateAndTrain(String trainingFilePath, String predictFilePath) {
@@ -216,8 +269,6 @@ public class Predictor {
 
         return eval;
     }
-
-
-
-
 }
+
+
