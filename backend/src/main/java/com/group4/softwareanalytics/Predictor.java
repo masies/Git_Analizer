@@ -160,7 +160,7 @@ public class Predictor {
         ts.buildClassifier(data);
         ts.setManualThresholdValue(0.7);
 
-        Evaluation results = runOnTestSet(classifier, predictionSet, toPredictName);
+        Evaluation results = runOnTestSet(ts, predictionSet, toPredictName);
 
         printResults(results);
     }
@@ -184,10 +184,7 @@ public class Predictor {
             String[] parts = prediction.toString().split(" ");
             String lastOne = parts[parts.length-1];
             double acc =Double.parseDouble(lastOne);
-            if(acc>=0.7)
-            {
-                System.out.println(prediction.toString());
-            }
+            System.out.println(prediction.toString());
         }
 
 
