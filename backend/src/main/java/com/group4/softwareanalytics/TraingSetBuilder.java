@@ -18,6 +18,22 @@ public class TraingSetBuilder {
         this.commitsEntries = commitEntries;
     }
 
+    public ArrayList<CommitEntry> exportTrainingSet(){
+        ArrayList<CommitEntry> toReturn = new ArrayList<>();
+        for (int i = 10; i < this.commitsEntries.size() ; i++) {
+            toReturn.add(this.commitsEntries.get(i));
+        }
+        return  toReturn;
+    }
+
+    public ArrayList<CommitEntry> exportPredictionSet(){
+        ArrayList<CommitEntry> toReturn = new ArrayList<>();
+        for (int i = 0; i < 10 ; i++) {
+            toReturn.add(this.commitsEntries.get(i));
+        }
+        return  toReturn;
+    }
+
     public void resume(){
         for (CommitEntry ce: this.commitsEntries) {
             System.out.println("Hash: " +ce.getCommitHash());

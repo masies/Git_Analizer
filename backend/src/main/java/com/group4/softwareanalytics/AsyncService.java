@@ -1,7 +1,5 @@
 package com.group4.softwareanalytics;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
@@ -111,11 +109,28 @@ public class AsyncService {
             computeSZZ(owner, name);
 
             traingSetBuilder.computeFinalMetrics();
-            traingSetBuilder.resume();
+
+            if (traingSetBuilder.getCommits().size() > 20){
+                computePredictions();
+            } else {
+                logger.info("NOT ENOUGH COMMITS TO RUN PREDICTIONS");
+            }
+
 
         } catch (Exception e){
             logger.warning(e.getMessage());
         }
+    }
+
+    private void computePredictions() {
+        try {
+            Predictor.evaluate(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()));
+            Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile(traingSetBuilder.exportPredictionSet()));
+
+        } catch (Exception e){
+            logger.info(e.getMessage());
+        }
+
     }
 
     public Repo fetchRepo(String owner, String name) throws IOException {

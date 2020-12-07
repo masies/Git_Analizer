@@ -36,53 +36,53 @@ public class Predictor {
 
 //    Class CommitEntry needs to be for this to work
 
-//    public static Instances createArfFile(List<CommitEntry> ces) {
-//
-//        Instances data;
-//        ArrayList<Attribute> atts = new ArrayList<>();
-//        ArrayList<String> attVals = new ArrayList<>();
-//        double[] vals;
-//
-//        attVals.add("True");
-//        attVals.add("False");
-//
-//        atts.add(new Attribute("addedFileCount"));
-//        atts.add(new Attribute("modifiedFileCount"));
-//        atts.add(new Attribute("deleteFileCount"));
-//        atts.add(new Attribute("addedLinesCount"));
-//        atts.add(new Attribute("deletedLinesCount"));
-//        atts.add(new Attribute("developerAbsoluteExperience"));
-//        atts.add(new Attribute("developerAverageExperience"));
-//        atts.add(new Attribute("developerBuggyCommitsRatio"));
-//        atts.add(new Attribute("developerTotalCommitsLastMont"));
-//        atts.add(new Attribute("buggy", attVals));
-//
-//        data = new Instances("CommitsSet", atts, 0);
-//
-//        for (CommitEntry ce: ces) {
-//            vals = new double[data.numAttributes()];
-//
-//            vals[0] = (double) ce.getAddedFileCount();
-//            vals[1] = (double) ce.getModifiedFileCount();
-//            vals[2] = (double) ce.getDeleteFileCount();
-//            vals[3] = (double) ce.getAddedFileCount();
-//            vals[4] = (double) ce.getDeleteFileCount();
-//            vals[5] = (double) ce.getDeveloperAbsoluteExperience();
-//            vals[6] = (double) ce.getDeveloperAverageExperience();
-//            vals[7] = (double) ce.getDeveloperBuggyCommitsRatio();
-//            vals[8] = (double) ce.getDeveloperTotalCommitsLastMont();
-//            if (ce.isBuggy()) {
-//                vals[9] = attVals.indexOf("True");
-//            } else {
-//                vals[9] = attVals.indexOf("False");
-//            }
-//            data.add(new DenseInstance(1.0, vals));
-//        }
-//        return data;
-//    }
+    public static Instances createArfFile(List<CommitEntry> ces) {
+
+        Instances data;
+        ArrayList<Attribute> atts = new ArrayList<>();
+        ArrayList<String> attVals = new ArrayList<>();
+        double[] vals;
+
+        attVals.add("True");
+        attVals.add("False");
+
+        atts.add(new Attribute("addedFileCount"));
+        atts.add(new Attribute("modifiedFileCount"));
+        atts.add(new Attribute("deleteFileCount"));
+        atts.add(new Attribute("addedLinesCount"));
+        atts.add(new Attribute("deletedLinesCount"));
+        atts.add(new Attribute("developerAbsoluteExperience"));
+        atts.add(new Attribute("developerAverageExperience"));
+        atts.add(new Attribute("developerBuggyCommitsRatio"));
+        atts.add(new Attribute("developerTotalCommitsLastMont"));
+        atts.add(new Attribute("buggy", attVals));
+
+        data = new Instances("CommitsSet", atts, 0);
+
+        for (CommitEntry ce: ces) {
+            vals = new double[data.numAttributes()];
+
+            vals[0] = (double) ce.getAddedFileCount();
+            vals[1] = (double) ce.getModifiedFileCount();
+            vals[2] = (double) ce.getDeleteFileCount();
+            vals[3] = (double) ce.getAddedFileCount();
+            vals[4] = (double) ce.getDeleteFileCount();
+            vals[5] = (double) ce.getDeveloperAbsoluteExperience();
+            vals[6] = (double) ce.getDeveloperAverageExperience();
+            vals[7] = (double) ce.getDeveloperBuggyCommitsRatio();
+            vals[8] = (double) ce.getDeveloperTotalCommitsLastMont();
+            if (ce.isBuggy()) {
+                vals[9] = attVals.indexOf("True");
+            } else {
+                vals[9] = attVals.indexOf("False");
+            }
+            data.add(new DenseInstance(1.0, vals));
+        }
+        return data;
+    }
 
 
-    public static void Evaluate(Instances dataset) throws Exception {
+    public static void evaluate(Instances dataset) throws Exception {
 
         ArrayList<String> categories = new ArrayList<String>();
         categories.add("true");
@@ -136,12 +136,12 @@ public class Predictor {
         }
 
 
-        System.out.println("Overall Evaluation:" +  AccTotal/10);
-        System.out.println("Overall Precision:" +  (PreTotal/10)*100);
-        System.out.println("Overall Recall:" +  (RecTotal/10)*100);
+        System.out.println("Overall Evaluation: " +  AccTotal/10);
+        System.out.println("Overall Precision: " +  (PreTotal/10)*100);
+        System.out.println("Overall Recall: " +  (RecTotal/10)*100);
     }
 
-    public static void Predict(Instances dataset, Instances predictionSet) throws Exception {
+    public static void predict(Instances dataset, Instances predictionSet) throws Exception {
 
         ArrayList<String> categories = new ArrayList<String>();
         categories.add("true");
