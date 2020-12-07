@@ -1,13 +1,6 @@
 package com.group4.softwareanalytics;
 
-import com.group4.softwareanalytics.commits.Commit;
-import com.group4.softwareanalytics.commits.CommitController;
-import com.group4.softwareanalytics.commits.CommitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class TraingSetBuilder {
 
@@ -39,6 +32,10 @@ public class TraingSetBuilder {
             System.out.println("dev average expertise: " +ce.getDeveloperAverageExperience());
             System.out.println("dev buggy ratio: " +ce.getDeveloperBuggyCommitsRatio());
             System.out.println("commits last month: " +ce.getDeveloperTotalCommitsLastMont());
+
+            for (Pair me : ce.getContibutions()) {
+                System.out.println("Key: "+ me.getKey() + " & Value: " + me.getVal());
+            }
 
             System.out.println("BUGGY: " + ce.isBuggy());
             System.out.println();
@@ -78,6 +75,43 @@ public class TraingSetBuilder {
             }
 
         }
+
+        for (int i = this.commitsEntries.size() - 1; i >= 1; i--) {
+            CommitEntry ce = this.commitsEntries.get(i);
+            String dev = ce.getDeveloperMail();
+            ArrayList<Pair<String,String>> contribs = ce.getContibutions();
+            for (int j = i - 1; j >= 0; j--) {
+                CommitEntry nextCe = this.commitsEntries.get(j);
+                String nextDev = nextCe.getDeveloperMail();
+                ArrayList<Pair<String, String>> nextContribs = ce.getContibutions();
+                for (Pair<String, String> pair : nextContribs) {
+                    if (contribs.contains(pair) && dev.equals(nextDev)) {
+                        ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() + 1);
+                    }
+                }
+                if (contribs.size() > 0) {
+                    ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() / contribs.size());
+                }
+            }
+        }
+
+
+//        for (int i = this.commitsEntries.size() - 1; i >= 1; i--) {
+//            CommitEntry ce = this.commitsEntries.get(i);
+//            String dev = ce.getDeveloperMail();
+//            ArrayList<String> relatedFiles = ce.getRelatedFilePaths();
+//            for (int j = i - 1; j >= 0; j--) {
+//                CommitEntry nextCe = this.commitsEntries.get(j);
+//                String nextDev = nextCe.getDeveloperMail();
+//                ArrayList<String> NextRelatedFiles = ce.getRelatedFilePaths();
+//                for (String file: NextRelatedFiles) {
+//                    if (relatedFiles.contains(file) && dev.equals(nextDev)){
+//                        ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() + 1);
+//                    }
+//                }
+//            }
+//
+//        }
 
     }
 }

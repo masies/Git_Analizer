@@ -1,6 +1,7 @@
 package com.group4.softwareanalytics;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+
 
 public class CommitEntry {
     private int addedFileCount = 0;
@@ -10,6 +11,7 @@ public class CommitEntry {
     private int deletedLinesCount = 0;
     private String commitHash;
     private String developerMail;
+    private ArrayList<Pair<String,String>> contibutions = new ArrayList<>();
     private boolean isBuggy = false;
 
 //    The absolute experience of the developer authoring the commit computed at the commit’s date (1 pre- dictor variable);
@@ -18,7 +20,7 @@ public class CommitEntry {
 //    The average absolute experience of the developer authoring the commit on the files impacted by the commit,
 //    e.g., given a commit impacting files Fj and Fk, the platform counts the number of commits performed in the past by the
 //    developer on Fj and Fk and computes the average (1 predictor variable).
-    private int developerAverageExperience = 0;
+    private float developerAverageExperience = 0;
 
 //     The ratio of buggy commits authored by the developer in the past,
 //     e.g.,if she committed 4 times, and 1 of these commits was buggy, this variable is equal 0.25 (1 predictor variable).
@@ -38,6 +40,19 @@ public class CommitEntry {
         this.developerBuggyCommitsRatio = developerBuggyCommitsRatio;
         this.developerTotalCommitsLastMont = developerTotalCommitsLastMont;
     }
+
+    public ArrayList<Pair<String,String>> getContibutions() {
+        return contibutions;
+    }
+
+    public void setContibutions(ArrayList<Pair<String,String>>  contibutions) {
+        this.contibutions = contibutions;
+    }
+
+    public void addContribution(Pair p){
+        this.contibutions.add(p);
+    }
+
 
     public boolean isBuggy() {
         return isBuggy;
@@ -111,11 +126,11 @@ public class CommitEntry {
         this.developerAbsoluteExperience = developerAbsoluteExperience;
     }
 
-    public int getDeveloperAverageExperience() {
+    public float getDeveloperAverageExperience() {
         return developerAverageExperience;
     }
 
-    public void setDeveloperAverageExperience(int developerAverageExperience) {
+    public void setDeveloperAverageExperience(float developerAverageExperience) {
         this.developerAverageExperience = developerAverageExperience;
     }
 

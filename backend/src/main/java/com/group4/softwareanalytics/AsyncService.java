@@ -1,5 +1,7 @@
 package com.group4.softwareanalytics;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
@@ -401,20 +403,31 @@ public class AsyncService {
                     for (FileContribution file : fileContributions) {
                         if (file.getContributionsMap().isEmpty() && file.isFile()) {
                             file.addDeveloperContribute(developerName.replace(".",""));
+
+                            Pair devAndFile = new Pair(developerMail, file.getPath());
+                            commitEntry.addContribution(devAndFile);
                         }
                     }
                 } else {
                     ArrayList<String> relatedFilePaths = computeRelatedFilePaths(git, revCommit.name(), commitEntry);
+
                     for (String path : relatedFilePaths) {
                         for (FileContribution file : fileContributions) {
                             // if is the last commit we add any file with no contributor yet (created here)
                             if (file.getPath().equals(path)) {
                                 // if it contains a dot, it will mess up With MongoDB mapping
                                 file.addDeveloperContribute(developerName.replace(".",""));
+
+                                Pair devAndFile = new Pair(developerMail, file.getPath());
+                                commitEntry.addContribution(devAndFile);
                             }
                         }
                     }
                 }
+
+
+
+
                 ArrayList<String> commitParentsIDs = new ArrayList<>();
                 for (RevCommit parent : revCommit.getParents()) {
                     commitParentsIDs.add(parent.name());
