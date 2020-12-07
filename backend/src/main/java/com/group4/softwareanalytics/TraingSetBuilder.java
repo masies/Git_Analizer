@@ -33,10 +33,6 @@ public class TraingSetBuilder {
             System.out.println("dev buggy ratio: " +ce.getDeveloperBuggyCommitsRatio());
             System.out.println("commits last month: " +ce.getDeveloperTotalCommitsLastMont());
 
-            for (Pair me : ce.getContibutions()) {
-                System.out.println("Key: "+ me.getKey() + " & Value: " + me.getVal());
-            }
-
             System.out.println("BUGGY: " + ce.isBuggy());
             System.out.println();
         }
