@@ -19,18 +19,26 @@ public class TraingSetBuilder {
     }
 
     public ArrayList<CommitEntry> exportTrainingSet(){
+        Collections.sort(this.commitsEntries, Collections.reverseOrder());
+        System.out.println("training set");
         ArrayList<CommitEntry> toReturn = new ArrayList<>();
         for (int i = 10; i < this.commitsEntries.size() ; i++) {
             toReturn.add(this.commitsEntries.get(i));
+            System.out.println(this.commitsEntries.get(i).getCommitHash());
         }
+        System.out.println();
         return  toReturn;
     }
 
     public ArrayList<CommitEntry> exportPredictionSet(){
+        Collections.sort(this.commitsEntries, Collections.reverseOrder());
+        System.out.println("prediction set");
         ArrayList<CommitEntry> toReturn = new ArrayList<>();
-        for (int i = 0; i < 10 ; i++) {
+        for (int i = 0; i < 10; i++) {
             toReturn.add(this.commitsEntries.get(i));
+            System.out.println(this.commitsEntries.get(i).getCommitHash());
         }
+        System.out.println();
         return  toReturn;
     }
 
@@ -64,7 +72,8 @@ public class TraingSetBuilder {
     }
 
     public void computeFinalMetrics() {
-
+        // TODO: check order of this
+        Collections.sort(this.commitsEntries, Collections.reverseOrder());
         for (int i = this.commitsEntries.size() - 1; i >= 1 ; i--) {
             CommitEntry ce = this.commitsEntries.get(i);
             String developer = ce.getDeveloperMail();
@@ -89,6 +98,8 @@ public class TraingSetBuilder {
         }
 
         for (int i = this.commitsEntries.size() - 1; i >= 1; i--) {
+            // TODO: check order of this
+            Collections.sort(this.commitsEntries, Collections.reverseOrder());
             CommitEntry ce = this.commitsEntries.get(i);
             String dev = ce.getDeveloperMail();
             ArrayList<Pair<String,String>> contribs = ce.getContibutions();

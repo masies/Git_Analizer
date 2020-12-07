@@ -410,6 +410,7 @@ public class AsyncService {
 
                 commitEntry.setCommitHash(commitName);
                 commitEntry.setDeveloperMail(developerMail);
+                commitEntry.setDate(date);
 
                 ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
 
