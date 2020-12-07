@@ -1,5 +1,7 @@
 package com.group4.softwareanalytics;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
@@ -43,7 +45,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -86,6 +87,8 @@ public class AsyncService {
 
     private static final String repoFolderPath = "./repo/";
 
+    private TraingSetBuilder traingSetBuilder = new TraingSetBuilder();
+
     @Async
     public void fetchData(String owner, String name){
         try {
@@ -106,6 +109,9 @@ public class AsyncService {
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
             computeSZZ(owner, name);
+
+            traingSetBuilder.computeFinalMetrics();
+            traingSetBuilder.resume();
 
         } catch (Exception e){
             logger.warning(e.getMessage());
@@ -185,15 +191,6 @@ public class AsyncService {
             // then we need to add all the reviewers, increment all it's reviewed count and accepted reviewed count
 
             String mergedBy = jsonPR.getAsJsonObject("merged_by").get("login").toString().replaceAll("\"","");
-
-            // TODO: ask if we have to consider this
-    //      HashSet<String> reviewers;
-    //      JsonArray jsonReviewers = jsonPR.getAsJsonArray("requested_reviewers");
-    //      System.out.println(jsonReviewers.toString());
-    //      for (int i = 0; i < jsonReviewers.size(); i++) {
-    //          String reviewer = jsonReviewers.get(i).getAsJsonObject().get("login").toString().replaceAll("\"","");
-    //          System.out.println(reviewer);
-    //      }
 
             boolean userFound = false;
             boolean reviewerFound = false;
@@ -329,9 +326,26 @@ public class AsyncService {
             logger.warning(e.getMessage());
             Thread.currentThread().interrupt();
         }
-
         return null;
     }
+
+    private String runProcess(ProcessBuilder pb){
+        Process process = null;
+        try {
+            process = pb.start();
+            process.waitFor();
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            return stdInput.lines().collect(Collectors.joining());
+        } catch (IOException | InterruptedException e) {
+            assert process != null;
+            process.destroy();
+            logger.warning(e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+        return null;
+    }
+
+
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
         String repo_url = "https://github.com/" + owner + "/" + repoName;
@@ -363,8 +377,12 @@ public class AsyncService {
             // focus on master branch
             revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
 
-            for (Iterator<RevCommit> iterator = revCommitList.iterator(); iterator.hasNext(); ) {
-                RevCommit revCommit = iterator.next();
+
+            for (int i = revCommitList.size()-1 ; i >= 0 ; i--) {
+                // we will store here the info for the dataset
+                CommitEntry commitEntry = new CommitEntry(0,0,0,0,0,0,0,0,0);
+
+                RevCommit revCommit = revCommitList.get(i);
                 String developerName = revCommit.getAuthorIdent().getName();
                 String developerMail = revCommit.getAuthorIdent().getEmailAddress();
                 String encodingName = revCommit.getEncodingName();
@@ -372,36 +390,41 @@ public class AsyncService {
                 String shortMessage = revCommit.getShortMessage();
                 String commitName = revCommit.getName();
                 int commitType = revCommit.getType();
-
                 long millis = revCommit.getCommitTime();
                 Date date = new Date(millis * 1000);
-                List<CommitDiff> diffEntries = new ArrayList<>();
+
+                commitEntry.setCommitHash(commitName);
+                commitEntry.setDeveloperMail(developerMail);
+
                 ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
 
-
-
-
-                // actually first commit may be retrieved with bash command
-                // git rev-list --max-parents=0 HEAD
-                if (!iterator.hasNext()){
+                if (i == revCommitList.size() -1 ){
                     // last commit, everything which does not have a contribution is created in here
                     for (FileContribution file : fileContributions) {
                         if (file.getContributionsMap().isEmpty() && file.isFile()) {
                             file.addDeveloperContribute(developerName.replace(".",""));
+
+                            Pair devAndFile = new Pair(developerMail, file.getPath());
+                            commitEntry.addContribution(devAndFile);
                         }
                     }
                 } else {
-                    ArrayList<String> relatedFilePaths = computeRelatedFilePaths(git, revCommit.name());
+                    ArrayList<String> relatedFilePaths = computeRelatedFilePaths(git, revCommit.name(), commitEntry);
+
                     for (String path : relatedFilePaths) {
                         for (FileContribution file : fileContributions) {
                             // if is the last commit we add any file with no contributor yet (created here)
                             if (file.getPath().equals(path)) {
                                 // if it contains a dot, it will mess up With MongoDB mapping
                                 file.addDeveloperContribute(developerName.replace(".",""));
+
+                                Pair devAndFile = new Pair(developerMail, file.getPath());
+                                commitEntry.addContribution(devAndFile);
                             }
                         }
                     }
                 }
+
 
 
 
@@ -412,8 +435,44 @@ public class AsyncService {
 
                 ArrayList<Integer> fixedIssues = fixedIssuesRelated(revCommit);
 
-                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName, developerExpertiseList);
+                linkCommitDev(owner, repoName, revCommit.getAuthorIdent().getEmailAddress(), commitName, developerExpertiseList, commitEntry, date);
 
+
+                // routine to retrieve the number of inserted and deleted lines; building the training set
+                if (!(i == revCommitList.size() -1 )) {
+                    ProcessBuilder diffProcessBuilder = new ProcessBuilder(
+                            "git", "--no-pager", "diff", "--shortstat", commitName, commitParentsIDs.get(0));
+
+                    diffProcessBuilder.directory(new File(repoFolderPath + owner + "/" + repoName));
+                    String linesCounts = runProcess(diffProcessBuilder);
+
+                    int linesAdded = 0;
+                    int linesDeleted = 0;
+
+                    if (linesCounts != null){
+                        Pattern patternDeletions = Pattern.compile("\\d+ deletion");
+                        Pattern patternInsertions = Pattern.compile("\\d+ insertion");
+
+                        Matcher matcherDeletion = patternDeletions.matcher(linesCounts);
+                        Matcher matcherInsertion = patternInsertions.matcher(linesCounts);
+
+                        while (matcherDeletion.find()) {
+                            linesDeleted = Integer.parseInt(matcherDeletion.group().replaceAll(" deletion",""));
+                        }
+                        while (matcherInsertion.find()) {
+                            linesAdded = Integer.parseInt(matcherInsertion.group().replaceAll(" insertion",""));
+                        }
+
+                    }
+                    commitEntry.setDeletedLinesCount(linesDeleted);
+                    commitEntry.setAddedLinesCount(linesAdded);
+
+                }
+
+
+
+
+                List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
 
@@ -421,10 +480,16 @@ public class AsyncService {
                 if (!c.getLinkedFixedIssues().isEmpty()) {
                     fixingCommits.add(c);
                 }
+
+                traingSetBuilder.addCommitEntry(commitEntry);
             }
+
+            Collections.reverse(commitList);
+
             commitRepository.saveAll(commitList);
             developerExpertiseRepository.saveAll(developerExpertiseList);
             fileContributionRepository.saveAll(fileContributions);
+
 
             logger.info("------- Commits stored successfully! -------");
 
@@ -438,7 +503,7 @@ public class AsyncService {
     }
 
 
-    ArrayList<String>  computeRelatedFilePaths(Git git, String commitHashID){
+    ArrayList<String>  computeRelatedFilePaths(Git git, String commitHashID, CommitEntry commitEntry){
         ArrayList<String> relatedFilePaths = new ArrayList<>();
 
         CanonicalTreeParser oldTreeIter;
@@ -458,6 +523,19 @@ public class AsyncService {
 
                 diffFormatter.setRepository(git.getRepository());
                 for (DiffEntry entry : diffFormatter.scan(oldTreeIter, newTreeIter)) {
+                    String type = entry.getChangeType().name();
+                    switch (type) {
+                        case "MODIFY":
+                            commitEntry.setModifiedFileCount(commitEntry.getModifiedFileCount() + 1);
+                            break;
+                        case "ADD":
+                            commitEntry.setAddedFileCount(commitEntry.getAddedFileCount() + 1);
+                            break;
+                        case "DELETE":
+                            commitEntry.setDeleteFileCount(commitEntry.getDeleteFileCount() + 1);
+                            break;
+                    }
+
                     diffFormatter.format(entry);
                     relatedFilePaths.add("/"+entry.getNewPath());
                 }
@@ -482,16 +560,21 @@ public class AsyncService {
         return fileContributions;
     }
 
-    public DeveloperExpertise linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList) {
+    public DeveloperExpertise linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList, CommitEntry commitEntry, Date commitDate) {
         for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
             if (dev.getEmail().equals(devEmail)) {
                 dev.setExpertise(dev.getExpertise() + 1);
                 dev.addCommitHash(commitHash);
+                dev.addCommitDate(commitDate);
+
+                commitEntry.setDeveloperAbsoluteExperience(dev.getExpertise());
+                commitEntry.setDeveloperTotalCommitsLastMont(dev.computeMonthExpertise(commitDate));
                 return dev;
             }
         }
 
         DeveloperExpertise newDev = new DeveloperExpertise(owner, repo,1, devEmail);
+        commitEntry.setDeveloperAbsoluteExperience(1);
         newDev.addCommitHash(commitHash);
         developerExpertiseList.add(newDev);
         return newDev;
@@ -543,10 +626,6 @@ public class AsyncService {
             HashSet<String> bugInducingCommitsHashSet;
             try (Git git = new Git(repo)) {
                 git.checkout().setName(commit.getCommitName()).call();
-
-                // compute modified files
-                List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commit.getCommitName(), dest_url, commit.getCommitParentsIDs());
-                commit.setModifications(diffEntries);
 
                 // java file --> list of modified lines
                 HashMap<String, ArrayList<Integer>> modifiedLinesPerJavaClass = new HashMap<>();
@@ -625,12 +704,18 @@ public class AsyncService {
                 }
             }
 
+
+
             HashSet<CommitGeneralInfo> bugInducingCommitsSet= new HashSet<>();
+
 
             for (String bugInducingCommitId: bugInducingCommitsHashSet) {
                 Commit bugInducingCommit = commitRepository.findByOwnerAndRepoAndCommitName(owner,repoName,bugInducingCommitId);
 
                 bugInducingCommit.setBugInducing(true);
+
+                traingSetBuilder.setBuggyCommit(bugInducingCommit.getCommitName());
+
                 CommitGeneralInfo info = new CommitGeneralInfo(commit.getCommitName(), commit.getDeveloperName(), commit.getCommitDate());
                 bugInducingCommit.addBugFixingCommit(info);
                 commitRepository.save(bugInducingCommit);
@@ -647,6 +732,7 @@ public class AsyncService {
             commitRepository.save(commit);
 
         }
+
         logger.info("------- SZZ completed. -------");
     }
 }
