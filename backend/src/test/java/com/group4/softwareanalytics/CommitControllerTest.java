@@ -86,7 +86,7 @@ class CommitControllerTest {
         assertNotNull(commits);
         assertNotNull(devExps);
 
-        List<String> nullFields = Arrays.asList("getEncodingName","getBugInducingCommits","getLinkedFixedIssues");
+        List<String> nullFields = Arrays.asList("getEncodingName","getBugInducingCommits","getLinkedFixedIssues","getCleanProbability");
 
         for(Commit commit:commits)
         {
