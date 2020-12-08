@@ -32,7 +32,7 @@ public class Commit {
     private boolean isBugInducing = false;
     private HashSet<CommitGeneralInfo> bugFixingCommits = new HashSet<>();
 
-    private double cleanProbability = -1;
+    private Double cleanProbability = null;
 
     @Field("projectMetrics")
     private ProjectMetric projectMetrics;
@@ -56,11 +56,11 @@ public class Commit {
         this.linkedFixedIssues = linkedFixedIssues;
     }
 
-    public double getCleanProbability() {
+    public Double getCleanProbability() {
         return cleanProbability;
     }
 
-    public void setCleanProbability(double cleanProbability) {
+    public void setCleanProbability(Double cleanProbability) {
         this.cleanProbability = cleanProbability;
     }
 

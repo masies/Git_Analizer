@@ -107,7 +107,7 @@ public class AsyncService {
             Repo repo = fetchRepo(owner,name);
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
-            computeSZZ(owner, name);
+            computeSZZ(owner, name, repo);
 
             traingSetBuilder.computeFinalMetrics();
 
@@ -537,6 +537,7 @@ public class AsyncService {
             logger.info("------- Commits stored successfully! -------");
 
             r.hasCommitsDone();
+            r.setTotalCommits(revCommitList.size());
             repoRepository.save(r);
 
 
@@ -659,7 +660,7 @@ public class AsyncService {
         return Lists.newArrayList(Sets.newHashSet(linkedIssues));
     }
 
-    public void computeSZZ(String owner, String repoName) throws IOException, GitAPIException {
+    public void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         for (Commit commit : fixingCommits) {
 
             // CHECKOUT this specific commit
@@ -774,8 +775,11 @@ public class AsyncService {
 
             commitRepository.save(commit);
 
+
         }
 
+        r.hasSZZDone();
+        repoRepository.save(r);
         logger.info("------- SZZ completed. -------");
     }
 }

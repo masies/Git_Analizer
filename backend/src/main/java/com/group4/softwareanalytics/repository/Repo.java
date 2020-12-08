@@ -16,6 +16,8 @@ public class Repo {
     private String repo;
     private RepoStatus status;
 
+    private int totalCommits = 0;
+
     private PredictorStats predictorStats;
 
     public Repo(Repository repository, String owner, String repo) {
@@ -25,6 +27,13 @@ public class Repo {
         this.repo = repo;
     }
 
+    public int getTotalCommits() {
+        return totalCommits;
+    }
+
+    public void setTotalCommits(int totalCommits) {
+        this.totalCommits = totalCommits;
+    }
 
     public PredictorStats getPredictorStats() {
         return predictorStats;
@@ -75,7 +84,9 @@ public class Repo {
     public void hasCommitsDone(){
         this.status.setFetchedCommits(true);
     }
+    public void hasSZZDone() {this.status.setSZZDone(true);}
     public void hasPredictionDone(){ this.status.setPredictionsDone(true); }
+
 
     public Repository getRepository() {
         return repository;

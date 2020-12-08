@@ -56,7 +56,7 @@ public class SzzTest {
 
         asyncService.fetchCommits(owner,name,r);
 
-        asyncService.computeSZZ(owner,name);
+        asyncService.computeSZZ(owner,name,r);
 
         List<Commit> commits = commitRepository.findAndRemove(owner,name);
 
