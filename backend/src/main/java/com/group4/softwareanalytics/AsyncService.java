@@ -127,12 +127,27 @@ public class AsyncService {
 
     private void computePredictions(Repo repo) {
         try {
-            ArrayList<Pair<String, Float>> predictions = new ArrayList<>();
+            ArrayList<String> commitIdsToPredict = new ArrayList<>();
+            ArrayList<CommitEntry> entriesToPredict = traingSetBuilder.exportPredictionSet();
+
+            for (int i = 0; i < entriesToPredict.size() ; i++) {
+                commitIdsToPredict.add(entriesToPredict.get(i).getCommitHash());
+            }
 
             PredictorStats predictorStats = Predictor.evaluate(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()));
 
+            if (predictorStats != null){
+                ArrayList<Double> predictions = Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile( entriesToPredict ));
 
-            Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile(traingSetBuilder.exportPredictionSet()));
+                // TODO: control sizes and everything
+                for (int i = 0; i < commitIdsToPredict.size() ; i++) {
+                    Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(repo.getOwner(), repo.getRepo(), commitIdsToPredict.get(i));
+                    commit.setCleanProbability(predictions.get(i));
+                    commitRepository.save(commit);
+                }
+            }
+
+
 
             repo.setPredictorStats(predictorStats);
             repo.hasPredictionDone();

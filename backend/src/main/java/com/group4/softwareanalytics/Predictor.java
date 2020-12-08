@@ -112,9 +112,25 @@ public class Predictor {
         for (int i = 0; i < runs; i++) {
             seed = i + 1;
             eval.crossValidateModel(ts, data, folds, new Random(seed));
-            pre.add(eval.precision(0));
-            rec.add(eval.recall(0));
-            acc.add(eval.pctCorrect());
+
+            Double currentPrecision = eval.precision(0);
+            if (currentPrecision.isNaN()){
+                return null;
+            }
+            pre.add(currentPrecision);
+
+            Double currentRecall = eval.recall(0);
+            if (currentRecall.isNaN()){
+                return null;
+            }
+            rec.add(currentRecall);
+
+            Double currentAccuracy = eval.pctCorrect();
+            if (currentAccuracy.isNaN()){
+                return null;
+            }
+            acc.add(currentAccuracy);
+
         }
 
         Double AccTotal = .0;
@@ -148,7 +164,9 @@ public class Predictor {
         return new PredictorStats(precision, recall, accuracy);
     }
 
-    public static void predict(Instances dataset, Instances predictionSet) throws Exception {
+    public static ArrayList<Double> predict(Instances dataset, Instances predictionSet) throws Exception {
+
+        ArrayList<Double> cleanProbability = new ArrayList<>();
 
         ArrayList<String> categories = new ArrayList<String>();
         categories.add("true");
@@ -169,7 +187,17 @@ public class Predictor {
 
         Evaluation results = runOnTestSet(ts, predictionSet, toPredictName);
 
+
+        for (int i = 0; i < results.predictions().size() ; i++) {
+            String[] parts = results.predictions().get(i).toString().split(" ");
+            String lastOne = parts[parts.length-1];
+            cleanProbability.add(Double.parseDouble(lastOne));
+        }
+
+
         printResults(results);
+
+        return cleanProbability;
     }
 
     private static void printResults(Evaluation results)
@@ -190,7 +218,7 @@ public class Predictor {
             //The toString prints: actual,predicted,probabilities
             String[] parts = prediction.toString().split(" ");
             String lastOne = parts[parts.length-1];
-            double acc =Double.parseDouble(lastOne);
+            double acc = Double.parseDouble(lastOne);
             System.out.println(prediction.toString());
         }
 
