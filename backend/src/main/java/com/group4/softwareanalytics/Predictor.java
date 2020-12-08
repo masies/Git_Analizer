@@ -1,24 +1,8 @@
 package com.group4.softwareanalytics;
 
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import com.group4.softwareanalytics.commits.Commit;
-import org.checkerframework.common.value.qual.ArrayLen;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.meta.ThresholdSelector;
 import weka.classifiers.trees.RandomForest;
@@ -26,9 +10,13 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.ArffSaver;
 import weka.filters.Filter;
 import weka.filters.supervised.instance.SMOTE;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 public class Predictor {
 
@@ -108,7 +96,6 @@ public class Predictor {
         int seed = 1;
         int folds = 10;
         int runs = 10;
-        System.out.println("Evaluating the Classifier.");
         for (int i = 0; i < runs; i++) {
             seed = i + 1;
             eval.crossValidateModel(ts, data, folds, new Random(seed));
@@ -151,11 +138,6 @@ public class Predictor {
             RecTotal +=res;
         }
 
-
-        System.out.println("Overall Evaluation: " +  AccTotal/10);
-        System.out.println("Overall Precision: " +  (PreTotal/10)*100);
-        System.out.println("Overall Recall: " +  (RecTotal/10)*100);
-
         double precision = (PreTotal/10) * 100;
         double recall = (RecTotal/10) * 100;
         double accuracy = AccTotal/10;
@@ -194,39 +176,10 @@ public class Predictor {
             cleanProbability.add(Double.parseDouble(lastOne));
         }
 
-
-        printResults(results);
-
         return cleanProbability;
     }
 
-    private static void printResults(Evaluation results)
-    {
-        ArrayList<Prediction> predictions = results.predictions();
 
-        int predictedAsBuggy = 0;
-        int predictedAsClean = 0;
-        for(Prediction prediction : predictions){
-            //if is predicted as true
-            if(prediction.predicted() == 0.0){
-                //the last two numbers of the toString method provide information on the probability
-                //that an instance is buggy
-                predictedAsBuggy++;
-            } else {
-                predictedAsClean++;
-            }
-            //The toString prints: actual,predicted,probabilities
-            String[] parts = prediction.toString().split(" ");
-            String lastOne = parts[parts.length-1];
-            double acc = Double.parseDouble(lastOne);
-            System.out.println(prediction.toString());
-        }
-
-
-        System.out.println("Buggy: " + predictedAsBuggy);
-        System.out.println("Clean: " + predictedAsClean);
-
-    }
     private static RandomForest buildRandomForestClassifier(Instances instances, String toPredictName) throws Exception{
 
 
@@ -243,8 +196,6 @@ public class Predictor {
 
     public static Instances balanceTrainingSetWithSMOTE(Instances instances, String toPredictName, ArrayList<String> categories) throws Exception{
 
-//        FileReader frTraining = new FileReader(trainingFilePath);
-//        Instances instances = new Instances(frTraining);
         instances.setClass(instances.attribute(toPredictName));
 
         ArrayList<Integer> percentages = getPercentageOfArtificialInstancesNeeded(instances, categories);
@@ -263,12 +214,6 @@ public class Predictor {
             instances = Filter.useFilter(instances, filter);
 
         }
-
-//        ArffSaver saver = new ArffSaver();
-//        saver.setInstances(instances);
-//        File outputFile = new File(trainingFilePath.replace(".arff", "_balanced.arff"));
-//        saver.setFile(outputFile);
-//        saver.writeBatch();
 
         return instances;
 

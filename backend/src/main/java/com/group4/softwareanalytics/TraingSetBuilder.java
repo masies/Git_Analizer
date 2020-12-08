@@ -20,46 +20,20 @@ public class TraingSetBuilder {
 
     public ArrayList<CommitEntry> exportTrainingSet(){
         Collections.sort(this.commitsEntries, Collections.reverseOrder());
-        System.out.println("training set");
         ArrayList<CommitEntry> toReturn = new ArrayList<>();
         for (int i = 10; i < this.commitsEntries.size() ; i++) {
             toReturn.add(this.commitsEntries.get(i));
-            System.out.println(this.commitsEntries.get(i).getCommitHash());
         }
-        System.out.println();
         return  toReturn;
     }
 
     public ArrayList<CommitEntry> exportPredictionSet(){
         Collections.sort(this.commitsEntries, Collections.reverseOrder());
-        System.out.println("prediction set");
         ArrayList<CommitEntry> toReturn = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             toReturn.add(this.commitsEntries.get(i));
-            System.out.println(this.commitsEntries.get(i).getCommitHash());
         }
-        System.out.println();
         return  toReturn;
-    }
-
-    public void resume(){
-        for (CommitEntry ce: this.commitsEntries) {
-            System.out.println("Hash: " +ce.getCommitHash());
-            System.out.println("developer mail: " +ce.getDeveloperMail());
-
-            System.out.println("added files: " +ce.getAddedFileCount());
-            System.out.println("deleted files: " +ce.getDeleteFileCount());
-            System.out.println("modified files: " +ce.getModifiedFileCount());
-            System.out.println("added lines: " +ce.getAddedLinesCount());
-            System.out.println("deleted lines: " +ce.getDeletedLinesCount());
-            System.out.println("dev absolute expertise: " +ce.getDeveloperAbsoluteExperience());
-            System.out.println("dev average expertise: " +ce.getDeveloperAverageExperience());
-            System.out.println("dev buggy ratio: " +ce.getDeveloperBuggyCommitsRatio());
-            System.out.println("commits last month: " +ce.getDeveloperTotalCommitsLastMont());
-
-            System.out.println("BUGGY: " + ce.isBuggy());
-            System.out.println();
-        }
     }
 
 
