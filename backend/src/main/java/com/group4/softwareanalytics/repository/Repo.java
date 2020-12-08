@@ -1,5 +1,6 @@
 package com.group4.softwareanalytics.repository;
 
+import com.group4.softwareanalytics.PredictorStats;
 import org.eclipse.egit.github.core.Repository;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,11 +16,22 @@ public class Repo {
     private String repo;
     private RepoStatus status;
 
+    private PredictorStats predictorStats;
+
     public Repo(Repository repository, String owner, String repo) {
         this.repository = repository;
         this.status = new RepoStatus();
         this.owner = owner;
         this.repo = repo;
+    }
+
+
+    public PredictorStats getPredictorStats() {
+        return predictorStats;
+    }
+
+    public void setPredictorStats(PredictorStats predictorStats) {
+        this.predictorStats = predictorStats;
     }
 
     public String getId() {
@@ -63,6 +75,7 @@ public class Repo {
     public void hasCommitsDone(){
         this.status.setFetchedCommits(true);
     }
+    public void hasPredictionDone(){ this.status.setPredictionsDone(true); }
 
     public Repository getRepository() {
         return repository;

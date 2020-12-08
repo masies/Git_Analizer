@@ -82,7 +82,7 @@ public class Predictor {
     }
 
 
-    public static void evaluate(Instances dataset) throws Exception {
+    public static PredictorStats evaluate(Instances dataset) throws Exception {
 
         ArrayList<String> categories = new ArrayList<String>();
         categories.add("true");
@@ -139,6 +139,13 @@ public class Predictor {
         System.out.println("Overall Evaluation: " +  AccTotal/10);
         System.out.println("Overall Precision: " +  (PreTotal/10)*100);
         System.out.println("Overall Recall: " +  (RecTotal/10)*100);
+
+        double precision = (PreTotal/10) * 100;
+        double recall = (RecTotal/10) * 100;
+        double accuracy = AccTotal/10;
+
+
+        return new PredictorStats(precision, recall, accuracy);
     }
 
     public static void predict(Instances dataset, Instances predictionSet) throws Exception {

@@ -101,6 +101,7 @@ public class AsyncService {
             developerExpertiseRepository.findAndRemove(owner,name);
             developerPRRepository.findAndRemove(owner,name);
             fileContributionRepository.findAndRemove(owner,name);
+            traingSetBuilder = new TraingSetBuilder();
             
             // mining repo
             Repo repo = fetchRepo(owner,name);
@@ -111,25 +112,36 @@ public class AsyncService {
             traingSetBuilder.computeFinalMetrics();
 
             if (traingSetBuilder.getCommits().size() > 20){
-                computePredictions();
+                computePredictions(repo);
             } else {
                 logger.info("NOT ENOUGH COMMITS TO RUN PREDICTIONS");
+                repo.setPredictorStats(null);
+                repo.hasPredictionDone();
+                repoRepository.save(repo);
             }
-
 
         } catch (Exception e){
             logger.warning(e.getMessage());
         }
     }
 
-    private void computePredictions() {
+    private void computePredictions(Repo repo) {
         try {
-            Predictor.evaluate(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()));
+            ArrayList<Pair<String, Float>> predictions = new ArrayList<>();
+
+            PredictorStats predictorStats = Predictor.evaluate(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()));
+
+
             Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile(traingSetBuilder.exportPredictionSet()));
 
+            repo.setPredictorStats(predictorStats);
+            repo.hasPredictionDone();
+            repoRepository.save(repo);
         } catch (Exception e){
             logger.info(e.getMessage());
         }
+
+
 
     }
 
@@ -420,7 +432,7 @@ public class AsyncService {
                         if (file.getContributionsMap().isEmpty() && file.isFile()) {
                             file.addDeveloperContribute(developerName.replace(".",""));
 
-                            Pair devAndFile = new Pair(developerMail, file.getPath());
+                            Pair<String, String> devAndFile = new Pair<>(developerMail, file.getPath());
                             commitEntry.addContribution(devAndFile);
                         }
                     }
@@ -434,7 +446,7 @@ public class AsyncService {
                                 // if it contains a dot, it will mess up With MongoDB mapping
                                 file.addDeveloperContribute(developerName.replace(".",""));
 
-                                Pair devAndFile = new Pair(developerMail, file.getPath());
+                                Pair<String, String> devAndFile = new Pair<>(developerMail, file.getPath());
                                 commitEntry.addContribution(devAndFile);
                             }
                         }

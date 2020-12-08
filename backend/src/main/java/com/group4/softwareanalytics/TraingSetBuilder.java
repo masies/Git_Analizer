@@ -72,7 +72,6 @@ public class TraingSetBuilder {
     }
 
     public void computeFinalMetrics() {
-        // TODO: check order of this
         Collections.sort(this.commitsEntries, Collections.reverseOrder());
         for (int i = this.commitsEntries.size() - 1; i >= 1 ; i--) {
             CommitEntry ce = this.commitsEntries.get(i);
@@ -81,7 +80,6 @@ public class TraingSetBuilder {
             float devBuggyCommitsCount = 0;
             for (int j = i - 1 ; j >=0 ; j--) {
                 CommitEntry nextCe = this.commitsEntries.get(j);
-                int nextExpertise = nextCe.getDeveloperAbsoluteExperience();
                 String nextDeveloper = nextCe.getDeveloperMail();
                 if (developer.equals(nextDeveloper)){
                     devCommitsCount += 1;
@@ -98,7 +96,6 @@ public class TraingSetBuilder {
         }
 
         for (int i = this.commitsEntries.size() - 1; i >= 1; i--) {
-            // TODO: check order of this
             Collections.sort(this.commitsEntries, Collections.reverseOrder());
             CommitEntry ce = this.commitsEntries.get(i);
             String dev = ce.getDeveloperMail();
@@ -117,24 +114,6 @@ public class TraingSetBuilder {
                 }
             }
         }
-
-
-//        for (int i = this.commitsEntries.size() - 1; i >= 1; i--) {
-//            CommitEntry ce = this.commitsEntries.get(i);
-//            String dev = ce.getDeveloperMail();
-//            ArrayList<String> relatedFiles = ce.getRelatedFilePaths();
-//            for (int j = i - 1; j >= 0; j--) {
-//                CommitEntry nextCe = this.commitsEntries.get(j);
-//                String nextDev = nextCe.getDeveloperMail();
-//                ArrayList<String> NextRelatedFiles = ce.getRelatedFilePaths();
-//                for (String file: NextRelatedFiles) {
-//                    if (relatedFiles.contains(file) && dev.equals(nextDev)){
-//                        ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() + 1);
-//                    }
-//                }
-//            }
-//
-//        }
 
     }
 }
