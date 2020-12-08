@@ -1,14 +1,16 @@
 package com.group4.softwareanalytics;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 
-public class CommitEntry {
+public class CommitEntry implements Comparable<CommitEntry> {
     private int addedFileCount = 0;
     private int modifiedFileCount = 0;
     private int deleteFileCount = 0;
     private int addedLinesCount = 0;
     private int deletedLinesCount = 0;
+    private Date date = new Date();
     private String commitHash;
     private String developerMail;
     private ArrayList<Pair<String,String>> contibutions = new ArrayList<>();
@@ -39,6 +41,19 @@ public class CommitEntry {
         this.developerAverageExperience = developerAverageExperience;
         this.developerBuggyCommitsRatio = developerBuggyCommitsRatio;
         this.developerTotalCommitsLastMont = developerTotalCommitsLastMont;
+    }
+
+    @Override
+    public int compareTo(CommitEntry o) {
+        return getDate().compareTo(o.getDate());
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public ArrayList<Pair<String,String>> getContibutions() {

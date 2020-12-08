@@ -1,7 +1,5 @@
 package com.group4.softwareanalytics;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
@@ -103,19 +101,63 @@ public class AsyncService {
             developerExpertiseRepository.findAndRemove(owner,name);
             developerPRRepository.findAndRemove(owner,name);
             fileContributionRepository.findAndRemove(owner,name);
+            traingSetBuilder = new TraingSetBuilder();
             
             // mining repo
             Repo repo = fetchRepo(owner,name);
             fetchIssues(owner, name, repo);
             fetchCommits(owner, name, repo);
-            computeSZZ(owner, name);
+            computeSZZ(owner, name, repo);
 
             traingSetBuilder.computeFinalMetrics();
-            traingSetBuilder.resume();
+
+            if (traingSetBuilder.getCommits().size() > 20){
+                computePredictions(repo);
+            } else {
+                logger.info("NOT ENOUGH COMMITS TO RUN PREDICTIONS");
+                repo.setPredictorStats(null);
+                repo.hasPredictionDone();
+                repoRepository.save(repo);
+            }
 
         } catch (Exception e){
             logger.warning(e.getMessage());
         }
+    }
+
+    private void computePredictions(Repo repo) {
+        try {
+            ArrayList<String> commitIdsToPredict = new ArrayList<>();
+            ArrayList<CommitEntry> entriesToPredict = traingSetBuilder.exportPredictionSet();
+
+            for (int i = 0; i < entriesToPredict.size() ; i++) {
+                commitIdsToPredict.add(entriesToPredict.get(i).getCommitHash());
+            }
+
+            PredictorStats predictorStats = Predictor.evaluate(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()));
+
+            if (predictorStats != null){
+                ArrayList<Double> predictions = Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile( entriesToPredict ));
+
+                // TODO: control sizes and everything
+                for (int i = 0; i < commitIdsToPredict.size() ; i++) {
+                    Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(repo.getOwner(), repo.getRepo(), commitIdsToPredict.get(i));
+                    commit.setCleanProbability(predictions.get(i));
+                    commitRepository.save(commit);
+                }
+            }
+
+
+
+            repo.setPredictorStats(predictorStats);
+            repo.hasPredictionDone();
+            repoRepository.save(repo);
+        } catch (Exception e){
+            logger.info(e.getMessage());
+        }
+
+
+
     }
 
     public Repo fetchRepo(String owner, String name) throws IOException {
@@ -395,6 +437,7 @@ public class AsyncService {
 
                 commitEntry.setCommitHash(commitName);
                 commitEntry.setDeveloperMail(developerMail);
+                commitEntry.setDate(date);
 
                 ProjectMetric projectMetric = new ProjectMetric(0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -404,7 +447,7 @@ public class AsyncService {
                         if (file.getContributionsMap().isEmpty() && file.isFile()) {
                             file.addDeveloperContribute(developerName.replace(".",""));
 
-                            Pair devAndFile = new Pair(developerMail, file.getPath());
+                            Pair<String, String> devAndFile = new Pair<>(developerMail, file.getPath());
                             commitEntry.addContribution(devAndFile);
                         }
                     }
@@ -418,7 +461,7 @@ public class AsyncService {
                                 // if it contains a dot, it will mess up With MongoDB mapping
                                 file.addDeveloperContribute(developerName.replace(".",""));
 
-                                Pair devAndFile = new Pair(developerMail, file.getPath());
+                                Pair<String, String> devAndFile = new Pair<>(developerMail, file.getPath());
                                 commitEntry.addContribution(devAndFile);
                             }
                         }
@@ -494,6 +537,7 @@ public class AsyncService {
             logger.info("------- Commits stored successfully! -------");
 
             r.hasCommitsDone();
+            r.setTotalCommits(revCommitList.size());
             repoRepository.save(r);
 
 
@@ -616,7 +660,7 @@ public class AsyncService {
         return Lists.newArrayList(Sets.newHashSet(linkedIssues));
     }
 
-    public void computeSZZ(String owner, String repoName) throws IOException, GitAPIException {
+    public void computeSZZ(String owner, String repoName, Repo r) throws IOException, GitAPIException {
         for (Commit commit : fixingCommits) {
 
             // CHECKOUT this specific commit
@@ -731,8 +775,11 @@ public class AsyncService {
 
             commitRepository.save(commit);
 
+
         }
 
+        r.hasSZZDone();
+        repoRepository.save(r);
         logger.info("------- SZZ completed. -------");
     }
 }

@@ -18,24 +18,22 @@ public class TraingSetBuilder {
         this.commitsEntries = commitEntries;
     }
 
-    public void resume(){
-        for (CommitEntry ce: this.commitsEntries) {
-            System.out.println("Hash: " +ce.getCommitHash());
-            System.out.println("developer mail: " +ce.getDeveloperMail());
-
-            System.out.println("added files: " +ce.getAddedFileCount());
-            System.out.println("deleted files: " +ce.getDeleteFileCount());
-            System.out.println("modified files: " +ce.getModifiedFileCount());
-            System.out.println("added lines: " +ce.getAddedLinesCount());
-            System.out.println("deleted lines: " +ce.getDeletedLinesCount());
-            System.out.println("dev absolute expertise: " +ce.getDeveloperAbsoluteExperience());
-            System.out.println("dev average expertise: " +ce.getDeveloperAverageExperience());
-            System.out.println("dev buggy ratio: " +ce.getDeveloperBuggyCommitsRatio());
-            System.out.println("commits last month: " +ce.getDeveloperTotalCommitsLastMont());
-
-            System.out.println("BUGGY: " + ce.isBuggy());
-            System.out.println();
+    public ArrayList<CommitEntry> exportTrainingSet(){
+        Collections.sort(this.commitsEntries, Collections.reverseOrder());
+        ArrayList<CommitEntry> toReturn = new ArrayList<>();
+        for (int i = 10; i < this.commitsEntries.size() ; i++) {
+            toReturn.add(this.commitsEntries.get(i));
         }
+        return  toReturn;
+    }
+
+    public ArrayList<CommitEntry> exportPredictionSet(){
+        Collections.sort(this.commitsEntries, Collections.reverseOrder());
+        ArrayList<CommitEntry> toReturn = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            toReturn.add(this.commitsEntries.get(i));
+        }
+        return  toReturn;
     }
 
 
@@ -48,7 +46,7 @@ public class TraingSetBuilder {
     }
 
     public void computeFinalMetrics() {
-
+        Collections.sort(this.commitsEntries, Collections.reverseOrder());
         for (int i = this.commitsEntries.size() - 1; i >= 1 ; i--) {
             CommitEntry ce = this.commitsEntries.get(i);
             String developer = ce.getDeveloperMail();
@@ -56,7 +54,6 @@ public class TraingSetBuilder {
             float devBuggyCommitsCount = 0;
             for (int j = i - 1 ; j >=0 ; j--) {
                 CommitEntry nextCe = this.commitsEntries.get(j);
-                int nextExpertise = nextCe.getDeveloperAbsoluteExperience();
                 String nextDeveloper = nextCe.getDeveloperMail();
                 if (developer.equals(nextDeveloper)){
                     devCommitsCount += 1;
@@ -73,6 +70,7 @@ public class TraingSetBuilder {
         }
 
         for (int i = this.commitsEntries.size() - 1; i >= 1; i--) {
+            Collections.sort(this.commitsEntries, Collections.reverseOrder());
             CommitEntry ce = this.commitsEntries.get(i);
             String dev = ce.getDeveloperMail();
             ArrayList<Pair<String,String>> contribs = ce.getContibutions();
@@ -90,24 +88,6 @@ public class TraingSetBuilder {
                 }
             }
         }
-
-
-//        for (int i = this.commitsEntries.size() - 1; i >= 1; i--) {
-//            CommitEntry ce = this.commitsEntries.get(i);
-//            String dev = ce.getDeveloperMail();
-//            ArrayList<String> relatedFiles = ce.getRelatedFilePaths();
-//            for (int j = i - 1; j >= 0; j--) {
-//                CommitEntry nextCe = this.commitsEntries.get(j);
-//                String nextDev = nextCe.getDeveloperMail();
-//                ArrayList<String> NextRelatedFiles = ce.getRelatedFilePaths();
-//                for (String file: NextRelatedFiles) {
-//                    if (relatedFiles.contains(file) && dev.equals(nextDev)){
-//                        ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() + 1);
-//                    }
-//                }
-//            }
-//
-//        }
 
     }
 }
