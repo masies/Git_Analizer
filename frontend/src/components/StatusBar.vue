@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="col-12">		
 			<div class="progress">
-				<div class="progress-bar" role="progressbar" :style="{width: percentage+'%'}" :aria-valuenow="percentage" aria-valuemin="0" aria-valuemax="100">
+				<div class="progress-bar" role="progressbar" :class="{'bg-success': isComplete}" :style="{width: percentage+'%'}" :aria-valuenow="percentage" aria-valuemin="0" aria-valuemax="100">
 					<span :class="{loading: !isComplete}" v-if="!isComplete">Fetching repository</span>
 					<span v-if="isComplete">Fetching complete!</span>
 				</div>
@@ -50,9 +50,12 @@
 				data: {
 					fetchedInfo: false,
 					fetchedIssues: false,
-					fetchedCommits: false
+					fetchedCommits: false,
+					predictionsDone: false,
+					szzdone: false
 				},
-				status: ["Fetching repository information...", "Fetching repository issues...", "Fetching repository commits..."]
+				status: ["Starting the analysis…"
+				]
 			}
 		},
 		mounted(){
@@ -71,6 +74,8 @@
 					this.$set(this.data, "fetchedInfo", data.fetchedInfo)
 					this.$set(this.data, "fetchedIssues", data.fetchedIssues)
 					this.$set(this.data, "fetchedCommits", data.fetchedCommits)
+					this.$set(this.data, "szzdone", data.szzdone)
+					this.$set(this.data, "predictionsDone", data.predictionsDone)
 				});
 			}
 		},
@@ -98,6 +103,12 @@
 			},
 			'data.fetchedCommits': function(newVal, oldVal){
 				this.status.push("Fetching reposiotry commits complete!")
+			},
+			'data.predictionsDone': function(newVal, oldVal){
+				this.status.push("Predicting buggy commits complete!")
+			},
+			'data.szzdone': function(newVal, oldVal){
+				this.status.push("Computing SZZ complete!")
 			}
 		}
 	}

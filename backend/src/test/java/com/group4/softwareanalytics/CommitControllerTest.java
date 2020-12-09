@@ -86,7 +86,7 @@ class CommitControllerTest {
         assertNotNull(commits);
         assertNotNull(devExps);
 
-        List<String> nullFields = Arrays.asList("getEncodingName","getBugInducingCommits","getLinkedFixedIssues");
+        List<String> nullFields = Arrays.asList("getEncodingName","getBugInducingCommits","getLinkedFixedIssues","getCleanProbability");
 
         for(Commit commit:commits)
         {
@@ -152,14 +152,15 @@ class CommitControllerTest {
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository("./repo/"+owner+"/"+name+"/.git"); // GET TOTAL NUMBER OF COMMITS FROM THE ACTUAL REPO
         List<String> branches = new ArrayList<>();
-        Git git = new Git(repo);
-        List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
-        for(Ref branch: refs)
-        {
-            branches.add(branch.getName());
-        }
+        List<RevCommit> revCommitList;
+        try (Git git = new Git(repo)) {
+            List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
+            for (Ref branch : refs) {
+                branches.add(branch.getName());
+            }
 
-        List<RevCommit> revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
+            revCommitList = CommitExtractor.getCommits(branches.get(0), git, repo);
+        }
 
         assertEquals(ids, revCommitList.size());
     }

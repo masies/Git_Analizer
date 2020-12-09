@@ -3,8 +3,6 @@ package com.group4.softwareanalytics.commits;
 
 import com.group4.softwareanalytics.metrics.ProjectMetric;
 import com.group4.softwareanalytics.metrics.ProjectMetricExtractor;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +13,7 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -104,12 +103,10 @@ public class CommitController {
             commit.setProjectMetrics(metrics);
             commit.setHasMetrics(true);
 
-            String dest_url = "./repo/" + owner + "/" + repoName;
-            org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
-            Git git = new Git(repo);
+//            String dest_url = "./repo/" + owner + "/" + repoName;
+//            org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+//            Git git = new Git(repo);
 
-            List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitID, dest_url, parentCommitIDs);
-            commit.setModifications(diffEntries);
             commitRepository.save(commit);
 
         }

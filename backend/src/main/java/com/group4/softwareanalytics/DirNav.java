@@ -4,9 +4,13 @@ import java.io.File;
 import java.util.HashMap;
 
 public class DirNav {
-    static HashMap<String,Boolean>  repoContents = new HashMap<>();
+    private HashMap<String,Boolean> repoContents = new HashMap<>();
 
-    public static HashMap<String,Boolean> repoContents(String repoPath){
+    public void initialize(){
+        this.repoContents = new HashMap<>();
+    }
+
+    public HashMap<String,Boolean> repoContents(String repoPath){
         Boolean directory = false;
         Boolean file = true;
 
@@ -26,4 +30,3 @@ public class DirNav {
         return repoContents;
     }
 }
-
