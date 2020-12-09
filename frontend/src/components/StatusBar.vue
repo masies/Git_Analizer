@@ -57,8 +57,8 @@
 				status: ["Fetching repository information...", 
 				"Fetching repository issues...", 
 				"Fetching repository commits...",
-				"Predicting buggy commits...",
-				"Computing SZZ..."
+				"Computing SZZ...",
+				"Predicting buggy commits..."
 				]
 			}
 		},
@@ -78,8 +78,8 @@
 					this.$set(this.data, "fetchedInfo", data.fetchedInfo)
 					this.$set(this.data, "fetchedIssues", data.fetchedIssues)
 					this.$set(this.data, "fetchedCommits", data.fetchedCommits)
-					this.$set(this.data, "predictionsDone", data.predictionsDone)
 					this.$set(this.data, "szzdone", data.szzdone)
+					this.$set(this.data, "predictionsDone", data.predictionsDone)
 				});
 			}
 		},
