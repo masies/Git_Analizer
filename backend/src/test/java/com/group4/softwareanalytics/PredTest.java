@@ -29,6 +29,7 @@ public class PredTest {
     @Autowired
     private AsyncService asyncService;
 
+    
     public static int randInt(int min, int max) {
 
         int range = max - min + 1;
