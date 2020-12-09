@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.group4.softwareanalytics.DirNav.repoContents;
 
 
 @Service
@@ -102,7 +101,7 @@ public class AsyncService {
             developerPRRepository.findAndRemove(owner,name);
             fileContributionRepository.findAndRemove(owner,name);
             traingSetBuilder = new TraingSetBuilder();
-            
+
             // mining repo
             Repo repo = fetchRepo(owner,name);
             fetchIssues(owner, name, repo);
@@ -157,6 +156,7 @@ public class AsyncService {
         }
 
 
+        logger.info("------- Classifier prediction completed. -------");
 
     }
 
@@ -182,7 +182,7 @@ public class AsyncService {
 
         List<Issue> issues = Stream.concat(issuesOpen.stream(), issuesClosed.stream())
                 .collect(Collectors.toList());
-        
+
         // list of developer expertise
         ArrayList<DeveloperPR> developerPRRatesList = new ArrayList<>();
 
@@ -402,7 +402,9 @@ public class AsyncService {
         }
 
         CommitExtractor.DownloadRepo(repo_url, dest_url);
-        
+
+
+
         ArrayList<FileContribution> fileContributions = computeFileContributions(owner, repoName, dest_url);
 
         org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
@@ -589,11 +591,14 @@ public class AsyncService {
 
         return relatedFilePaths;
     }
-    
+
     ArrayList<FileContribution> computeFileContributions(String owner, String repoName, String path){
         ArrayList<FileContribution> fileContributions = new ArrayList<>();
 
-        HashMap<String,Boolean> filesAndRepos = repoContents(path);
+        DirNav dirNav = new DirNav();
+        dirNav.initialize();
+
+        HashMap<String,Boolean> filesAndRepos = dirNav.repoContents(path);
         for (Map.Entry<String, Boolean> entry : filesAndRepos.entrySet()) {
             String filePath = entry.getKey().replace("./repo/" + owner + "/"+ repoName , "");
             Boolean fileType = entry.getValue();
