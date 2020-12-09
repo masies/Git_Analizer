@@ -18,6 +18,9 @@ public interface FileContributionRepository extends MongoRepository<FileContribu
     @Query("{'owner' : ?0 , 'repo' : ?1}")
     ArrayList<FileContribution> findByOwnerAndRepo(String owner, String repo);
 
+    @Query("{'owner' : ?0 , 'repo' : ?1, 'filename': {$regex: ?2 }}")
+    ArrayList<FileContribution> findByOwnerAndRepoAndName(String owner, String repo, String q);
+
     ArrayList<FileContribution> findByOwnerAndRepoAndDir(String owner, String repo, String path);
 
 

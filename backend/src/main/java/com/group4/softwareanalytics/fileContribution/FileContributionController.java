@@ -23,6 +23,13 @@ public class FileContributionController {
         return fileContributionRepository.findByOwnerAndRepo(owner, repo);
     }
 
+    @GetMapping("/repo/{owner}/{repo}/tree/search")
+    public ArrayList<FileContribution> searchTree(@PathVariable(value="owner") String owner,
+                    @PathVariable(value="repo") String repo,
+                    @RequestParam(defaultValue = "") String q){
+        return fileContributionRepository.findByOwnerAndRepoAndName(owner,repo, q);
+    }
+
     @GetMapping("/repo/{owner}/{repo}/tree/**")
     public ArrayList<FileContribution> getAttr(@PathVariable(value="owner") String owner,
                     @PathVariable(value="repo") String repo,
@@ -31,5 +38,7 @@ public class FileContributionController {
         String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree","");
         return fileContributionRepository.findByOwnerAndRepoAndDir(owner,repo,path);
     }
+
+
 
 }
