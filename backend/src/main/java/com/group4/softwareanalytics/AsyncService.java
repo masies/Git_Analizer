@@ -156,6 +156,7 @@ public class AsyncService {
         }
 
 
+        logger.info("------- Classifier prediction completed. -------");
 
     }
 
