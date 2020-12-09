@@ -54,11 +54,7 @@
 					predictionsDone: false,
 					szzdone: false
 				},
-				status: ["Fetching repository information...", 
-				"Fetching repository issues...", 
-				"Fetching repository commits...",
-				"Computing SZZ...",
-				"Predicting buggy commits..."
+				status: ["Starting the analysis…"
 				]
 			}
 		},
