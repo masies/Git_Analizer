@@ -185,9 +185,9 @@ public class Predictor {
 
         RandomForest classifier = new RandomForest();
 
-        String options = ("-I 100");
-        String[] optionsArray = options.split(" ");
-        classifier.setOptions(optionsArray);
+//        String options = ("-I 100");
+//        String[] optionsArray = options.split(" ");
+//        classifier.setOptions(optionsArray);
         instances.setClass(instances.attribute(toPredictName));
         classifier.buildClassifier(instances);
         return classifier;
