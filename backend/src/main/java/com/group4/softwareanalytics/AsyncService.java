@@ -82,7 +82,7 @@ public class AsyncService {
 
     java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AsyncService.class.getName());
 
-    private static final String repoFolderPath = "./repo/";
+    private static final String REPO_FOLDER_PATH = "./repo/";
 
     private TraingSetBuilder traingSetBuilder = new TraingSetBuilder();
 
@@ -391,7 +391,7 @@ public class AsyncService {
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
         String repo_url = "https://github.com/" + owner + "/" + repoName;
-        String dest_url = repoFolderPath + owner + "/" + repoName;
+        String dest_url = REPO_FOLDER_PATH + owner + "/" + repoName;
 
         List<Commit> commitList = new ArrayList<>();
         List<String> branches = new ArrayList<>();
@@ -488,7 +488,7 @@ public class AsyncService {
                     ProcessBuilder diffProcessBuilder = new ProcessBuilder(
                             "git", "--no-pager", "diff", "--shortstat", commitName, commitParentsIDs.get(0));
 
-                    diffProcessBuilder.directory(new File(repoFolderPath + owner + "/" + repoName));
+                    diffProcessBuilder.directory(new File(REPO_FOLDER_PATH + owner + "/" + repoName));
                     String linesCounts = runProcess(diffProcessBuilder);
 
                     int linesAdded = 0;
@@ -669,7 +669,7 @@ public class AsyncService {
         for (Commit commit : fixingCommits) {
 
             // CHECKOUT this specific commit
-            String dest_url = repoFolderPath + commit.getOwner() +"/"+ commit.getRepo();
+            String dest_url = REPO_FOLDER_PATH + commit.getOwner() +"/"+ commit.getRepo();
             org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 
             HashSet<String> bugInducingCommitsHashSet;
@@ -738,7 +738,7 @@ public class AsyncService {
                     String file = entry.getKey();
                     ArrayList<Integer> deletedLines = entry.getValue();
 
-                    String relativePath = repoFolderPath + owner + "/" + repoName + "/" + file;
+                    String relativePath = REPO_FOLDER_PATH + owner + "/" + repoName + "/" + file;
                     ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
 
                     BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
