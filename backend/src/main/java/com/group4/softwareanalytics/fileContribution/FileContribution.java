@@ -29,7 +29,7 @@ public class FileContribution {
     private String dir;
 
     // map developer (String username) to number of commits he performed on this file
-    HashMap<String,Integer> contributionsMap = new HashMap<>();
+    Map<String, Integer> contributionsMap = new HashMap<>();
 
     private String topContributor;
 
@@ -125,11 +125,11 @@ public class FileContribution {
         this.file = file;
     }
 
-    public HashMap<String, Integer> getContributionsMap() {
+    public Map<String, Integer> getContributionsMap() {
         return contributionsMap;
     }
 
-    public void setContributionsMap(HashMap<String, Integer> contributionsMap) {
+    public void setContributionsMap(Map<String, Integer> contributionsMap) {
         this.contributionsMap = contributionsMap;
     }
 

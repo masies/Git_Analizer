@@ -2,6 +2,7 @@ package com.group4.softwareanalytics;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 
 public class DirNav {
     private HashMap<String,Boolean> repoContents = new HashMap<>();
@@ -10,7 +11,7 @@ public class DirNav {
         this.repoContents = new HashMap<>();
     }
 
-    public HashMap<String,Boolean> repoContents(String repoPath){
+    public Map<String, Boolean> repoContents(String repoPath){
         Boolean directory = false;
         Boolean file = true;
 
