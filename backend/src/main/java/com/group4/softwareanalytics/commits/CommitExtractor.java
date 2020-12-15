@@ -71,8 +71,8 @@ public class CommitExtractor {
                     ArrayList<Float> parentMetrics = new ArrayList<>();
 
                     if (entry.getChangeType().name().equals("MODIFY") && entry.getNewPath().endsWith(".java")) {
-                        String repoNewPath = path + "/" + entry.getNewPath();
-                        String repoOldPath = path + "/" + entry.getOldPath();
+                        String repoNewPath = path + File.separator + entry.getNewPath();
+                        String repoOldPath = path + File.separator + entry.getOldPath();
                         git.checkout().setName(commitHashID).call();
 
                         MetricResults results = new MetricResults();

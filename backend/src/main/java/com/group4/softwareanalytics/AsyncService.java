@@ -217,7 +217,7 @@ public class AsyncService {
 
      public DeveloperPR linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
         ProcessBuilder curlPRProcess = new ProcessBuilder(
-                "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
+                "curl", "-X", "GET", "https://api.github.com/repos/" + owner + File.separator + repoName+ "/pulls/" + PRnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
 
         JsonObject jsonPR = curlRequest(curlPRProcess);
@@ -293,7 +293,7 @@ public class AsyncService {
             // we do not have the closed_by info in the pull request fetched as pull
             // hence we need to fetch it as issue
             ProcessBuilder curlIssueProcess = new ProcessBuilder(
-                    "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName + "/issues/" + PRnumber,
+                    "curl", "-X", "GET", "https://api.github.com/repos/" + owner + File.separator + repoName + "/issues/" + PRnumber,
                     "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
 
             JsonObject jsonIssue = curlRequest(curlIssueProcess);
@@ -390,8 +390,8 @@ public class AsyncService {
 
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
-        String repoUrl = "https://github.com/" + owner + "/" + repoName;
-        String destUrl = REPO_FOLDER_PATH + owner + "/" + repoName;
+        String repoUrl = "https://github.com/" + owner + File.separator + repoName;
+        String destUrl = REPO_FOLDER_PATH + owner + File.separator + repoName;
 
         List<Commit> commitList = new ArrayList<>();
         List<String> branches = new ArrayList<>();
@@ -488,7 +488,7 @@ public class AsyncService {
                     ProcessBuilder diffProcessBuilder = new ProcessBuilder(
                             "git", "--no-pager", "diff", "--shortstat", commitName, commitParentsIDs.get(0));
 
-                    diffProcessBuilder.directory(new File(REPO_FOLDER_PATH + owner + "/" + repoName));
+                    diffProcessBuilder.directory(new File(REPO_FOLDER_PATH + owner + File.separator + repoName));
                     String linesCounts = runProcess(diffProcessBuilder);
 
                     int linesAdded = 0;
@@ -738,7 +738,7 @@ public class AsyncService {
                     String file = entry.getKey();
                     ArrayList<Integer> deletedLines = entry.getValue();
 
-                    String relativePath = REPO_FOLDER_PATH + owner + "/" + repoName + "/" + file;
+                    String relativePath = REPO_FOLDER_PATH + owner + File.separator + repoName + File.separator + file;
                     ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
 
                     BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();

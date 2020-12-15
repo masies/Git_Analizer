@@ -45,8 +45,8 @@ public class FileContrTest {
         String owner = "HouariZegai";
         String name = "Calculator";
 
-        String repoUrl = "https://github.com/" + owner + "/" + name;
-        String destUrl = "./repo/" + owner + "/" + name;
+        String repoUrl = "https://github.com/" + owner + File.separator + name;
+        String destUrl = "./repo/" + owner + File.separator + name;
 
 
         deleteDir();
