@@ -106,11 +106,11 @@ public class MetricsTest {
 
         assertFalse(targetCommit.getHasMetrics());
 
-        String destUrl = "./repo/" + owner +"/"+ name;
-        org.eclipse.jgit.lib.Repository repo = new FileRepository(destUrl + "/.git");
+        String dest_url = "./repo/" + owner +"/"+ name;
+        org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
         Git git = new Git(repo);
 
-        List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, targetCommit.getCommitName(), destUrl, targetCommit.getCommitParentsIDs());
+        List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, targetCommit.getCommitName(), dest_url, targetCommit.getCommitParentsIDs());
 
         assertEquals(1, diffEntries.size());
 

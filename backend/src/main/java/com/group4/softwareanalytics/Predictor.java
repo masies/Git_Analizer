@@ -120,27 +120,27 @@ public class Predictor {
 
         }
 
-        Double acctotal = .0;
+        Double AccTotal = .0;
         for(Double res: acc)
         {
-            acctotal +=res;
+            AccTotal +=res;
         }
 
-        Double pretotal = .0;
+        Double PreTotal = .0;
         for(Double res: pre)
         {
-            pretotal +=res;
+            PreTotal +=res;
         }
 
-        Double rectotal = .0;
+        Double RecTotal = .0;
         for(Double res: rec)
         {
-            rectotal +=res;
+            RecTotal +=res;
         }
 
-        double precision = (pretotal/10) * 100;
-        double recall = (rectotal/10) * 100;
-        double accuracy = acctotal/10;
+        double precision = (PreTotal/10) * 100;
+        double recall = (RecTotal/10) * 100;
+        double accuracy = AccTotal/10;
 
 
         return new PredictorStats(precision, recall, accuracy);

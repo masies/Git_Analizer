@@ -16,21 +16,21 @@ public class ProjectMetric {
     private float deltaWMC;
     private float deltaLCOM;
 
-    public ProjectMetric( float cbo, float wmc, float loc, float lcom, float parentCBO, float parentWMC, float parentLOC, float parentLCOM ) {
-        this.LOC = loc;
-        this.CBO = cbo;
-        this.WMC = wmc;
-        this.LCOM = lcom;
+    public ProjectMetric( float CBO, float WMC, float LOC, float LCOM, float parentCBO, float parentWMC, float parentLOC, float parentLCOM ) {
+        this.LOC = LOC;
+        this.CBO = CBO;
+        this.WMC = WMC;
+        this.LCOM = LCOM;
 
         this.parentLOC = parentLOC;
         this.parentCBO = parentCBO;
         this.parentWMC = parentWMC;
         this.parentLCOM = parentLCOM;
 
-        this.deltaCBO = parentCBO - cbo;
-        this.deltaLCOM = parentLCOM - lcom;
-        this.deltaLOC = parentLOC - loc;
-        this.deltaWMC = parentWMC - wmc;
+        this.deltaCBO = parentCBO - CBO;
+        this.deltaLCOM = parentLCOM - LCOM;
+        this.deltaLOC = parentLOC - LOC;
+        this.deltaWMC = parentWMC - WMC;
     }
 
     public float getLOC() {

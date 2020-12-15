@@ -18,14 +18,14 @@ public class DeveloperPR {
     private int opened;
     private int reviewed;
 
-    private int acceptedOpened;
-    private int acceptedReviewed;
+    private int accepted_opened;
+    private int accepted_reviewed;
 
-    private double acceptedOpenedPercentage;
-    private double acceptedReviewedPercentage;
+    private double accepted_opened_percentage;
+    private double accepted_reviewed_percentage;
 
-    private HashSet<Integer> propenednumbers = new HashSet<>();
-    private HashSet<Integer> prreviewednumbers = new HashSet<>();
+    private HashSet<Integer> PROpenedNumbers = new HashSet<>();
+    private HashSet<Integer> PRReviewedNumbers = new HashSet<>();
 
     public DeveloperPR(String owner, String repo, String username) {
         this.owner = owner;
@@ -33,34 +33,34 @@ public class DeveloperPR {
         this.username = username;
         this.opened = 0;
         this.reviewed = 0;
-        this.acceptedOpened = 0;
-        this.acceptedReviewed = 0;
-        this.acceptedOpenedPercentage = 0;
-        this.acceptedReviewedPercentage = 0;
+        this.accepted_opened = 0;
+        this.accepted_reviewed = 0;
+        this.accepted_opened_percentage = 0;
+        this.accepted_reviewed_percentage = 0;
     }
 
     public void addPROpened(int number){
-        this.propenednumbers.add(number);
+        this.PROpenedNumbers.add(number);
     }
 
-    public HashSet<Integer> getPropenednumbers() {
-        return propenednumbers;
+    public HashSet<Integer> getPROpenedNumbers() {
+        return PROpenedNumbers;
     }
 
-    public void setPropenednumbers(HashSet<Integer> propenednumbers) {
-        this.propenednumbers = propenednumbers;
+    public void setPROpenedNumbers(HashSet<Integer> PROpenedNumbers) {
+        this.PROpenedNumbers = PROpenedNumbers;
     }
 
     public void addPRreviewed(int number){
-        prreviewednumbers.add(number);
+        PRReviewedNumbers.add(number);
     }
 
-    public HashSet<Integer> getPrreviewednumbers() {
-        return prreviewednumbers;
+    public HashSet<Integer> getPRReviewedNumbers() {
+        return PRReviewedNumbers;
     }
 
-    public void setPrreviewednumbers(HashSet<Integer> prreviewednumbers) {
-        this.prreviewednumbers = prreviewednumbers;
+    public void setPRReviewedNumbers(HashSet<Integer> PRReviewedNumbers) {
+        this.PRReviewedNumbers = PRReviewedNumbers;
     }
 
     public String getOwner() {
@@ -88,60 +88,60 @@ public class DeveloperPR {
     public int getReviewed() {
         return reviewed;
     }
-    public int getAcceptedOpened() {
-        return acceptedOpened;
+    public int getAccepted_opened() {
+        return accepted_opened;
     }
-    public int getAcceptedReviewed() {
-        return acceptedReviewed;
+    public int getAccepted_reviewed() {
+        return accepted_reviewed;
     }
-    public double getAcceptedOpenedPercentage() {
-        return acceptedOpenedPercentage;
+    public double getAccepted_opened_percentage() {
+        return accepted_opened_percentage;
     }
-    public double getAcceptedReviewedPercentage() {
-        return acceptedReviewedPercentage;
+    public double getAccepted_reviewed_percentage() {
+        return accepted_reviewed_percentage;
     }
 
     public void setOpened(int opened) {
         this.opened = opened;
         if (this.opened > 0 ){
-            this.acceptedOpenedPercentage = (double) this.acceptedOpened / this.opened;
+            this.accepted_opened_percentage = (double) this.accepted_opened / this.opened;
         } else{
-            this.acceptedOpenedPercentage = 0;
+            this.accepted_opened_percentage = 0;
         }
     }
 
     public void setReviewed(int reviewed) {
         this.reviewed = reviewed;
         if (this.reviewed > 0 ){
-            this.acceptedReviewedPercentage = (double) this.acceptedReviewed / this.reviewed  ;
+            this.accepted_reviewed_percentage = (double) this.accepted_reviewed / this.reviewed  ;
         } else{
-            this.acceptedReviewedPercentage = 0;
+            this.accepted_reviewed_percentage = 0;
         }
     }
 
-    public void setAcceptedOpened(int acceptedOpened) {
-        this.acceptedOpened = acceptedOpened;
+    public void setAccepted_opened(int accepted_opened) {
+        this.accepted_opened = accepted_opened;
         if (this.opened > 0 ){
-            this.acceptedOpenedPercentage = (double) this.acceptedOpened / this.opened;
+            this.accepted_opened_percentage = (double) this.accepted_opened / this.opened;
         } else{
-            this.acceptedOpenedPercentage = 0;
+            this.accepted_opened_percentage = 0;
         }
     }
 
-    public void setAcceptedReviewed(int acceptedReviewed) {
-        this.acceptedReviewed = acceptedReviewed;
+    public void setAccepted_reviewed(int accepted_reviewed) {
+        this.accepted_reviewed = accepted_reviewed;
         if (this.reviewed > 0 ){
-            this.acceptedReviewedPercentage = (double) this.acceptedReviewed / this.reviewed;
+            this.accepted_reviewed_percentage = (double) this.accepted_reviewed / this.reviewed;
         } else{
-            this.acceptedReviewedPercentage = 0;
+            this.accepted_reviewed_percentage = 0;
         }
     }
 
-    public void setAcceptedOpenedPercentage(double acceptedOpenedPercentage) {
-        this.acceptedOpenedPercentage = acceptedOpenedPercentage;
+    public void setAccepted_opened_percentage(double accepted_opened_percentage) {
+        this.accepted_opened_percentage = accepted_opened_percentage;
     }
 
-    public void setAcceptedReviewedPercentage(double acceptedReviewedPercentage) {
-        this.acceptedReviewedPercentage = acceptedReviewedPercentage;
+    public void setAccepted_reviewed_percentage(double accepted_reviewed_percentage) {
+        this.accepted_reviewed_percentage = accepted_reviewed_percentage;
     }
 }

@@ -84,7 +84,7 @@ public class Repo {
     public void hasCommitsDone(){
         this.status.setFetchedCommits(true);
     }
-    public void hasSZZDone() {this.status.setSzzdone(true);}
+    public void hasSZZDone() {this.status.setSZZDone(true);}
     public void hasPredictionDone(){ this.status.setPredictionsDone(true); }
 
 
