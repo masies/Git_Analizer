@@ -21,10 +21,10 @@ public class CommitExtractor {
 
     static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CommitExtractor.class.getName());
 
-    public static void DownloadRepo(String repo_url, String destUrl) {
+    public static void DownloadRepo(String repoUrl, String destUrl) {
         try {
             Git.cloneRepository()
-                    .setURI(repo_url)
+                    .setURI(repoUrl)
                     .setDirectory(Paths.get(destUrl).toFile())
                     .call();
             logger.info("------- Repo cloned succesfully! -------");

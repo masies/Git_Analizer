@@ -45,15 +45,15 @@ public class FileContrTest {
         String owner = "HouariZegai";
         String name = "Calculator";
 
-        String repo_url = "https://github.com/" + owner + "/" + name;
-        String dest_url = "./repo/" + owner + "/" + name;
+        String repoUrl = "https://github.com/" + owner + "/" + name;
+        String destUrl = "./repo/" + owner + "/" + name;
 
 
         deleteDir();
 
-        CommitExtractor.DownloadRepo(repo_url, dest_url);
+        CommitExtractor.DownloadRepo(repoUrl, destUrl);
 
-        ArrayList<FileContribution> fileContributions = asyncService.computeFileContributions(owner,name,dest_url);
+        ArrayList<FileContribution> fileContributions = asyncService.computeFileContributions(owner,name,destUrl);
 
         assertNotNull(fileContributions);
 
@@ -63,7 +63,7 @@ public class FileContrTest {
         Path file = Paths.get("./repo/" + owner +"/" + name  +"/test-file.txt");
         Files.write(file, lines, StandardCharsets.UTF_8);
 
-        ArrayList<FileContribution> newFileContributions = asyncService.computeFileContributions(owner,name,dest_url);
+        ArrayList<FileContribution> newFileContributions = asyncService.computeFileContributions(owner,name,destUrl);
 
         assertTrue(newFileContributions.size() > fileContributions.size());
 

@@ -215,9 +215,9 @@ public class AsyncService {
         repoRepository.save(repo);
     }
 
-     public DeveloperPR linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
+     public DeveloperPR linkIssueDev(String owner, String repoName, String userName, int prnumber, ArrayList<DeveloperPR> developerPRRatesList){
         ProcessBuilder curlPRProcess = new ProcessBuilder(
-                "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + PRnumber,
+                "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName+ "/pulls/" + prnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
 
         JsonObject jsonPR = curlRequest(curlPRProcess);
@@ -241,16 +241,16 @@ public class AsyncService {
                 // the developer which opened the PR gets it's PR total and accepeted total increased by 1
                 if (dev.getUsername().equals(userName)) {
                     dev.setOpened(dev.getOpened()+1);
-                    dev.setAccepted_opened(dev.getAccepted_opened() + 1);
-                    dev.addPROpened(PRnumber);
+                    dev.setAcceptedOpened(dev.getAcceptedOpened() + 1);
+                    dev.addPROpened(prnumber);
                     userFound = true;
                 }
                 // the developer which approved the PR gets it's PR reviewed total increased by 1
                 // and the accepted reviewed total increased by 1
                 if (dev.getUsername().equals(mergedBy)) {
                     dev.setReviewed(dev.getReviewed()+1);
-                    dev.setAccepted_reviewed(dev.getAccepted_reviewed() + 1);
-                    dev.addPRreviewed(PRnumber);
+                    dev.setAcceptedReviewed(dev.getAcceptedReviewed() + 1);
+                    dev.addPRreviewed(prnumber);
                     reviewerFound = true;
                 }
                 if(userFound && reviewerFound){
@@ -262,11 +262,11 @@ public class AsyncService {
                 if (mergedBy.equals(userName)){
                     DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                     newDev.setOpened(1);
-                    newDev.setAccepted_opened(1);
+                    newDev.setAcceptedOpened(1);
                     newDev.setReviewed(1);
-                    newDev.setAccepted_reviewed(1);
-                    newDev.addPROpened(PRnumber);
-                    newDev.addPRreviewed(PRnumber);
+                    newDev.setAcceptedReviewed(1);
+                    newDev.addPROpened(prnumber);
+                    newDev.addPRreviewed(prnumber);
                     developerPRRatesList.add(newDev);
                     return newDev;
                 }
@@ -275,16 +275,16 @@ public class AsyncService {
             if (!userFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                 newDev.setOpened(1);
-                newDev.setAccepted_opened(1);
-                newDev.addPROpened(PRnumber);
+                newDev.setAcceptedOpened(1);
+                newDev.addPROpened(prnumber);
                 developerPRRatesList.add(newDev);
             }
 
             if (!reviewerFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,mergedBy);
                 newDev.setReviewed(1);
-                newDev.setAccepted_reviewed(1);
-                newDev.addPRreviewed(PRnumber);
+                newDev.setAcceptedReviewed(1);
+                newDev.addPRreviewed(prnumber);
                 developerPRRatesList.add(newDev);
             }
 
@@ -293,7 +293,7 @@ public class AsyncService {
             // we do not have the closed_by info in the pull request fetched as pull
             // hence we need to fetch it as issue
             ProcessBuilder curlIssueProcess = new ProcessBuilder(
-                    "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName + "/issues/" + PRnumber,
+                    "curl", "-X", "GET", "https://api.github.com/repos/" + owner + "/" + repoName + "/issues/" + prnumber,
                     "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
 
             JsonObject jsonIssue = curlRequest(curlIssueProcess);
@@ -311,13 +311,13 @@ public class AsyncService {
                 // the developer which opened the PR gets it's PR total increased by 1, but not the accepted total
                 if (dev.getUsername().equals(userName)) {
                     dev.setOpened(dev.getOpened()+1);
-                    dev.addPROpened(PRnumber);
+                    dev.addPROpened(prnumber);
                     userFound = true;
                 }
                 // the developer which closed the PR gets it's PR reviewed total increased by 1
                 if (dev.getUsername().equals(closedBy)) {
                     dev.setReviewed(dev.getReviewed()+1);
-                    dev.addPRreviewed(PRnumber);
+                    dev.addPRreviewed(prnumber);
                     reviewerFound = true;
                 }
                 if(userFound && reviewerFound){
@@ -330,8 +330,8 @@ public class AsyncService {
                     DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                     newDev.setOpened(1);
                     newDev.setReviewed(1);
-                    newDev.addPROpened(PRnumber);
-                    newDev.addPRreviewed(PRnumber);
+                    newDev.addPROpened(prnumber);
+                    newDev.addPRreviewed(prnumber);
                     developerPRRatesList.add(newDev);
                     return newDev;
                 }
@@ -340,14 +340,14 @@ public class AsyncService {
             if (!userFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                 newDev.setOpened(1);
-                newDev.addPROpened(PRnumber);
+                newDev.addPROpened(prnumber);
                 developerPRRatesList.add(newDev);
             }
 
             if (!reviewerFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,closedBy);
                 newDev.setReviewed(1);
-                newDev.addPRreviewed(PRnumber);
+                newDev.addPRreviewed(prnumber);
                 developerPRRatesList.add(newDev);
             }
         }
@@ -390,24 +390,24 @@ public class AsyncService {
 
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
-        String repo_url = "https://github.com/" + owner + "/" + repoName;
-        String dest_url = repoFolderPath + owner + "/" + repoName;
+        String repoUrl = "https://github.com/" + owner + "/" + repoName;
+        String destUrl = repoFolderPath + owner + "/" + repoName;
 
         List<Commit> commitList = new ArrayList<>();
         List<String> branches = new ArrayList<>();
 
-        File dir = new File(dest_url);
+        File dir = new File(destUrl);
         if (dir.exists()) {
             FileUtils.deleteDirectory(dir);
         }
 
-        CommitExtractor.DownloadRepo(repo_url, dest_url);
+        CommitExtractor.DownloadRepo(repoUrl, destUrl);
 
 
 
-        ArrayList<FileContribution> fileContributions = computeFileContributions(owner, repoName, dest_url);
+        ArrayList<FileContribution> fileContributions = computeFileContributions(owner, repoName, destUrl);
 
-        org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+        org.eclipse.jgit.lib.Repository repo = new FileRepository(destUrl + "/.git");
 
         // list of developer expertise
         ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
@@ -517,7 +517,7 @@ public class AsyncService {
 
 
 
-                List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
+                List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName, destUrl, commitParentsIDs);
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
 
@@ -669,8 +669,8 @@ public class AsyncService {
         for (Commit commit : fixingCommits) {
 
             // CHECKOUT this specific commit
-            String dest_url = repoFolderPath + commit.getOwner() +"/"+ commit.getRepo();
-            org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+            String destUrl = repoFolderPath + commit.getOwner() +"/"+ commit.getRepo();
+            org.eclipse.jgit.lib.Repository repo = new FileRepository(destUrl + "/.git");
 
             HashSet<String> bugInducingCommitsHashSet;
             try (Git git = new Git(repo)) {

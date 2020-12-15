@@ -35,9 +35,9 @@ public class DevLinkTest {
         DeveloperPR ExpectedDevPR = new DeveloperPR(owner,name, username);
 
         ExpectedDevPR.setOpened(1);
-        ExpectedDevPR.setAccepted_opened(1);
+        ExpectedDevPR.setAcceptedOpened(1);
         ExpectedDevPR.setReviewed(1);
-        ExpectedDevPR.setAccepted_reviewed(1);
+        ExpectedDevPR.setAcceptedReviewed(1);
         ExpectedDevPR.addPROpened(21);
         ExpectedDevPR.addPRreviewed(21);
 
