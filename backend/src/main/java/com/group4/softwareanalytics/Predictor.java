@@ -146,7 +146,7 @@ public class Predictor {
         return new PredictorStats(precision, recall, accuracy);
     }
 
-    public static ArrayList<Double> predict(Instances dataset, Instances predictionSet) throws Exception {
+    public static List<Double> predict(Instances dataset, Instances predictionSet) throws Exception {
 
         ArrayList<Double> cleanProbability = new ArrayList<>();
 
@@ -194,7 +194,7 @@ public class Predictor {
     }
 
 
-    public static Instances balanceTrainingSetWithSMOTE(Instances instances, String toPredictName, ArrayList<String> categories) throws Exception{
+    public static Instances balanceTrainingSetWithSMOTE(Instances instances, String toPredictName, List<String> categories) throws Exception{
 
         instances.setClass(instances.attribute(toPredictName));
 
@@ -219,7 +219,7 @@ public class Predictor {
 
     }
 
-    private static ArrayList<Integer> getPercentageOfArtificialInstancesNeeded(Instances instances, ArrayList<String> categories){
+    private static ArrayList<Integer> getPercentageOfArtificialInstancesNeeded(Instances instances, List<String> categories){
         ArrayList<Integer> result = new ArrayList<Integer>();
         ArrayList<Integer> numberOfInstancesPerCategory = new ArrayList<Integer>();
         for(int i=0; i<categories.size(); i++){

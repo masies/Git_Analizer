@@ -26,8 +26,8 @@ public class Commit {
     private int commitType;
     private Date commitDate;
     private boolean hasMetrics;
-    ArrayList<String> commitParentsIDs;
-    private ArrayList<Integer> linkedFixedIssues;
+    List<String> commitParentsIDs;
+    private List<Integer> linkedFixedIssues;
     private HashSet<CommitGeneralInfo> bugInducingCommits;
     private boolean isBugInducing = false;
     private HashSet<CommitGeneralInfo> bugFixingCommits = new HashSet<>();
@@ -38,7 +38,7 @@ public class Commit {
     private ProjectMetric projectMetrics;
 
     public Commit(List<CommitDiff> modifications, String owner, String repo, String developerName, String developerMail, String encodingName,
-                  String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, ArrayList<String> commitParentsIDs, boolean hasMetrics, ArrayList<Integer> linkedFixedIssues) {
+                  String fullMessage, String shortMessage, String commitName, int commitType, Date commitDate, ProjectMetric projectMetrics, List<String> commitParentsIDs, boolean hasMetrics, List<Integer> linkedFixedIssues) {
         this.modifications = modifications;
         this.owner = owner;
         this.repo = repo;
@@ -92,7 +92,7 @@ public class Commit {
         this.bugInducingCommits = bugInducingCommits;
     }
 
-    public ArrayList<Integer> getLinkedFixedIssues() {
+    public List<Integer> getLinkedFixedIssues() {
         return linkedFixedIssues;
     }
 
@@ -212,7 +212,7 @@ public class Commit {
         this.repo = repo;
     }
 
-    public ArrayList<String> getCommitParentsIDs() {
+    public List<String> getCommitParentsIDs() {
         return commitParentsIDs;
     }
 

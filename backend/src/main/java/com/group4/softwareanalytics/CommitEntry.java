@@ -2,6 +2,7 @@ package com.group4.softwareanalytics;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class CommitEntry implements Comparable<CommitEntry> {
@@ -13,7 +14,7 @@ public class CommitEntry implements Comparable<CommitEntry> {
     private Date date = new Date();
     private String commitHash;
     private String developerMail;
-    private ArrayList<Pair<String,String>> contibutions = new ArrayList<>();
+    private List<Pair<String, String>> contibutions = new ArrayList<>();
     private boolean isBuggy = false;
 
 //    The absolute experience of the developer authoring the commit computed at the commit’s date (1 pre- dictor variable);
@@ -56,11 +57,11 @@ public class CommitEntry implements Comparable<CommitEntry> {
         this.date = date;
     }
 
-    public ArrayList<Pair<String,String>> getContibutions() {
+    public List<Pair<String, String>> getContibutions() {
         return contibutions;
     }
 
-    public void setContibutions(ArrayList<Pair<String,String>>  contibutions) {
+    public void setContibutions(List<Pair<String, String>> contibutions) {
         this.contibutions = contibutions;
     }
 

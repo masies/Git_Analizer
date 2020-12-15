@@ -46,7 +46,7 @@ public class CommitExtractor {
         return commitList;
     }
 
-    public static List<CommitDiff> getModifications(Git git, String commitHashID, String path, ArrayList<String> commitParentsIDs) {
+    public static List<CommitDiff> getModifications(Git git, String commitHashID, String path, List<String> commitParentsIDs) {
         List<CommitDiff> entriesList = new ArrayList<>();
         try {
             CanonicalTreeParser oldTreeIter;
@@ -67,8 +67,8 @@ public class CommitExtractor {
                     diffFormatter.format(entry);
                     String diffText = stream.toString();
 
-                    ArrayList<Float> currentMetrics = new ArrayList<>();
-                    ArrayList<Float> parentMetrics = new ArrayList<>();
+                    List<Float> currentMetrics = new ArrayList<>();
+                    List<Float> parentMetrics = new ArrayList<>();
 
                     if (entry.getChangeType().name().equals("MODIFY") && entry.getNewPath().endsWith(".java")) {
                         String repoNewPath = path + File.separator + entry.getNewPath();

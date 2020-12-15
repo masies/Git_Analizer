@@ -127,7 +127,7 @@ public class AsyncService {
     private void computePredictions(Repo repo) {
         try {
             ArrayList<String> commitIdsToPredict = new ArrayList<>();
-            ArrayList<CommitEntry> entriesToPredict = traingSetBuilder.exportPredictionSet();
+            List<CommitEntry> entriesToPredict = traingSetBuilder.exportPredictionSet();
 
             for (int i = 0; i < entriesToPredict.size() ; i++) {
                 commitIdsToPredict.add(entriesToPredict.get(i).getCommitHash());
@@ -136,7 +136,7 @@ public class AsyncService {
             PredictorStats predictorStats = Predictor.evaluate(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()));
 
             if (predictorStats != null){
-                ArrayList<Double> predictions = Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile( entriesToPredict ));
+                List<Double> predictions = Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile( entriesToPredict ));
 
                 for (int i = 0; i < commitIdsToPredict.size() ; i++) {
                     Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(repo.getOwner(), repo.getRepo(), commitIdsToPredict.get(i));
@@ -214,7 +214,7 @@ public class AsyncService {
         repoRepository.save(repo);
     }
 
-     public DeveloperPR linkIssueDev(String owner, String repoName, String userName, int PRnumber, ArrayList<DeveloperPR> developerPRRatesList){
+     public DeveloperPR linkIssueDev(String owner, String repoName, String userName, int PRnumber, List<DeveloperPR> developerPRRatesList){
         ProcessBuilder curlPRProcess = new ProcessBuilder(
                 "curl", "-X", "GET", "https://api.github.com/repos/" + owner + File.separator + repoName+ "/pulls/" + PRnumber,
                 "-H", "Authorization: Bearer 9a7ae8cd24203a8035b91d753326cabc6ade6eac");
@@ -608,7 +608,7 @@ public class AsyncService {
         return fileContributions;
     }
 
-    public DeveloperExpertise linkCommitDev(String owner, String repo, String devEmail, String commitHash, ArrayList<DeveloperExpertise> developerExpertiseList, CommitEntry commitEntry, Date commitDate) {
+    public DeveloperExpertise linkCommitDev(String owner, String repo, String devEmail, String commitHash, List<DeveloperExpertise> developerExpertiseList, CommitEntry commitEntry, Date commitDate) {
         for (DeveloperExpertise dev : developerExpertiseList) {   // CHECK IF DEV EXISTS
             if (dev.getEmail().equals(devEmail)) {
                 dev.setExpertise(dev.getExpertise() + 1);
@@ -738,7 +738,7 @@ public class AsyncService {
                     ArrayList<Integer> deletedLines = entry.getValue();
 
                     String relativePath = REPO_FOLDER_PATH + owner + File.separator + repoName + File.separator + file;
-                    ArrayList<Integer> codeLines = LOCExtractor.extractLines(relativePath);
+                    List<Integer> codeLines = LOCExtractor.extractLines(relativePath);
 
                     BlameResult blameResult = git.blame().setFilePath(file).setTextComparator(RawTextComparator.WS_IGNORE_ALL).call();
                     final RawText rawText = blameResult.getResultContents();

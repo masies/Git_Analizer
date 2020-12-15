@@ -3,10 +3,7 @@ package com.group4.softwareanalytics.metrics;
 import com.github.mauricioaniche.ck.CKClassResult;
 import com.github.mauricioaniche.ck.CKNotifier;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MetricResults implements CKNotifier {
     private float averageCBO = 0F;
@@ -26,7 +23,7 @@ public class MetricResults implements CKNotifier {
             this.averageLOC += ckClassResult.getLoc();
     }
 
-    public ArrayList<Float> getResults(){
+    public List<Float> getResults(){
         if (numberOfClasses > 0){
             averageCBO = averageCBO / numberOfClasses;
             averageWMC = averageWMC / numberOfClasses;

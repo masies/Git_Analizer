@@ -4,21 +4,21 @@ import java.util.*;
 
 public class TraingSetBuilder {
 
-    private ArrayList<CommitEntry> commitsEntries = new ArrayList<>();
+    private List<CommitEntry> commitsEntries = new ArrayList<>();
 
     public void addCommitEntry(CommitEntry c) {
         this.commitsEntries.add(c);
     }
 
-    public ArrayList<CommitEntry> getCommits() {
+    public List<CommitEntry> getCommits() {
         return commitsEntries;
     }
 
-    public void setCommits(ArrayList<CommitEntry> commitEntries) {
+    public void setCommits(List<CommitEntry> commitEntries) {
         this.commitsEntries = commitEntries;
     }
 
-    public ArrayList<CommitEntry> exportTrainingSet(){
+    public List<CommitEntry> exportTrainingSet(){
         Collections.sort(this.commitsEntries, Collections.reverseOrder());
         ArrayList<CommitEntry> toReturn = new ArrayList<>();
         for (int i = 10; i < this.commitsEntries.size() ; i++) {
@@ -27,7 +27,7 @@ public class TraingSetBuilder {
         return  toReturn;
     }
 
-    public ArrayList<CommitEntry> exportPredictionSet(){
+    public List<CommitEntry> exportPredictionSet(){
         Collections.sort(this.commitsEntries, Collections.reverseOrder());
         ArrayList<CommitEntry> toReturn = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -73,11 +73,11 @@ public class TraingSetBuilder {
             Collections.sort(this.commitsEntries, Collections.reverseOrder());
             CommitEntry ce = this.commitsEntries.get(i);
             String dev = ce.getDeveloperMail();
-            ArrayList<Pair<String,String>> contribs = ce.getContibutions();
+            List<Pair<String, String>> contribs = ce.getContibutions();
             for (int j = i - 1; j >= 0; j--) {
                 CommitEntry nextCe = this.commitsEntries.get(j);
                 String nextDev = nextCe.getDeveloperMail();
-                ArrayList<Pair<String, String>> nextContribs = ce.getContibutions();
+                List<Pair<String, String>> nextContribs = ce.getContibutions();
                 for (Pair<String, String> pair : nextContribs) {
                     if (contribs.contains(pair) && dev.equals(nextDev)) {
                         ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() + 1);

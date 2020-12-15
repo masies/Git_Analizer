@@ -94,7 +94,7 @@ public class CommitController {
                    @RequestParam(value = "mode", defaultValue = "quick") String AnalysisMode) throws IOException {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner, repoName, commitID);
         if (!commit.getHasMetrics() || (AnalysisMode != null && AnalysisMode.equals("deep"))) {
-            ArrayList<String> parentCommitIDs = commit.getCommitParentsIDs();
+            List<String> parentCommitIDs = commit.getCommitParentsIDs();
             ProjectMetric metrics = new ProjectMetric(0,0,0,0,0,0,0,0);
             if (AnalysisMode != null && AnalysisMode.equals("deep")) {
                 metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);

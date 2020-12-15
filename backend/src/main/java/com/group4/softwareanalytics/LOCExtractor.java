@@ -21,7 +21,7 @@ public class LOCExtractor {
 
     static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LOCExtractor.class.getName());
 
-    public static ArrayList<Integer> extractLines(String src)
+    public static List<Integer> extractLines(String src)
     {
         ArrayList<String> lineNb = new ArrayList<>();
         Document doc = getXml(src);
