@@ -104,7 +104,7 @@ public class CommitExtractor {
                     stream.reset();
                 }
             } catch (Exception e){
-//            logger.info(e.getMessage());
+
         }
         }
         catch (Exception ignore) {

@@ -17,7 +17,7 @@ public class CommitEntry implements Comparable<CommitEntry> {
     private List<Pair<String, String>> contibutions = new ArrayList<>();
     private boolean isBuggy = false;
 
-//    The absolute experience of the developer authoring the commit computed at the commit’s date (1 pre- dictor variable);
+
     private int developerAbsoluteExperience = 0;
 
 //    The average absolute experience of the developer authoring the commit on the files impacted by the commit,

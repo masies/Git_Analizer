@@ -102,7 +102,7 @@ public class CommitController {
             commit.setProjectMetrics(metrics);
             commit.setHasMetrics(true);
 
-//            String dest_url = "./repo/" + owner + "/" + repoName;
+
 //            org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
 //            Git git = new Git(repo);
 
