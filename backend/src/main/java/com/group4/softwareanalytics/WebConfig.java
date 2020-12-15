@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final static String viewName = "forward:/index.html";
+    private final static String VIEW_NAME = "forward:/index.html";
     /**
      * Ensure client-side paths redirect to index.html because client handles routing. NOTE: Do NOT use @EnableWebMvc or it will break this.
      */
@@ -16,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         // Map "/"
         registry.addViewController("/")
-                .setViewName(viewName);
+                .setViewName(VIEW_NAME);
 
         // Map "/word", "/word/word", and "/word/word/word" - except for anything starting with "/api/..." or ending with
         // a file extension like ".js" - to index.html. By doing this, the client receives and routes the url. It also
@@ -24,10 +24,10 @@ public class WebConfig implements WebMvcConfigurer {
 
         // Single directory level - no need to exclude "api"
         registry.addViewController("/{x:[\\w\\-]+}")
-                .setViewName(viewName);
+                .setViewName(VIEW_NAME);
         // Multi-level directory path, need to exclude "api" on the first part of the path
         registry.addViewController("/{x:^(?!api$).*$}/**/{y:[\\w\\-]+}")
-                .setViewName(viewName);
+                .setViewName(VIEW_NAME);
     }
 
     @Override
