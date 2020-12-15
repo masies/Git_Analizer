@@ -390,24 +390,24 @@ public class AsyncService {
 
 
     public void fetchCommits(String owner, String repoName, Repo r) throws IOException {
-        String repo_url = "https://github.com/" + owner + "/" + repoName;
-        String dest_url = repoFolderPath + owner + "/" + repoName;
+        String repoUrl = "https://github.com/" + owner + "/" + repoName;
+        String destUrl = repoFolderPath + owner + "/" + repoName;
 
         List<Commit> commitList = new ArrayList<>();
         List<String> branches = new ArrayList<>();
 
-        File dir = new File(dest_url);
+        File dir = new File(destUrl);
         if (dir.exists()) {
             FileUtils.deleteDirectory(dir);
         }
 
-        CommitExtractor.DownloadRepo(repo_url, dest_url);
+        CommitExtractor.DownloadRepo(repoUrl, destUrl);
 
 
 
-        ArrayList<FileContribution> fileContributions = computeFileContributions(owner, repoName, dest_url);
+        ArrayList<FileContribution> fileContributions = computeFileContributions(owner, repoName, destUrl);
 
-        org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+        org.eclipse.jgit.lib.Repository repo = new FileRepository(destUrl + "/.git");
 
         // list of developer expertise
         ArrayList<DeveloperExpertise> developerExpertiseList = new ArrayList<>();
@@ -517,7 +517,7 @@ public class AsyncService {
 
 
 
-                List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName, dest_url, commitParentsIDs);
+                List<CommitDiff> diffEntries = CommitExtractor.getModifications(git, commitName, destUrl, commitParentsIDs);
                 Commit c = new Commit(diffEntries, owner, repoName, developerName, developerMail, encodingName, fullMessage, shortMessage, commitName, commitType, date, projectMetric, commitParentsIDs, false, fixedIssues);
                 commitList.add(c);
 
@@ -669,8 +669,8 @@ public class AsyncService {
         for (Commit commit : fixingCommits) {
 
             // CHECKOUT this specific commit
-            String dest_url = repoFolderPath + commit.getOwner() +"/"+ commit.getRepo();
-            org.eclipse.jgit.lib.Repository repo = new FileRepository(dest_url + "/.git");
+            String destUrl = repoFolderPath + commit.getOwner() +"/"+ commit.getRepo();
+            org.eclipse.jgit.lib.Repository repo = new FileRepository(destUrl + "/.git");
 
             HashSet<String> bugInducingCommitsHashSet;
             try (Git git = new Git(repo)) {
