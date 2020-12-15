@@ -72,7 +72,7 @@ public class Predictor {
 
     public static PredictorStats evaluate(Instances dataset) throws Exception {
 
-        ArrayList<String> categories = new ArrayList<String>();
+        ArrayList<String> categories = new ArrayList<>();
         categories.add("true");
         categories.add("false");
         String toPredictName = "buggy";
@@ -185,9 +185,6 @@ public class Predictor {
 
         RandomForest classifier = new RandomForest();
 
-//        String options = ("-I 100");
-//        String[] optionsArray = options.split(" ");
-//        classifier.setOptions(optionsArray);
         instances.setClass(instances.attribute(toPredictName));
         classifier.buildClassifier(instances);
         return classifier;
@@ -220,8 +217,8 @@ public class Predictor {
     }
 
     private static ArrayList<Integer> getPercentageOfArtificialInstancesNeeded(Instances instances, List<String> categories){
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        ArrayList<Integer> numberOfInstancesPerCategory = new ArrayList<Integer>();
+        ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<Integer> numberOfInstancesPerCategory = new ArrayList<>();
         for(int i=0; i<categories.size(); i++){
             numberOfInstancesPerCategory.add(0);
         }
