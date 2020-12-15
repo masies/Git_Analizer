@@ -2,8 +2,6 @@ package com.group4.softwareanalytics.developer;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import javax.xml.crypto.Data;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
