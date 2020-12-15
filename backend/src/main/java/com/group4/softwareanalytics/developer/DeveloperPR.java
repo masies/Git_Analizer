@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class DeveloperPR {
     @Field("DeveloperPR")
@@ -24,8 +25,8 @@ public class DeveloperPR {
     private double accepted_opened_percentage;
     private double accepted_reviewed_percentage;
 
-    private HashSet<Integer> PROpenedNumbers = new HashSet<>();
-    private HashSet<Integer> PRReviewedNumbers = new HashSet<>();
+    private Set<Integer> PROpenedNumbers = new HashSet<>();
+    private Set<Integer> PRReviewedNumbers = new HashSet<>();
 
     public DeveloperPR(String owner, String repo, String username) {
         this.owner = owner;
@@ -43,23 +44,23 @@ public class DeveloperPR {
         this.PROpenedNumbers.add(number);
     }
 
-    public HashSet<Integer> getPROpenedNumbers() {
+    public Set<Integer> getPROpenedNumbers() {
         return PROpenedNumbers;
     }
 
-    public void setPROpenedNumbers(HashSet<Integer> PROpenedNumbers) {
-        this.PROpenedNumbers = PROpenedNumbers;
+    public void setPROpenedNumbers(Set<Integer> propenednumbers) {
+        this.PROpenedNumbers = propenednumbers;
     }
 
     public void addPRreviewed(int number){
         PRReviewedNumbers.add(number);
     }
 
-    public HashSet<Integer> getPRReviewedNumbers() {
+    public Set<Integer> getPRReviewedNumbers() {
         return PRReviewedNumbers;
     }
 
-    public void setPRReviewedNumbers(HashSet<Integer> PRReviewedNumbers) {
+    public void setPRReviewedNumbers(Set<Integer> PRReviewedNumbers) {
         this.PRReviewedNumbers = PRReviewedNumbers;
     }
 

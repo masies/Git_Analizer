@@ -4,10 +4,7 @@ import com.group4.softwareanalytics.metrics.ProjectMetric;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Commit {
     @Id
@@ -30,7 +27,7 @@ public class Commit {
     private List<Integer> linkedFixedIssues;
     private HashSet<CommitGeneralInfo> bugInducingCommits;
     private boolean isBugInducing = false;
-    private HashSet<CommitGeneralInfo> bugFixingCommits = new HashSet<>();
+    private Set<CommitGeneralInfo> bugFixingCommits = new HashSet<>();
 
     private Double cleanProbability = null;
 
@@ -64,11 +61,11 @@ public class Commit {
         this.cleanProbability = cleanProbability;
     }
 
-    public HashSet<CommitGeneralInfo> getBugFixingCommits() {
+    public Set<CommitGeneralInfo> getBugFixingCommits() {
         return bugFixingCommits;
     }
 
-    public void setBugFixingCommits(HashSet<CommitGeneralInfo> bugFixingCommits) {
+    public void setBugFixingCommits(Set<CommitGeneralInfo> bugFixingCommits) {
         this.bugFixingCommits = bugFixingCommits;
     }
 
@@ -84,7 +81,7 @@ public class Commit {
         isBugInducing = bugInducing;
     }
 
-    public HashSet<CommitGeneralInfo> getBugInducingCommits() {
+    public Set<CommitGeneralInfo> getBugInducingCommits() {
         return bugInducingCommits;
     }
 
@@ -96,7 +93,7 @@ public class Commit {
         return linkedFixedIssues;
     }
 
-    public void setLinkedFixedIssues(ArrayList<Integer> linkedFixedIssues) {
+    public void setLinkedFixedIssues(List<Integer> linkedFixedIssues) {
         this.linkedFixedIssues = linkedFixedIssues;
     }
 
@@ -216,7 +213,7 @@ public class Commit {
         return commitParentsIDs;
     }
 
-    public void setCommitParentsIDs(ArrayList<String> commitParentsIDs) {
+    public void setCommitParentsIDs(List<String> commitParentsIDs) {
         this.commitParentsIDs = commitParentsIDs;
     }
 }

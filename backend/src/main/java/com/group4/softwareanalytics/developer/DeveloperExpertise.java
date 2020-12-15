@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 public class DeveloperExpertise {
     @Field("DeveloperExpertise")
@@ -17,8 +18,8 @@ public class DeveloperExpertise {
 
     private String email;
 
-    HashSet<String> commitHashSet = new HashSet<>();
-    HashSet<Date> commitDates = new HashSet<>();
+    Set<String> commitHashSet = new HashSet<>();
+    Set<Date> commitDates = new HashSet<>();
     private int expertise;
 
 
@@ -29,11 +30,11 @@ public class DeveloperExpertise {
         this.email = email;
     }
 
-    public HashSet<Date> getCommitDates() {
+    public Set<Date> getCommitDates() {
         return commitDates;
     }
 
-    public void setCommitDates(HashSet<Date> commitDates) {
+    public void setCommitDates(Set<Date> commitDates) {
         this.commitDates = commitDates;
     }
 
@@ -43,11 +44,11 @@ public class DeveloperExpertise {
 
 
 
-    public HashSet<String> getCommitHashSet() {
+    public Set<String> getCommitHashSet() {
         return commitHashSet;
     }
 
-    public void setCommitHashSet(HashSet<String> commitHashSet) {
+    public void setCommitHashSet(Set<String> commitHashSet) {
         this.commitHashSet = commitHashSet;
     }
 
