@@ -120,27 +120,27 @@ public class Predictor {
 
         }
 
-        Double AccTotal = .0;
+        Double accTotal = .0;
         for(Double res: acc)
         {
-            AccTotal +=res;
+            accTotal +=res;
         }
 
-        Double PreTotal = .0;
+        Double preTotal = .0;
         for(Double res: pre)
         {
-            PreTotal +=res;
+            preTotal +=res;
         }
 
-        Double RecTotal = .0;
+        Double recTotal = .0;
         for(Double res: rec)
         {
-            RecTotal +=res;
+            recTotal +=res;
         }
 
-        double precision = (PreTotal/10) * 100;
-        double recall = (RecTotal/10) * 100;
-        double accuracy = AccTotal/10;
+        double precision = (preTotal/10) * 100;
+        double recall = (recTotal/10) * 100;
+        double accuracy = accTotal/10;
 
 
         return new PredictorStats(precision, recall, accuracy);
@@ -150,7 +150,7 @@ public class Predictor {
 
         ArrayList<Double> cleanProbability = new ArrayList<>();
 
-        ArrayList<String> categories = new ArrayList<String>();
+        ArrayList<String> categories = new ArrayList<>();
         categories.add("true");
         categories.add("false");
         String toPredictName = "buggy";
