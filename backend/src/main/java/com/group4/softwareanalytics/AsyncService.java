@@ -138,7 +138,6 @@ public class AsyncService {
             if (predictorStats != null){
                 ArrayList<Double> predictions = Predictor.predict(Predictor.createArfFile(traingSetBuilder.exportTrainingSet()),Predictor.createArfFile( entriesToPredict ));
 
-                // TODO: control sizes and everything
                 for (int i = 0; i < commitIdsToPredict.size() ; i++) {
                     Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(repo.getOwner(), repo.getRepo(), commitIdsToPredict.get(i));
                     commit.setCleanProbability(predictions.get(i));
