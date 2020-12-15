@@ -1,10 +1,10 @@
 package com.group4.softwareanalytics.metrics;
 
 public class ProjectMetric {
-    private float LOC;
-    private float CBO;
-    private float WMC;
-    private float LCOM;
+    private float loc;
+    private float cbo;
+    private float wmc;
+    private float lcom;
 
     private float parentLOC;
     private float parentCBO;
@@ -16,57 +16,57 @@ public class ProjectMetric {
     private float deltaWMC;
     private float deltaLCOM;
 
-    public ProjectMetric( float CBO, float WMC, float LOC, float LCOM, float parentCBO, float parentWMC, float parentLOC, float parentLCOM ) {
-        this.LOC = LOC;
-        this.CBO = CBO;
-        this.WMC = WMC;
-        this.LCOM = LCOM;
+    public ProjectMetric(float cbo, float wmc, float loc, float lcom, float parentCBO, float parentWMC, float parentLOC, float parentLCOM ) {
+        this.loc = loc;
+        this.cbo = cbo;
+        this.wmc = wmc;
+        this.lcom = lcom;
 
         this.parentLOC = parentLOC;
         this.parentCBO = parentCBO;
         this.parentWMC = parentWMC;
         this.parentLCOM = parentLCOM;
 
-        this.deltaCBO = parentCBO - CBO;
-        this.deltaLCOM = parentLCOM - LCOM;
-        this.deltaLOC = parentLOC - LOC;
-        this.deltaWMC = parentWMC - WMC;
+        this.deltaCBO = parentCBO - cbo;
+        this.deltaLCOM = parentLCOM - lcom;
+        this.deltaLOC = parentLOC - loc;
+        this.deltaWMC = parentWMC - wmc;
     }
 
-    public float getLOC() {
-        return LOC;
+    public float getLoc() {
+        return loc;
     }
 
-    public void setLOC(float LOC) {
-        this.LOC = LOC;
-        this.deltaLOC = this.parentLOC - LOC;
+    public void setLoc(float loc) {
+        this.loc = loc;
+        this.deltaLOC = this.parentLOC - loc;
     }
 
-    public float getCBO() {
-        return CBO;
+    public float getCbo() {
+        return cbo;
     }
 
-    public void setCBO(float CBO) {
-        this.CBO = CBO;
-        this.deltaCBO = this.parentCBO - CBO;
+    public void setCbo(float cbo) {
+        this.cbo = cbo;
+        this.deltaCBO = this.parentCBO - cbo;
     }
 
-    public float getWMC() {
-        return WMC;
+    public float getWmc() {
+        return wmc;
     }
 
-    public void setWMC(float WMC) {
-        this.WMC = WMC;
-        this.deltaWMC = this.parentWMC - WMC;
+    public void setWmc(float wmc) {
+        this.wmc = wmc;
+        this.deltaWMC = this.parentWMC - wmc;
     }
 
-    public float getLCOM() {
-        return LCOM;
+    public float getLcom() {
+        return lcom;
     }
 
-    public void setLCOM(float LCOM) {
-        this.LCOM = LCOM;
-        this.deltaLCOM = this.parentLCOM - LCOM;
+    public void setLcom(float lcom) {
+        this.lcom = lcom;
+        this.deltaLCOM = this.parentLCOM - lcom;
     }
 
     public float getParentLOC() {
@@ -75,7 +75,7 @@ public class ProjectMetric {
 
     public void setParentLOC(float parentLOC) {
         this.parentLOC = parentLOC;
-        this.deltaLOC = parentLOC - this.LOC;
+        this.deltaLOC = parentLOC - this.loc;
     }
 
     public float getParentCBO() {
@@ -84,7 +84,7 @@ public class ProjectMetric {
 
     public void setParentCBO(float parentCBO) {
         this.parentCBO = parentCBO;
-        this.deltaCBO = parentCBO - this.CBO;
+        this.deltaCBO = parentCBO - this.cbo;
     }
 
     public float getParentWMC() {
@@ -93,7 +93,7 @@ public class ProjectMetric {
 
     public void setParentWMC(float parentWMC) {
         this.parentWMC = parentWMC;
-        this.deltaWMC = parentWMC - this.WMC;
+        this.deltaWMC = parentWMC - this.wmc;
     }
 
     public float getParentLCOM() {
@@ -102,7 +102,7 @@ public class ProjectMetric {
 
     public void setParentLCOM(float parentLCOM) {
         this.parentLCOM = parentLCOM;
-        this.deltaLCOM = parentLCOM - this.LCOM;
+        this.deltaLCOM = parentLCOM - this.lcom;
     }
 
     public float getDeltaLOC() {

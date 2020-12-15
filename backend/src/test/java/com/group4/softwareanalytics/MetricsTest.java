@@ -73,10 +73,10 @@ public class MetricsTest {
         assertEquals(metrics.getParentLCOM(),targetCommitMetrics.getParentLCOM());
 
 //        //Self Metrics Check
-        assertEquals(metrics.getLOC(),targetCommitMetrics.getParentLOC());
-        assertEquals(metrics.getCBO(),targetCommitMetrics.getCBO());
-        assertEquals(metrics.getWMC(),targetCommitMetrics.getWMC());
-        assertEquals(metrics.getLCOM(),targetCommitMetrics.getLCOM());
+        assertEquals(metrics.getLoc(),targetCommitMetrics.getParentLOC());
+        assertEquals(metrics.getCbo(),targetCommitMetrics.getCbo());
+        assertEquals(metrics.getWmc(),targetCommitMetrics.getWmc());
+        assertEquals(metrics.getLcom(),targetCommitMetrics.getLcom());
 
         for (Method m : metrics.getClass().getMethods()) {
             if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
