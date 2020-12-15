@@ -257,8 +257,7 @@ public class AsyncService {
                 }
             }
 
-            if (!userFound && !reviewerFound){
-                if (mergedBy.equals(userName)){
+            if ((!userFound && !reviewerFound)&&(mergedBy.equals(userName))){
                     DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                     newDev.setOpened(1);
                     newDev.setAccepted_opened(1);
@@ -269,7 +268,7 @@ public class AsyncService {
                     developerPRRatesList.add(newDev);
                     return newDev;
                 }
-            }
+
 
             if (!userFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
@@ -324,8 +323,7 @@ public class AsyncService {
                 }
             }
 
-            if (!userFound && !reviewerFound){
-                if (closedBy.equals(userName)){
+            if ((!userFound && !reviewerFound) && (closedBy.equals(userName))){
                     DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                     newDev.setOpened(1);
                     newDev.setReviewed(1);
@@ -334,7 +332,7 @@ public class AsyncService {
                     developerPRRatesList.add(newDev);
                     return newDev;
                 }
-            }
+
 
             if (!userFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
@@ -637,8 +635,7 @@ public class AsyncService {
         String[] words = fullText.replace("\t", " ").replace("\n", " ").replace("\r", " ").toLowerCase().split(" ");
 
         for (int i=0; i<words.length; i++) {
-            if (keywords.contains(words[i].replaceAll("[^a-zA-Z0-9]", ""))){
-                if (i>0 && !(stopWord.contains(words[i-1].replaceAll("[^a-zA-Z0-9]", "")))) {
+            if ((keywords.contains(words[i].replaceAll("[^a-zA-Z0-9]", "")))&& (i>0 && !(stopWord.contains(words[i-1].replaceAll("[^a-zA-Z0-9]", "")))) ){
                     for(int j=i+1; j<words.length; j++) {
                         words[j] = words[j].replaceAll(",","");
                         if(words[j].matches("[#][0-9]+")) {
@@ -658,7 +655,7 @@ public class AsyncService {
                         }
                     }
                 }
-            }
+
         }
         // no duplicates
         return Lists.newArrayList(Sets.newHashSet(linkedIssues));
