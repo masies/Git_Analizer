@@ -83,7 +83,7 @@ public class TraingSetBuilder {
                         ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() + 1);
                     }
                 }
-                if (contribs.size() > 0) {
+                if (contribs.isEmpty()) {
                     ce.setDeveloperAverageExperience(ce.getDeveloperAverageExperience() / contribs.size());
                 }
             }
