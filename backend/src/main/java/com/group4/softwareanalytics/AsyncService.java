@@ -398,7 +398,7 @@ public class AsyncService {
             FileUtils.deleteDirectory(dir);
         }
 
-        CommitExtractor.DownloadRepo(repoUrl, destUrl);
+        CommitExtractor.downloadRepo(repoUrl, destUrl);
 
 
 

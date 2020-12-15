@@ -91,12 +91,12 @@ public class CommitController {
     Commit getAttr(@PathVariable(value = "owner") String owner,
                    @PathVariable(value = "repoName") String repoName,
                    @PathVariable(value = "commitId") String commitID,
-                   @RequestParam(value = "mode", defaultValue = "quick") String AnalysisMode) throws IOException {
+                   @RequestParam(value = "mode", defaultValue = "quick") String analysisMode) throws IOException {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner, repoName, commitID);
-        if (!commit.getHasMetrics() || (AnalysisMode != null && AnalysisMode.equals("deep"))) {
+        if (!commit.getHasMetrics() || (analysisMode != null && analysisMode.equals("deep"))) {
             List<String> parentCommitIDs = commit.getCommitParentsIDs();
             ProjectMetric metrics = new ProjectMetric(0,0,0,0,0,0,0,0);
-            if (AnalysisMode != null && AnalysisMode.equals("deep")) {
+            if (analysisMode != null && analysisMode.equals("deep")) {
                 metrics = ProjectMetricExtractor.commitCodeQualityExtractor(owner, repoName, commitID, parentCommitIDs);
             }
             commit.setProjectMetrics(metrics);

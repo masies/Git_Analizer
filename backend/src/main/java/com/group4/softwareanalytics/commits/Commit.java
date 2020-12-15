@@ -25,7 +25,7 @@ public class Commit {
     private boolean hasMetrics;
     List<String> commitParentsIDs;
     private List<Integer> linkedFixedIssues;
-    private HashSet<CommitGeneralInfo> bugInducingCommits;
+    private Set<CommitGeneralInfo> bugInducingCommits;
     private boolean isBugInducing = false;
     private Set<CommitGeneralInfo> bugFixingCommits = new HashSet<>();
 
@@ -85,7 +85,7 @@ public class Commit {
         return bugInducingCommits;
     }
 
-    public void setBugInducingCommits(HashSet<CommitGeneralInfo> bugInducingCommits) {
+    public void setBugInducingCommits(Set<CommitGeneralInfo> bugInducingCommits) {
         this.bugInducingCommits = bugInducingCommits;
     }
 

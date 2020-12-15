@@ -1,8 +1,6 @@
 package com.group4.softwareanalytics;
 
 
-import com.group4.softwareanalytics.commits.Commit;
-import com.group4.softwareanalytics.commits.CommitController;
 import com.group4.softwareanalytics.commits.CommitExtractor;
 import com.group4.softwareanalytics.commits.CommitRepository;
 import com.group4.softwareanalytics.fileContribution.FileContribution;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,7 +48,7 @@ public class FileContrTest {
 
         deleteDir();
 
-        CommitExtractor.DownloadRepo(repoUrl, destUrl);
+        CommitExtractor.downloadRepo(repoUrl, destUrl);
 
         ArrayList<FileContribution> fileContributions = asyncService.computeFileContributions(owner,name,destUrl);
 

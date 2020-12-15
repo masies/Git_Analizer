@@ -21,7 +21,7 @@ public class CommitExtractor {
 
     static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CommitExtractor.class.getName());
 
-    public static void DownloadRepo(String repoUrl, String destUrl) {
+    public static void downloadRepo(String repoUrl, String destUrl) {
         try {
             Git.cloneRepository()
                     .setURI(repoUrl)
