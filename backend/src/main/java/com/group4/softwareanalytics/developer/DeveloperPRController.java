@@ -24,7 +24,7 @@ public class DeveloperPRController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
             @RequestParam(value = "order", defaultValue = "desc") String order,
-            @RequestParam(value = "sort", defaultValue = "percentage_accepted_opened") String sort
+            @RequestParam(value = "sort", defaultValue = "percentageAcceptedOpened") String sort
     ) {
         return developerPRRepository.findByOwnerAndRepo(
                 owner,
@@ -55,7 +55,7 @@ public class DeveloperPRController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(value = "username", defaultValue = "") String q,
             @RequestParam(value = "order", defaultValue = "desc") String order,
-            @RequestParam(value = "sort", defaultValue = "percentage_accepted_opened") String sort) {
+            @RequestParam(value = "sort", defaultValue = "percentageAcceptedOpened") String sort) {
 
         Pageable paging = PageRequest.of(
                 page,

@@ -55,7 +55,7 @@ public class DeveloperExpertiseController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(value = "email", defaultValue = "") String q,
             @RequestParam(value = "order", defaultValue = "desc") String order,
-            @RequestParam(value = "sort", defaultValue = "percentage_accepted_opened") String sort) {
+            @RequestParam(value = "sort", defaultValue = "percentageAcceptedOpened") String sort) {
 
         Pageable paging = PageRequest.of(page, size, Sort.by(sortingScheme(sort, order)));
         return developerExpertiseRepository.findByQuery(owner, repo, q, paging);

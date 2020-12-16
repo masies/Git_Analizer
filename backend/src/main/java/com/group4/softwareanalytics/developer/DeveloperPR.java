@@ -19,14 +19,14 @@ public class DeveloperPR {
     private int opened;
     private int reviewed;
 
-    private int accepted_opened;
-    private int accepted_reviewed;
+    private int acceptedOpened;
+    private int acceptedReviewed;
 
-    private double accepted_opened_percentage;
-    private double accepted_reviewed_percentage;
+    private double acceptedOpenedPercentage;
+    private double acceptedReviewedPercentage;
 
-    private Set<Integer> PROpenedNumbers = new HashSet<>();
-    private Set<Integer> PRReviewedNumbers = new HashSet<>();
+    private Set<Integer> propenednumbers = new HashSet<>();
+    private Set<Integer> prreviewednumbers = new HashSet<>();
 
     public DeveloperPR(String owner, String repo, String username) {
         this.owner = owner;
@@ -34,34 +34,34 @@ public class DeveloperPR {
         this.username = username;
         this.opened = 0;
         this.reviewed = 0;
-        this.accepted_opened = 0;
-        this.accepted_reviewed = 0;
-        this.accepted_opened_percentage = 0;
-        this.accepted_reviewed_percentage = 0;
+        this.acceptedOpened = 0;
+        this.acceptedReviewed = 0;
+        this.acceptedOpenedPercentage = 0;
+        this.acceptedReviewedPercentage = 0;
     }
 
     public void addPROpened(int number){
-        this.PROpenedNumbers.add(number);
+        this.propenednumbers.add(number);
     }
 
-    public Set<Integer> getPROpenedNumbers() {
-        return PROpenedNumbers;
+    public Set<Integer> getPropenednumbers() {
+        return propenednumbers;
     }
 
-    public void setPROpenedNumbers(Set<Integer> propenednumbers) {
-        this.PROpenedNumbers = propenednumbers;
+    public void setPropenednumbers(Set<Integer> propenednumbers) {
+        this.propenednumbers = propenednumbers;
     }
 
     public void addPRreviewed(int number){
-        PRReviewedNumbers.add(number);
+        prreviewednumbers.add(number);
     }
 
-    public Set<Integer> getPRReviewedNumbers() {
-        return PRReviewedNumbers;
+    public Set<Integer> getPrreviewednumbers() {
+        return prreviewednumbers;
     }
 
-    public void setPRReviewedNumbers(Set<Integer> PRReviewedNumbers) {
-        this.PRReviewedNumbers = PRReviewedNumbers;
+    public void setPrreviewednumbers(Set<Integer> prreviewednumbers) {
+        this.prreviewednumbers = prreviewednumbers;
     }
 
     public String getOwner() {
@@ -89,60 +89,60 @@ public class DeveloperPR {
     public int getReviewed() {
         return reviewed;
     }
-    public int getAccepted_opened() {
-        return accepted_opened;
+    public int getAcceptedOpened() {
+        return acceptedOpened;
     }
-    public int getAccepted_reviewed() {
-        return accepted_reviewed;
+    public int getAcceptedReviewed() {
+        return acceptedReviewed;
     }
-    public double getAccepted_opened_percentage() {
-        return accepted_opened_percentage;
+    public double getAcceptedOpenedPercentage() {
+        return acceptedOpenedPercentage;
     }
-    public double getAccepted_reviewed_percentage() {
-        return accepted_reviewed_percentage;
+    public double getAcceptedReviewedPercentage() {
+        return acceptedReviewedPercentage;
     }
 
     public void setOpened(int opened) {
         this.opened = opened;
         if (this.opened > 0 ){
-            this.accepted_opened_percentage = (double) this.accepted_opened / this.opened;
+            this.acceptedOpenedPercentage = (double) this.acceptedOpened / this.opened;
         } else{
-            this.accepted_opened_percentage = 0;
+            this.acceptedOpenedPercentage = 0;
         }
     }
 
     public void setReviewed(int reviewed) {
         this.reviewed = reviewed;
         if (this.reviewed > 0 ){
-            this.accepted_reviewed_percentage = (double) this.accepted_reviewed / this.reviewed  ;
+            this.acceptedReviewedPercentage = (double) this.acceptedReviewed / this.reviewed  ;
         } else{
-            this.accepted_reviewed_percentage = 0;
+            this.acceptedReviewedPercentage = 0;
         }
     }
 
-    public void setAccepted_opened(int accepted_opened) {
-        this.accepted_opened = accepted_opened;
+    public void setAcceptedOpened(int acceptedOpened) {
+        this.acceptedOpened = acceptedOpened;
         if (this.opened > 0 ){
-            this.accepted_opened_percentage = (double) this.accepted_opened / this.opened;
+            this.acceptedOpenedPercentage = (double) this.acceptedOpened / this.opened;
         } else{
-            this.accepted_opened_percentage = 0;
+            this.acceptedOpenedPercentage = 0;
         }
     }
 
-    public void setAccepted_reviewed(int accepted_reviewed) {
-        this.accepted_reviewed = accepted_reviewed;
+    public void setAcceptedReviewed(int acceptedReviewed) {
+        this.acceptedReviewed = acceptedReviewed;
         if (this.reviewed > 0 ){
-            this.accepted_reviewed_percentage = (double) this.accepted_reviewed / this.reviewed;
+            this.acceptedReviewedPercentage = (double) this.acceptedReviewed / this.reviewed;
         } else{
-            this.accepted_reviewed_percentage = 0;
+            this.acceptedReviewedPercentage = 0;
         }
     }
 
-    public void setAccepted_opened_percentage(double accepted_opened_percentage) {
-        this.accepted_opened_percentage = accepted_opened_percentage;
+    public void setAcceptedOpenedPercentage(double acceptedOpenedPercentage) {
+        this.acceptedOpenedPercentage = acceptedOpenedPercentage;
     }
 
-    public void setAccepted_reviewed_percentage(double accepted_reviewed_percentage) {
-        this.accepted_reviewed_percentage = accepted_reviewed_percentage;
+    public void setAcceptedReviewedPercentage(double acceptedReviewedPercentage) {
+        this.acceptedReviewedPercentage = acceptedReviewedPercentage;
     }
 }

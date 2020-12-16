@@ -240,7 +240,7 @@ public class AsyncService {
                 // the developer which opened the PR gets it's PR total and accepeted total increased by 1
                 if (dev.getUsername().equals(userName)) {
                     dev.setOpened(dev.getOpened()+1);
-                    dev.setAccepted_opened(dev.getAccepted_opened() + 1);
+                    dev.setAcceptedOpened(dev.getAcceptedOpened() + 1);
                     dev.addPROpened(PRnumber);
                     userFound = true;
                 }
@@ -248,7 +248,7 @@ public class AsyncService {
                 // and the accepted reviewed total increased by 1
                 if (dev.getUsername().equals(mergedBy)) {
                     dev.setReviewed(dev.getReviewed()+1);
-                    dev.setAccepted_reviewed(dev.getAccepted_reviewed() + 1);
+                    dev.setAcceptedReviewed(dev.getAcceptedReviewed() + 1);
                     dev.addPRreviewed(PRnumber);
                     reviewerFound = true;
                 }
@@ -260,9 +260,9 @@ public class AsyncService {
             if ((!userFound && !reviewerFound)&&(mergedBy.equals(userName))){
                     DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                     newDev.setOpened(1);
-                    newDev.setAccepted_opened(1);
+                    newDev.setAcceptedOpened(1);
                     newDev.setReviewed(1);
-                    newDev.setAccepted_reviewed(1);
+                    newDev.setAcceptedReviewed(1);
                     newDev.addPROpened(PRnumber);
                     newDev.addPRreviewed(PRnumber);
                     developerPRRatesList.add(newDev);
@@ -273,7 +273,7 @@ public class AsyncService {
             if (!userFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,userName);
                 newDev.setOpened(1);
-                newDev.setAccepted_opened(1);
+                newDev.setAcceptedOpened(1);
                 newDev.addPROpened(PRnumber);
                 developerPRRatesList.add(newDev);
             }
@@ -281,7 +281,7 @@ public class AsyncService {
             if (!reviewerFound){
                 DeveloperPR newDev = new DeveloperPR(owner,repoName,mergedBy);
                 newDev.setReviewed(1);
-                newDev.setAccepted_reviewed(1);
+                newDev.setAcceptedReviewed(1);
                 newDev.addPRreviewed(PRnumber);
                 developerPRRatesList.add(newDev);
             }
