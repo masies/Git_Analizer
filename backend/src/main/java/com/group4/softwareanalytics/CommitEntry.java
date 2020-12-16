@@ -46,6 +46,7 @@ public class CommitEntry implements Comparable<CommitEntry> {
 
     @Override
     public int compareTo(CommitEntry o) {
+
         return getDate().compareTo(o.getDate());
     }
 

@@ -5,19 +5,19 @@ public class RepoStatus {
     private Boolean fetchedInfo = false;
     private Boolean fetchedIssues = false;
     private Boolean fetchedCommits = false;
-    private Boolean SZZDone = false;
+    private Boolean szzdone = false;
     private Boolean predictionsDone = false;
 
     public RepoStatus() {
         // empty constructor
     }
 
-    public Boolean getSZZDone() {
-        return SZZDone;
+    public Boolean getSzzdone() {
+        return szzdone;
     }
 
-    public void setSZZDone(Boolean SZZDone) {
-        this.SZZDone = SZZDone;
+    public void setSzzdone(Boolean szzdone) {
+        this.szzdone = szzdone;
     }
 
     public Boolean getPredictionsDone() {
