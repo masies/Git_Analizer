@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.List;
 
 @RestController
@@ -35,7 +36,7 @@ public class FileContributionController {
                                           @PathVariable(value="repo") String repo,
                                           HttpServletRequest request){
         String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String path = restOfTheUrl.replace("/api/repo/"+ owner +"/"+ repo +"/tree","");
+        String path = restOfTheUrl.replace("/api/repo/"+ owner + File.separator + repo +"/tree","");
         return fileContributionRepository.findByOwnerAndRepoAndDir(owner,repo,path);
     }
 
