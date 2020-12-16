@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics.fileContribution;
+package com.group4.softwareanalytics.contribution;
 
 
 import org.springframework.data.mongodb.repository.MongoRepository;

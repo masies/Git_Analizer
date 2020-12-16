@@ -91,7 +91,7 @@ public class CommitController {
     Commit getAttr(@PathVariable(value = "owner") String owner,
                    @PathVariable(value = "repoName") String repoName,
                    @PathVariable(value = "commitId") String commitID,
-                   @RequestParam(value = "mode", defaultValue = "quick") String analysisMode) throws IOException {
+                   @RequestParam(value = "mode", defaultValue = "quick") String analysisMode)  {
         Commit commit = commitRepository.findByOwnerAndRepoAndCommitName(owner, repoName, commitID);
         if (!commit.getHasMetrics() || (analysisMode != null && analysisMode.equals("deep"))) {
             List<String> parentCommitIDs = commit.getCommitParentsIDs();

@@ -3,8 +3,8 @@ package com.group4.softwareanalytics;
 
 import com.group4.softwareanalytics.commits.CommitExtractor;
 import com.group4.softwareanalytics.commits.CommitRepository;
-import com.group4.softwareanalytics.fileContribution.FileContribution;
-import com.group4.softwareanalytics.fileContribution.FileContributionRepository;
+import com.group4.softwareanalytics.contribution.FileContribution;
+import com.group4.softwareanalytics.contribution.FileContributionRepository;
 import com.group4.softwareanalytics.repository.Repo;
 import com.group4.softwareanalytics.repository.RepoRepository;
 import org.apache.commons.io.FileUtils;

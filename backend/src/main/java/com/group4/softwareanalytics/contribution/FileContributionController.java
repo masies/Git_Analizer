@@ -1,4 +1,4 @@
-package com.group4.softwareanalytics.fileContribution;
+package com.group4.softwareanalytics.contribution;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

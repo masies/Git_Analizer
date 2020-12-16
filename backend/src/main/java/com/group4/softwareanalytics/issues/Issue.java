@@ -25,8 +25,8 @@ public class Issue {
         return isPR;
     }
 
-    public void setPR(Boolean PR) {
-        isPR = PR;
+    public void setPR(Boolean pr) {
+        isPR = pr;
     }
 
     public String getId() {
